@@ -3823,6 +3823,49 @@ body.dark-mode .list-group-item.active {
   border-color: #0052cc;
 }
 
+/* Dark Mode - Multi-Step Form */
+body.dark-mode .multi-step-form-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .step-number {
+  background: #4b5563;
+  color: #d1d5db;
+}
+
+body.dark-mode .step-indicator.active .step-number {
+  background: #0052cc;
+  color: white;
+}
+
+body.dark-mode .step-label {
+  color: #d1d5db;
+}
+
+body.dark-mode .step-indicator.active .step-label {
+  color: #5b8dee;
+}
+
+body.dark-mode .step-line {
+  background: #4b5563;
+}
+
+body.dark-mode .form-check-input {
+  background: #4b5563;
+  border-color: #4b5563;
+}
+
+body.dark-mode .form-check-input:checked {
+  background: #0052cc;
+  border-color: #0052cc;
+}
+
+body.dark-mode .form-check-label {
+  color: #e5e7eb;
+}
+
 /* Responsive Mobile Dashboard */
 @media (max-width: 768px) {
   .testimonial-card {
