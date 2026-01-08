@@ -3866,6 +3866,40 @@ body.dark-mode .form-check-label {
   color: #e5e7eb;
 }
 
+/* Dark Mode - Compliance & Security Cards */
+body.dark-mode .compliance-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .compliance-card h4 {
+  color: #f9fafb;
+}
+
+body.dark-mode .compliance-card p {
+  color: #d1d5db;
+}
+
+body.dark-mode .cert-badge {
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .cert-badge h6 {
+  color: #f9fafb;
+}
+
+body.dark-mode .cert-badge p {
+  color: #d1d5db;
+}
+
+body.dark-mode .cert-badge:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #5b6d7a 100%);
+  border-color: #5b8dee;
+}
+
 /* Responsive Mobile Dashboard */
 @media (max-width: 768px) {
   .testimonial-card {
