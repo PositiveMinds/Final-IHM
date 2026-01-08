@@ -3973,6 +3973,21 @@ body.dark-mode .contact-method p {
   color: #d1d5db;
 }
 
+/* Dark Mode - How It Works Cards */
+body.dark-mode .step-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .step-card h4 {
+  color: #f9fafb;
+}
+
+body.dark-mode .step-card p {
+  color: #d1d5db;
+}
+
 /* Responsive Mobile Dashboard */
 @media (max-width: 768px) {
   .testimonial-card {
