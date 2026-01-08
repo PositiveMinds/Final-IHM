@@ -26,6 +26,37 @@ window.addEventListener("load", function () {
   document.getElementById("userInitials").textContent = initials;
 });
 
+// ===== SIDEBAR TOGGLE (MOBILE) =====
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebarOverlay");
+
+  sidebar.classList.toggle("active");
+  overlay.classList.toggle("active");
+
+  // Prevent body scroll when sidebar is open
+  if (sidebar.classList.contains("active")) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+}
+
+// Close sidebar when clicking on a menu item
+document.addEventListener("DOMContentLoaded", function () {
+  const sidebarLinks = document.querySelectorAll(".sidebar-menu a");
+  sidebarLinks.forEach((link) => {
+    link.addEventListener("click", function () {
+      // Close sidebar on mobile
+      if (window.innerWidth <= 767) {
+        document.getElementById("sidebar").classList.remove("active");
+        document.getElementById("sidebarOverlay").classList.remove("active");
+        document.body.style.overflow = "";
+      }
+    });
+  });
+});
+
 // ===== SECTION NAVIGATION =====
 function showSection(sectionId, event) {
   if (event) {
