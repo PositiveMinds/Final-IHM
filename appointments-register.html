@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Registration</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .form-container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            display: none;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-links a {
+            margin: 0 10px;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Appointment Registration</h1>
+        <div class="success-message" id="successMessage"></div>
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="appointmentForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="patientId">Patient ID</label>
+                    <input type="text" id="patientId" name="patientId" required placeholder="e.g., PAT1001">
+                </div>
+                <div class="form-group">
+                    <label for="facilityIdCode">Facility ID</label>
+                    <input type="text" id="facilityIdCode" name="facilityIdCode" required placeholder="e.g., facility-kampala-001">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="patientName">Patient Name</label>
+                <input type="text" id="patientName" name="patientName" required placeholder="Full name">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="appointmentDate">Appointment Date</label>
+                    <input type="date" id="appointmentDate" name="appointmentDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentTime">Appointment Time</label>
+                    <input type="time" id="appointmentTime" name="appointmentTime" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lastAppointment">Last Appointment Date</label>
+                    <input type="date" id="lastAppointment" name="lastAppointment">
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Completed">Completed</option>
+                        <option value="No-Show">No-Show</option>
+                        <option value="Rescheduled">Rescheduled</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="primaryCondition">Primary Condition</label>
+                    <select id="primaryCondition" name="primaryCondition" required>
+                        <option value="">Select Condition</option>
+                        <option value="HIV">HIV</option>
+                        <option value="Diabetes">Diabetes</option>
+                        <option value="Hypertension">Hypertension</option>
+                        <option value="Maternal Health">Maternal Health</option>
+                        <option value="Mixed (HIV+Diabetes)">Mixed (HIV+Diabetes)</option>
+                        <option value="Asthma">Asthma</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="facility">Facility Name</label>
+                    <input type="text" id="facility" name="facility" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" placeholder="Additional notes about the appointment"></textarea>
+            </div>
+            
+            <button type="submit">Schedule Appointment</button>
+        </form>
+        
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="patients-register.html">Patient Registration</a>
+            <a href="facilities-register.html">Facility Registration</a>
+            <a href="patients.html">View Patients</a>
+        </div>
+    </div>
+    
+    <script src="supabase-config.js"></script>
+    <script>
+        const appointmentForm = document.getElementById('appointmentForm');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        appointmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const appointmentData = {
+                patient_id: document.getElementById('patientId').value,
+                patient_name: document.getElementById('patientName').value,
+                appointment_date: document.getElementById('appointmentDate').value,
+                appointment_time: document.getElementById('appointmentTime').value,
+                last_appointment: document.getElementById('lastAppointment').value || null,
+                status: document.getElementById('status').value,
+                primary_condition: document.getElementById('primaryCondition').value,
+                facility: document.getElementById('facility').value,
+                facility_id_code: document.getElementById('facilityIdCode').value,
+                notes: document.getElementById('notes').value || null
+            };
+            
+            try {
+                // Verify patient exists
+                const { data: patientData, error: patientError } = await supabase
+                    .from('patients')
+                    .select('id')
+                    .eq('patient_id', appointmentData.patient_id)
+                    .single();
+                
+                if (patientError && patientError.code !== 'PGRST116') {
+                    throw new Error('Patient not found or error checking patient');
+                }
+                
+                // Get facility ID
+                const { data: facilityData, error: facilityError } = await supabase
+                    .from('facilities')
+                    .select('id')
+                    .eq('facility_id', appointmentData.facility_id_code)
+                    .single();
+                
+                if (facilityError && facilityError.code !== 'PGRST116') {
+                    throw facilityError;
+                }
+                
+                appointmentData.facility_id = facilityData?.id || null;
+                
+                const { data, error } = await supabase
+                    .from('appointments')
+                    .insert([appointmentData])
+                    .select();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                successMessage.textContent = 'Appointment scheduled successfully!';
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+                appointmentForm.reset();
+                
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

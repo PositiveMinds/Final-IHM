@@ -1,51 +1,82 @@
-Patient_ID,Full_Name,Age,Gender,Phone,Email,Facility,Primary_Condition,Last_Appointment,Next_Appointment,Appointment_Time,Status,Notes,Region,ART_Adherence_Percent,Viral_Load_Status
-PAT1001,James Okoro,42,M,+256712345678,james.okoro@email.com,Kampala Regional Referral Hospital,HIV,2025-11-15,2026-01-10,09:00 AM,Scheduled,Stable condition,Kampala,95%,Undetectable
-PAT1002,Mary Mugisha,38,F,+256787654321,mary.mugisha@email.com,Fort Portal Regional Referral Hospital,Diabetes,2025-10-20,2026-01-15,10:30 AM,Confirmed,Needs follow-up lab tests,Fort Portal,N/A,N/A
-PAT1003,John Okonkwo,55,M,+256701234567,john.okonkwo@email.com,Mbarara Regional Referral Hospital,Hypertension,2025-11-08,2026-01-22,02:00 PM,Scheduled,BP monitoring needed,Mbarara,N/A,N/A
-PAT1004,Grace Kamau,29,F,+256765432109,grace.kamau@email.com,Jinja Regional Referral Hospital,Maternal Health,2025-11-20,2026-01-08,03:30 PM,Confirmed,Stable condition,Jinja,N/A,N/A
-PAT1005,Peter Adeyemi,51,M,+256778123456,peter.adeyemi@email.com,Arua Regional Referral Hospital,Mixed (HIV+Diabetes),2025-10-15,2026-01-18,09:00 AM,No-Show,Medication adjustment required,Arua,87%,Low
-PAT1006,Anna Nkosi,35,F,+256702567890,anna.nkosi@email.com,Masaka District Hospital,HIV,2025-11-10,2026-01-25,11:00 AM,Completed,Viral suppression achieved,Masaka,98%,Undetectable
-PAT1007,David Mwangi,47,M,+256716789012,david.mwangi@email.com,Soroti Regional Referral Hospital,Asthma,2025-11-01,2026-01-12,10:30 AM,Rescheduled,Patient reports improvement,Soroti,N/A,N/A
-PAT1008,Sarah Mensah,33,F,+256789345678,sarah.mensah@email.com,Mulago National Referral Hospital,Diabetes,2025-10-25,2026-01-20,02:00 PM,Scheduled,Needs follow-up lab tests,Kampala,N/A,N/A
-PAT1009,Michael Kaunda,58,M,+256705432109,michael.kaunda@email.com,Fort Portal Health Center IV,Hypertension,2025-11-05,2026-01-28,09:00 AM,Confirmed,BP monitoring needed,Fort Portal,N/A,N/A
-PAT1010,Rebecca Banda,41,F,+256717890123,rebecca.banda@email.com,Mbarara Referral Hospital,HIV,2025-11-12,2026-01-05,03:30 PM,Scheduled,Stable condition,Mbarara,92%,Undetectable
-PAT1011,Henry Kibaki,60,M,+256704567890,henry.kibaki@email.com,Jinja Medical Center,Diabetes,2025-10-28,2026-01-19,10:30 AM,Completed,Medication adjustment required,Jinja,N/A,N/A
-PAT1012,Linda Nyerere,36,F,+256718234567,linda.nyerere@email.com,Arua Health Center III,Mixed (HIV+Diabetes),2025-11-08,2026-01-15,02:00 PM,No-Show,Requires counseling,Arua,81%,Moderate
-PAT1013,Charles Mandela,52,M,+256703456789,charles.mandela@email.com,Masaka Referral Hospital,HIV,2025-10-30,2026-01-22,09:00 AM,Scheduled,Viral suppression achieved,Masaka,96%,Undetectable
-PAT1014,Alice Dlamini,39,F,+256719456789,alice.dlamini@email.com,Soroti Health Center IV,Asthma,2025-11-02,2026-01-14,11:00 AM,Confirmed,Patient reports improvement,Soroti,N/A,N/A
-PAT1015,Robert Achieng,45,M,+256706789012,robert.achieng@email.com,Kampala Central Hospital,Maternal Health,2025-11-18,2026-01-11,03:30 PM,Rescheduled,Stable condition,Kampala,N/A,N/A
-PAT1016,Jane Obi,31,F,+256715678901,jane.obi@email.com,Fort Portal Medical Center,HIV,2025-11-09,2026-01-26,09:00 AM,Scheduled,Needs follow-up lab tests,Fort Portal,89%,Low
-PAT1017,Paul Senghor,56,M,+256708901234,paul.senghor@email.com,Mbarara Health Center IV,Hypertension,2025-10-22,2026-01-17,02:00 PM,Completed,BP monitoring needed,Mbarara,N/A,N/A
-PAT1018,Elizabeth Kenyatta,42,F,+256716234567,elizabeth.kenyatta@email.com,Jinja District Hospital,Diabetes,2025-11-03,2026-01-24,10:30 AM,Confirmed,Medication adjustment required,Jinja,N/A,N/A
-PAT1019,Joseph Habyarimana,48,M,+256707123456,joseph.habyarimana@email.com,Arua Referral Hospital,Mixed (HIV+Diabetes),2025-11-06,2026-01-20,11:00 AM,Scheduled,Stable condition,Arua,94%,Undetectable
-PAT1020,Margaret Chiluba,37,F,+256720123456,margaret.chiluba@email.com,Masaka Health Center IV,HIV,2025-10-18,2026-01-23,03:30 PM,No-Show,Viral suppression achieved,Masaka,85%,Low
-PAT1021,Thomas Kwame,54,M,+256709234567,thomas.kwame@email.com,Soroti Medical Center,Asthma,2025-11-04,2026-01-16,09:00 AM,Scheduled,Patient reports improvement,Soroti,N/A,N/A
-PAT1022,Victoria Mensah,40,F,+256721234567,victoria.mensah@email.com,Kampala Specialized Hospital,Diabetes,2025-10-26,2026-01-19,02:00 PM,Confirmed,Needs follow-up lab tests,Kampala,N/A,N/A
-PAT1023,William Adepoju,59,M,+256710345678,william.adepoju@email.com,Fort Portal District Hospital,Hypertension,2025-11-11,2026-01-27,10:30 AM,Completed,BP monitoring needed,Fort Portal,N/A,N/A
-PAT1024,Diana Akosua,34,F,+256722345678,diana.akosua@email.com,Mbarara Medical Center,HIV,2025-11-07,2026-01-12,11:00 AM,Rescheduled,Medication adjustment required,Mbarara,91%,Undetectable
-PAT1025,Kenneth Boateng,49,M,+256711456789,kenneth.boateng@email.com,Jinja Referral Hospital,Maternal Health,2025-10-29,2026-01-21,03:30 PM,Scheduled,Stable condition,Jinja,N/A,N/A
-PAT1026,Patricia Quartey,36,F,+256723456789,patricia.quartey@email.com,Arua Health Center IV,Mixed (HIV+Diabetes),2025-11-14,2026-01-09,09:00 AM,Confirmed,Viral suppression achieved,Arua,88%,Undetectable
-PAT1027,George Osei,53,M,+256712567890,george.osei@email.com,Masaka District Hospital,HIV,2025-10-31,2026-01-25,02:00 PM,No-Show,Needs follow-up lab tests,Masaka,83%,Moderate
-PAT1028,Helen Ansah,38,F,+256724567890,helen.ansah@email.com,Soroti District Hospital,Diabetes,2025-11-16,2026-01-13,10:30 AM,Scheduled,Patient reports improvement,Soroti,N/A,N/A
-PAT1029,Samuel Agyeman,46,M,+256713678901,samuel.agyeman@email.com,Kampala Medical Center,Hypertension,2025-10-19,2026-01-28,11:00 AM,Completed,BP monitoring needed,Kampala,N/A,N/A
-PAT1030,Caroline Asiedu,43,F,+256725678901,caroline.asiedu@email.com,Fort Portal Referral Hospital,HIV,2025-11-13,2026-01-18,03:30 PM,Scheduled,Stable condition,Fort Portal,97%,Undetectable
-PAT1031,Richard Boakye,57,M,+256714789012,richard.boakye@email.com,Mbarara District Hospital,Asthma,2025-10-23,2026-01-22,09:00 AM,Confirmed,Medication adjustment required,Mbarara,N/A,N/A
-PAT1032,Sylvia Yeboah,35,F,+256726789012,sylvia.yeboah@email.com,Jinja Health Center IV,Maternal Health,2025-11-17,2026-01-10,02:00 PM,Rescheduled,Viral suppression achieved,Jinja,N/A,N/A
-PAT1033,Anthony Anane,50,M,+256715890123,anthony.anane@email.com,Arua Medical Center,Mixed (HIV+Diabetes),2025-10-27,2026-01-25,10:30 AM,No-Show,Needs follow-up lab tests,Arua,86%,Low
-PAT1034,Beatrice Mensah,32,F,+256727890123,beatrice.mensah@email.com,Masaka Medical Center,HIV,2025-11-09,2026-01-19,11:00 AM,Scheduled,Patient reports improvement,Masaka,90%,Undetectable
-PAT1035,Christopher Owusu,55,M,+256716901234,christopher.owusu@email.com,Soroti Health Center III,Diabetes,2025-10-21,2026-01-24,03:30 PM,Completed,BP monitoring needed,Soroti,N/A,N/A
-PAT1036,Judith Afara,44,F,+256728901234,judith.afara@email.com,Kampala Health Center IV,Hypertension,2025-11-06,2026-01-16,09:00 AM,Confirmed,Stable condition,Kampala,N/A,N/A
-PAT1037,Daniel Sarpong,48,M,+256717012345,daniel.sarpong@email.com,Fort Portal Health Center III,HIV,2025-10-24,2026-01-21,02:00 PM,Scheduled,Medication adjustment required,Fort Portal,84%,Moderate
-PAT1038,Evelyn Arhin,37,F,+256729012345,evelyn.arhin@email.com,Mbarara Referral Hospital,Mixed (HIV+Diabetes),2025-11-12,2026-01-14,10:30 AM,Rescheduled,Viral suppression achieved,Mbarara,93%,Undetectable
-PAT1039,Edward Sowa,61,M,+256718123456,edward.sowa@email.com,Jinja Medical Center,Asthma,2025-10-28,2026-01-23,11:00 AM,No-Show,Needs follow-up lab tests,Jinja,N/A,N/A
-PAT1040,Frances Nyarko,33,F,+256730123456,frances.nyarko@email.com,Arua District Hospital,Maternal Health,2025-11-19,2026-01-08,03:30 PM,Scheduled,Patient reports improvement,Arua,N/A,N/A
-PAT1041,Gregory Nti,52,M,+256719234567,gregory.nti@email.com,Masaka Referral Hospital,HIV,2025-11-01,2026-01-20,09:00 AM,Confirmed,BP monitoring needed,Masaka,99%,Undetectable
-PAT1042,Harriet Adarkwa,40,F,+256731234567,harriet.adarkwa@email.com,Soroti Referral Hospital,Diabetes,2025-10-16,2026-01-27,02:00 PM,Completed,Stable condition,Soroti,N/A,N/A
-PAT1043,Isaac Armah,56,M,+256720345678,isaac.armah@email.com,Kampala National Hospital,Hypertension,2025-11-10,2026-01-15,10:30 AM,Scheduled,Medication adjustment required,Kampala,N/A,N/A
-PAT1044,Iris Boateng,31,F,+256732345678,iris.boateng@email.com,Fort Portal Medical Center,Mixed (HIV+Diabetes),2025-10-30,2026-01-18,11:00 AM,Rescheduled,Viral suppression achieved,Fort Portal,80%,Low
-PAT1045,Jabari Mensah,47,M,+256721456789,jabari.mensah@email.com,Mbarara Health Center III,HIV,2025-11-14,2026-01-25,03:30 PM,No-Show,Needs follow-up lab tests,Mbarara,82%,Moderate
-PAT1046,Kayley Quartey,39,F,+256733456789,kayley.quartey@email.com,Jinja District Hospital,Asthma,2025-10-25,2026-01-22,09:00 AM,Scheduled,Patient reports improvement,Jinja,N/A,N/A
-PAT1047,Leroy Boakye,54,M,+256722567890,leroy.boakye@email.com,Arua Referral Hospital,Maternal Health,2025-11-08,2026-01-11,02:00 PM,Confirmed,BP monitoring needed,Arua,N/A,N/A
-PAT1048,Miriam Asiedu,36,F,+256734567890,miriam.asiedu@email.com,Masaka Health Center III,HIV,2025-10-20,2026-01-28,10:30 AM,Completed,Stable condition,Masaka,88%,Undetectable
-PAT1049,Nathan Anane,59,M,+256723678901,nathan.anane@email.com,Soroti Medical Center,Diabetes,2025-11-03,2026-01-19,11:00 AM,Scheduled,Medication adjustment required,Soroti,N/A,N/A
-PAT1050,Olivia Yeboah,42,F,+256735678901,olivia.yeboah@email.com,Kampala Referral Hospital,Mixed (HIV+Diabetes),2025-10-27,2026-01-24,03:30 PM,Rescheduled,Viral suppression achieved,Kampala,96%,Undetectable
+Patient_ID,Full_Name,Age,Gender,Phone,Email,Facility,Facility_Id,Primary_Condition,Last_Appointment,Next_Appointment,Appointment_Time,Status,Notes,Region,ART_Adherence_Percent,Viral_Load_Status
+PAT1001,James Okoro,42,M,256712345678,james.okoro@email.com,Kampala Regional Referral Hospital,facility-kampala-001,HIV,15/11/2025,10/01/2026,9:00 AM,Scheduled,Stable condition,Kampala,95%,Undetectable
+PAT1002,Mary Mugisha,38,F,256787654321,mary.mugisha@email.com,Fort Portal Regional Referral Hospital,facility-fortportal-001,Diabetes,20/10/2025,15/01/2026,10:30 AM,Confirmed,Needs follow-up lab tests,Fort Portal,N/A,N/A
+PAT1003,John Okonkwo,55,M,256701234567,john.okonkwo@email.com,Mbarara Regional Referral Hospital,facility-mbarara-001,Hypertension,08/11/2025,22/01/2026,2:00 PM,Scheduled,BP monitoring needed,Mbarara,N/A,N/A
+PAT1004,Grace Kamau,29,F,256765432109,grace.kamau@email.com,Jinja Regional Referral Hospital,facility-jinja-001,Maternal Health,20/11/2025,08/01/2026,3:30 PM,Confirmed,Stable condition,Jinja,N/A,N/A
+PAT1005,Peter Adeyemi,51,M,256778123456,peter.adeyemi@email.com,Arua Regional Referral Hospital,facility-arua-001,Mixed (HIV+Diabetes),15/10/2025,18/01/2026,9:00 AM,No-Show,Medication adjustment required,Arua,87%,Low
+PAT1006,Anna Nkosi,35,F,256702567890,anna.nkosi@email.com,Masaka District Hospital,facility-masaka-001,HIV,10/11/2025,25/01/2026,11:00 AM,Completed,Viral suppression achieved,Masaka,98%,Undetectable
+PAT1007,David Mwangi,47,M,256716789012,david.mwangi@email.com,Soroti Regional Referral Hospital,facility-soroti-001,Asthma,01/11/2025,12/01/2026,10:30 AM,Rescheduled,Patient reports improvement,Soroti,N/A,N/A
+PAT1008,Sarah Mensah,33,F,256789345678,sarah.mensah@email.com,Mulago National Referral Hospital,facility-kampala-002,Diabetes,25/10/2025,20/01/2026,2:00 PM,Scheduled,Needs follow-up lab tests,Kampala,N/A,N/A
+PAT1009,Michael Kaunda,58,M,256705432109,michael.kaunda@email.com,Fort Portal Health Center IV,facility-fortportal-002,Hypertension,05/11/2025,28/01/2026,9:00 AM,Confirmed,BP monitoring needed,Fort Portal,N/A,N/A
+PAT1010,Rebecca Banda,41,F,256717890123,rebecca.banda@email.com,Mbarara Referral Hospital,facility-mbarara-002,HIV,12/11/2025,05/01/2026,3:30 PM,Scheduled,Stable condition,Mbarara,92%,Undetectable
+PAT1011,Henry Kibaki,60,M,256704567890,henry.kibaki@email.com,Jinja Medical Center,facility-jinja-002,Diabetes,28/10/2025,19/01/2026,10:30 AM,Completed,Medication adjustment required,Jinja,N/A,N/A
+PAT1012,Linda Nyerere,36,F,256718234567,linda.nyerere@email.com,Arua Health Center III,facility-arua-002,Mixed (HIV+Diabetes),08/11/2025,15/01/2026,2:00 PM,No-Show,Requires counseling,Arua,81%,Moderate
+PAT1013,Charles Mandela,52,M,256703456789,charles.mandela@email.com,Masaka Referral Hospital,facility-masaka-002,HIV,30/10/2025,22/01/2026,9:00 AM,Scheduled,Viral suppression achieved,Masaka,96%,Undetectable
+PAT1014,Alice Dlamini,39,F,256719456789,alice.dlamini@email.com,Soroti Health Center IV,facility-soroti-002,Asthma,02/11/2025,14/01/2026,11:00 AM,Confirmed,Patient reports improvement,Soroti,N/A,N/A
+PAT1015,Robert Achieng,45,M,256706789012,robert.achieng@email.com,Kampala Central Hospital,facility-kampala-003,Maternal Health,18/11/2025,11/01/2026,3:30 PM,Rescheduled,Stable condition,Kampala,N/A,N/A
+PAT1016,Jane Obi,31,F,256715678901,jane.obi@email.com,Fort Portal Medical Center,facility-fortportal-003,HIV,09/11/2025,26/01/2026,9:00 AM,Scheduled,Needs follow-up lab tests,Fort Portal,89%,Low
+PAT1017,Paul Senghor,56,M,256708901234,paul.senghor@email.com,Mbarara Health Center IV,facility-mbarara-003,Hypertension,22/10/2025,17/01/2026,2:00 PM,Completed,BP monitoring needed,Mbarara,N/A,N/A
+PAT1018,Elizabeth Kenyatta,42,F,256716234567,elizabeth.kenyatta@email.com,Jinja District Hospital,facility-jinja-003,Diabetes,03/11/2025,24/01/2026,10:30 AM,Confirmed,Medication adjustment required,Jinja,N/A,N/A
+PAT1019,Joseph Habyarimana,48,M,256707123456,joseph.habyarimana@email.com,Arua Referral Hospital,facility-arua-003,Mixed (HIV+Diabetes),06/11/2025,20/01/2026,11:00 AM,Scheduled,Stable condition,Arua,94%,Undetectable
+PAT1020,Margaret Chiluba,37,F,256720123456,margaret.chiluba@email.com,Masaka Health Center IV,facility-masaka-003,HIV,18/10/2025,23/01/2026,3:30 PM,No-Show,Viral suppression achieved,Masaka,85%,Low
+PAT1021,Thomas Kwame,54,M,256709234567,thomas.kwame@email.com,Soroti Medical Center,facility-soroti-003,Asthma,04/11/2025,16/01/2026,9:00 AM,Scheduled,Patient reports improvement,Soroti,N/A,N/A
+PAT1022,Victoria Mensah,40,F,256721234567,victoria.mensah@email.com,Kampala Specialized Hospital,facility-kampala-004,Diabetes,26/10/2025,19/01/2026,2:00 PM,Confirmed,Needs follow-up lab tests,Kampala,N/A,N/A
+PAT1023,William Adepoju,59,M,256710345678,william.adepoju@email.com,Fort Portal District Hospital,facility-fortportal-004,Hypertension,11/11/2025,27/01/2026,10:30 AM,Completed,BP monitoring needed,Fort Portal,N/A,N/A
+PAT1024,Diana Akosua,34,F,256722345678,diana.akosua@email.com,Mbarara Medical Center,facility-mbarara-004,HIV,07/11/2025,12/01/2026,11:00 AM,Rescheduled,Medication adjustment required,Mbarara,91%,Undetectable
+PAT1025,Kenneth Boateng,49,M,256711456789,kenneth.boateng@email.com,Jinja Referral Hospital,facility-jinja-004,Maternal Health,29/10/2025,21/01/2026,3:30 PM,Scheduled,Stable condition,Jinja,N/A,N/A
+PAT1026,Patricia Quartey,36,F,256723456789,patricia.quartey@email.com,Arua Health Center IV,facility-arua-004,Mixed (HIV+Diabetes),14/11/2025,09/01/2026,9:00 AM,Confirmed,Viral suppression achieved,Arua,88%,Undetectable
+PAT1027,George Osei,53,M,256712567890,george.osei@email.com,Masaka District Hospital,facility-masaka-004,HIV,31/10/2025,25/01/2026,2:00 PM,No-Show,Needs follow-up lab tests,Masaka,83%,Moderate
+PAT1028,Helen Ansah,38,F,256724567890,helen.ansah@email.com,Soroti District Hospital,facility-soroti-004,Diabetes,16/11/2025,13/01/2026,10:30 AM,Scheduled,Patient reports improvement,Soroti,N/A,N/A
+PAT1029,Samuel Agyeman,46,M,256713678901,samuel.agyeman@email.com,Kampala Medical Center,facility-kampala-005,Hypertension,19/10/2025,28/01/2026,11:00 AM,Completed,BP monitoring needed,Kampala,N/A,N/A
+PAT1030,Caroline Asiedu,43,F,256725678901,caroline.asiedu@email.com,Fort Portal Referral Hospital,facility-fortportal-005,HIV,13/11/2025,18/01/2026,3:30 PM,Scheduled,Stable condition,Fort Portal,97%,Undetectable
+PAT1031,Richard Boakye,57,M,256714789012,richard.boakye@email.com,Mbarara District Hospital,facility-mbarara-005,Asthma,23/10/2025,22/01/2026,9:00 AM,Confirmed,Medication adjustment required,Mbarara,N/A,N/A
+PAT1032,Sylvia Yeboah,35,F,256726789012,sylvia.yeboah@email.com,Jinja Health Center IV,facility-jinja-005,Maternal Health,17/11/2025,10/01/2026,2:00 PM,Rescheduled,Viral suppression achieved,Jinja,N/A,N/A
+PAT1033,Anthony Anane,50,M,256715890123,anthony.anane@email.com,Arua Medical Center,facility-arua-005,Mixed (HIV+Diabetes),27/10/2025,25/01/2026,10:30 AM,No-Show,Needs follow-up lab tests,Arua,86%,Low
+PAT1034,Beatrice Mensah,32,F,256727890123,beatrice.mensah@email.com,Masaka Medical Center,facility-masaka-005,HIV,09/11/2025,19/01/2026,11:00 AM,Scheduled,Patient reports improvement,Masaka,90%,Undetectable
+PAT1035,Christopher Owusu,55,M,256716901234,christopher.owusu@email.com,Soroti Health Center III,facility-soroti-005,Diabetes,21/10/2025,24/01/2026,3:30 PM,Completed,BP monitoring needed,Soroti,N/A,N/A
+PAT1036,Judith Afara,44,F,256728901234,judith.afara@email.com,Kampala Health Center IV,facility-kampala-006,Hypertension,06/11/2025,16/01/2026,9:00 AM,Confirmed,Stable condition,Kampala,N/A,N/A
+PAT1037,Daniel Sarpong,48,M,256717012345,daniel.sarpong@email.com,Fort Portal Health Center III,facility-fortportal-006,HIV,24/10/2025,21/01/2026,2:00 PM,Scheduled,Medication adjustment required,Fort Portal,84%,Moderate
+PAT1038,Evelyn Arhin,37,F,256729012345,evelyn.arhin@email.com,Mbarara Referral Hospital,facility-mbarara-006,Mixed (HIV+Diabetes),12/11/2025,14/01/2026,10:30 AM,Rescheduled,Viral suppression achieved,Mbarara,93%,Undetectable
+PAT1039,Edward Sowa,61,M,256718123456,edward.sowa@email.com,Jinja Medical Center,facility-jinja-006,Asthma,28/10/2025,23/01/2026,11:00 AM,No-Show,Needs follow-up lab tests,Jinja,N/A,N/A
+PAT1040,Frances Nyarko,33,F,256730123456,frances.nyarko@email.com,Arua District Hospital,facility-arua-006,Maternal Health,19/11/2025,08/01/2026,3:30 PM,Scheduled,Patient reports improvement,Arua,N/A,N/A
+PAT1041,Gregory Nti,52,M,256719234567,gregory.nti@email.com,Masaka Referral Hospital,facility-masaka-006,HIV,01/11/2025,20/01/2026,9:00 AM,Confirmed,BP monitoring needed,Masaka,99%,Undetectable
+PAT1042,Harriet Adarkwa,40,F,256731234567,harriet.adarkwa@email.com,Soroti Referral Hospital,facility-soroti-006,Diabetes,16/10/2025,27/01/2026,2:00 PM,Completed,Stable condition,Soroti,N/A,N/A
+PAT1043,Isaac Armah,56,M,256720345678,isaac.armah@email.com,Kampala National Hospital,facility-kampala-007,Hypertension,10/11/2025,15/01/2026,10:30 AM,Scheduled,Medication adjustment required,Kampala,N/A,N/A
+PAT1044,Iris Boateng,31,F,256732345678,iris.boateng@email.com,Fort Portal Medical Center,facility-fortportal-007,Mixed (HIV+Diabetes),30/10/2025,18/01/2026,11:00 AM,Rescheduled,Viral suppression achieved,Fort Portal,80%,Low
+PAT1045,Jabari Mensah,47,M,256721456789,jabari.mensah@email.com,Mbarara Health Center III,facility-mbarara-007,HIV,14/11/2025,25/01/2026,3:30 PM,No-Show,Needs follow-up lab tests,Mbarara,82%,Moderate
+PAT1046,Kayley Quartey,39,F,256733456789,kayley.quartey@email.com,Jinja District Hospital,facility-jinja-007,Asthma,25/10/2025,22/01/2026,9:00 AM,Scheduled,Patient reports improvement,Jinja,N/A,N/A
+PAT1047,Leroy Boakye,54,M,256722567890,leroy.boakye@email.com,Arua Referral Hospital,facility-arua-007,Maternal Health,08/11/2025,11/01/2026,2:00 PM,Confirmed,BP monitoring needed,Arua,N/A,N/A
+PAT1048,Miriam Asiedu,36,F,256734567890,miriam.asiedu@email.com,Masaka Health Center III,facility-masaka-007,HIV,20/10/2025,28/01/2026,10:30 AM,Completed,Stable condition,Masaka,88%,Undetectable
+PAT1049,Nathan Anane,59,M,256723678901,nathan.anane@email.com,Soroti Medical Center,facility-soroti-007,Diabetes,03/11/2025,19/01/2026,11:00 AM,Scheduled,Medication adjustment required,Soroti,N/A,N/A
+PAT1050,Olivia Yeboah,42,F,256735678901,olivia.yeboah@email.com,Kampala Referral Hospital,facility-kampala-008,Mixed (HIV+Diabetes),27/10/2025,24/01/2026,3:30 PM,Rescheduled,Viral suppression achieved,Kampala,96%,Undetectable
+
+PAT1051,Steven Ackah,44,M,256736789012,steven.ackah@email.com,Fort Portal Referral Hospital,facility-fortportal-008,HIV,11/11/2025,17/01/2026,9:00 AM,Scheduled,Stable condition,Fort Portal,91%,Undetectable
+PAT1052,Theresa Addai,38,F,256724789012,theresa.addai@email.com,Mbarara Referral Hospital,facility-mbarara-008,Hypertension,05/11/2025,26/01/2026,2:00 PM,Confirmed,BP monitoring needed,Mbarara,N/A,N/A
+PAT1053,Uriel Agbo,58,M,256737890123,uriel.agbo@email.com,Jinja Referral Hospital,facility-jinja-008,Diabetes,22/10/2025,23/01/2026,10:30 AM,No-Show,Needs follow-up lab tests,Jinja,N/A,N/A
+PAT1054,Yvonne Akyeampong,35,F,256725890123,yvonne.akyeampong@email.com,Arua Medical Center,facility-arua-008,Mixed (HIV+Diabetes),16/11/2025,13/01/2026,11:00 AM,Completed,Viral suppression achieved,Arua,87%,Undetectable
+PAT1055,Zachary Amartey,51,M,256738901234,zachary.amartey@email.com,Masaka Referral Hospital,facility-masaka-008,HIV,02/11/2025,29/01/2026,3:30 PM,Scheduled,Patient reports improvement,Masaka,94%,Undetectable
+PAT1056,Abigail Ansah,41,F,256726901234,abigail.ansah@email.com,Soroti Health Center IV,facility-soroti-008,Asthma,13/11/2025,21/01/2026,9:00 AM,Confirmed,Medication adjustment required,Soroti,N/A,N/A
+PAT1057,Benjamin Asmah,46,M,256739012345,benjamin.asmah@email.com,Kampala Health Center IV,facility-kampala-009,Maternal Health,18/10/2025,25/01/2026,2:00 PM,Rescheduled,BP monitoring needed,Kampala,N/A,N/A
+PAT1058,Charlotte Asuah,37,F,256727012345,charlotte.asuah@email.com,Fort Portal District Hospital,facility-fortportal-009,HIV,24/11/2025,07/01/2026,10:30 AM,No-Show,Stable condition,Fort Portal,85%,Low
+PAT1059,Douglas Asiamah,53,M,256740123456,douglas.asiamah@email.com,Mbarara Medical Center,facility-mbarara-009,Hypertension,06/11/2025,20/01/2026,11:00 AM,Scheduled,Medication adjustment required,Mbarara,N/A,N/A
+PAT1060,Emma Asiedu,29,F,256728123456,emma.asiedu@email.com,Jinja Health Center IV,facility-jinja-009,Mixed (HIV+Diabetes),11/11/2025,14/01/2026,3:30 PM,Completed,Viral suppression achieved,Jinja,90%,Undetectable
+PAT1061,Felix Atieno,55,M,256741234567,felix.atieno@email.com,Arua Referral Hospital,facility-arua-009,Diabetes,28/10/2025,22/01/2026,9:00 AM,Confirmed,Needs follow-up lab tests,Arua,N/A,N/A
+PAT1062,Gloria Attakora,43,F,256729234567,gloria.attakora@email.com,Masaka District Hospital,facility-masaka-009,HIV,19/11/2025,16/01/2026,2:00 PM,Rescheduled,Patient reports improvement,Masaka,89%,Undetectable
+PAT1063,Harold Ava,49,M,256742345678,harold.ava@email.com,Soroti Referral Hospital,facility-soroti-009,Asthma,04/11/2025,27/01/2026,10:30 AM,No-Show,BP monitoring needed,Soroti,N/A,N/A
+PAT1064,Iris Awuah,32,F,256730345678,iris.awuah@email.com,Kampala Medical Center,facility-kampala-010,Maternal Health,21/10/2025,30/01/2026,11:00 AM,Scheduled,Stable condition,Kampala,N/A,N/A
+PAT1065,Jerome Ayensu,57,M,256743456789,jerome.ayensu@email.com,Fort Portal Medical Center,facility-fortportal-010,Mixed (HIV+Diabetes),15/11/2025,12/01/2026,3:30 PM,Completed,Viral suppression achieved,Fort Portal,92%,Undetectable
+PAT1066,Karen Ayesha,40,F,256731456789,karen.ayesha@email.com,Mbarara Health Center IV,facility-mbarara-010,HIV,09/11/2025,19/01/2026,9:00 AM,Scheduled,Medication adjustment required,Mbarara,88%,Undetectable
+PAT1067,Leonard Baah,52,M,256744567890,leonard.baah@email.com,Jinja Medical Center,facility-jinja-010,Hypertension,31/10/2025,24/01/2026,2:00 PM,Confirmed,Needs follow-up lab tests,Jinja,N/A,N/A
+PAT1068,Lydia Baiden,36,F,256732567890,lydia.baiden@email.com,Arua Health Center III,facility-arua-010,Diabetes,14/11/2025,11/01/2026,10:30 AM,No-Show,Patient reports improvement,Arua,N/A,N/A
+PAT1069,Marcus Bailey,48,M,256745678901,marcus.bailey@email.com,Masaka Referral Hospital,facility-masaka-010,Mixed (HIV+Diabetes),23/10/2025,21/01/2026,11:00 AM,Rescheduled,BP monitoring needed,Masaka,86%,Moderate
+PAT1070,Naomi Baird,34,F,256733678901,naomi.baird@email.com,Soroti Medical Center,facility-soroti-010,HIV,17/11/2025,15/01/2026,3:30 PM,Completed,Viral suppression achieved,Soroti,87%,Undetectable
+PAT1071,Obadiah Baker,61,M,256746789012,obadiah.baker@email.com,Kampala Specialized Hospital,facility-kampala-011,Asthma,07/11/2025,23/01/2026,9:00 AM,Scheduled,Stable condition,Kampala,N/A,N/A
+PAT1072,Ophelia Baldwin,39,F,256734789012,ophelia.baldwin@email.com,Fort Portal Health Center IV,facility-fortportal-011,Maternal Health,12/11/2025,17/01/2026,2:00 PM,Confirmed,Medication adjustment required,Fort Portal,N/A,N/A
+PAT1073,Percival Banda,50,M,256747890123,percival.banda@email.com,Mbarara District Hospital,facility-mbarara-011,HIV,20/10/2025,28/01/2026,10:30 AM,No-Show,Needs follow-up lab tests,Mbarara,83%,Low
+PAT1074,Priscilla Banks,44,F,256735890123,priscilla.banks@email.com,Jinja District Hospital,facility-jinja-011,Mixed (HIV+Diabetes),29/10/2025,20/01/2026,11:00 AM,Rescheduled,Patient reports improvement,Jinja,91%,Undetectable
+PAT1075,Quincy Bannerman,56,M,256748901234,quincy.bannerman@email.com,Arua Medical Center,facility-arua-011,Hypertension,11/11/2025,25/01/2026,3:30 PM,Completed,BP monitoring needed,Arua,N/A,N/A
+PAT1076,Rachel Barrera,31,F,256736901234,rachel.barrera@email.com,Masaka Health Center IV,facility-masaka-011,HIV,25/10/2025,19/01/2026,9:00 AM,Scheduled,Viral suppression achieved,Masaka,95%,Undetectable
+PAT1077,Raymond Barros,47,M,256749012345,raymond.barros@email.com,Soroti District Hospital,facility-soroti-011,Diabetes,16/11/2025,22/01/2026,2:00 PM,Confirmed,Stable condition,Soroti,N/A,N/A
+PAT1078,Rita Barry,38,F,256737012345,rita.barry@email.com,Kampala National Hospital,facility-kampala-012,Mixed (HIV+Diabetes),03/11/2025,18/01/2026,10:30 AM,No-Show,Medication adjustment required,Kampala,84%,Moderate
+PAT1079,Ronald Barton,54,M,256750123456,ronald.barton@email.com,Fort Portal Referral Hospital,facility-fortportal-012,Asthma,21/10/2025,26/01/2026,11:00 AM,Rescheduled,Needs follow-up lab tests,Fort Portal,N/A,N/A
+PAT1080,Rosalind Basile,43,F,256738123456,rosalind.basile@email.com,Mbarara Referral Hospital,facility-mbarara-012,HIV,10/11/2025,24/01/2026,3:30 PM,Completed,Patient reports improvement,Mbarara,89%,Undetectable

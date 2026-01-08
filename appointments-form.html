@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .optional {
+            color: #999;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-reset {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-reset:hover {
+            background: #e0e0e0;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .status-badge.future {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge.past {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Schedule Appointment</h1>
+            <p>Schedule a new appointment for a patient</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="appointmentForm">
+            <!-- Patient Information Section -->
+            <div class="form-section">
+                <div class="section-title">Patient Information</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patient_id">
+                            Patient ID <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="patient_id" 
+                            name="patient_id" 
+                            placeholder="e.g., PAT1001"
+                            required
+                        >
+                        <div class="info-text">Must match existing patient ID</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="patient_name">
+                            Patient Name <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="patient_name" 
+                            name="patient_name" 
+                            placeholder="Patient full name"
+                            required
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointment Details Section -->
+            <div class="form-section">
+                <div class="section-title">Appointment Details</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="appointment_date">
+                            Appointment Date <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="date" 
+                            id="appointment_date" 
+                            name="appointment_date" 
+                            required
+                        >
+                        <div class="info-text">Must be a future date</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointment_time">
+                            Appointment Time <span class="optional">(optional)</span>
+                        </label>
+                        <input 
+                            type="time" 
+                            id="appointment_time" 
+                            name="appointment_time"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="status">
+                            Status <span class="required">*</span>
+                        </label>
+                        <select id="status" name="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Completed">Completed</option>
+                            <option value="No-Show">No-Show</option>
+                            <option value="Rescheduled">Rescheduled</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_appointment">
+                            Last Appointment Date <span class="optional">(optional)</span>
+                        </label>
+                        <input 
+                            type="date" 
+                            id="last_appointment" 
+                            name="last_appointment"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Facility Information Section -->
+            <div class="form-section">
+                <div class="section-title">Facility Information</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="facility">
+                            Facility <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="facility" 
+                            name="facility" 
+                            placeholder="e.g., Kampala Regional Referral Hospital"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="facility_id_code">
+                            Facility ID Code <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="facility_id_code" 
+                            name="facility_id_code" 
+                            placeholder="e.g., facility-kampala-001"
+                            required
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Information Section -->
+            <div class="form-section">
+                <div class="section-title">Medical Information</div>
+
+                <div class="form-group">
+                    <label for="primary_condition">
+                        Primary Condition <span class="required">*</span>
+                    </label>
+                    <select id="primary_condition" name="primary_condition" required>
+                        <option value="">Select Condition</option>
+                        <option value="HIV">HIV</option>
+                        <option value="Diabetes">Diabetes</option>
+                        <option value="Hypertension">Hypertension</option>
+                        <option value="Asthma">Asthma</option>
+                        <option value="Maternal Health">Maternal Health</option>
+                        <option value="Mixed (HIV+Diabetes)">Mixed (HIV+Diabetes)</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">
+                        Clinical Notes <span class="optional">(optional)</span>
+                    </label>
+                    <textarea 
+                        id="notes" 
+                        name="notes" 
+                        placeholder="Add any clinical notes or special requirements for this appointment..."
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Schedule Appointment</button>
+                <button type="reset" class="btn-reset">Clear</button>
+            </div>
+
+            <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('appointmentForm');
+        const messageDiv = document.getElementById('message');
+        const appointmentDateInput = document.getElementById('appointment_date');
+        const lastAppointmentInput = document.getElementById('last_appointment');
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        appointmentDateInput.min = today;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                patient_id: document.getElementById('patient_id').value.trim(),
+                patient_name: document.getElementById('patient_name').value.trim(),
+                appointment_date: document.getElementById('appointment_date').value,
+                appointment_time: document.getElementById('appointment_time').value,
+                status: document.getElementById('status').value,
+                last_appointment: document.getElementById('last_appointment').value,
+                facility: document.getElementById('facility').value.trim(),
+                facility_id_code: document.getElementById('facility_id_code').value.trim(),
+                primary_condition: document.getElementById('primary_condition').value,
+                notes: document.getElementById('notes').value.trim()
+            };
+
+            // Validation
+            if (!formData.patient_id || !formData.patient_name || !formData.appointment_date || 
+                !formData.status || !formData.facility || !formData.facility_id_code || 
+                !formData.primary_condition) {
+                showMessage('Please fill in all required fields', 'error');
+                return;
+            }
+
+            const selectedDate = new Date(formData.appointment_date);
+            const todayDate = new Date();
+            todayDate.setHours(0, 0, 0, 0);
+
+            if (selectedDate < todayDate && formData.status !== 'Completed' && formData.status !== 'No-Show') {
+                showMessage('Past dates can only be marked as Completed or No-Show', 'error');
+                return;
+            }
+
+            if (formData.last_appointment && formData.last_appointment >= formData.appointment_date) {
+                showMessage('Last appointment date must be before the new appointment date', 'error');
+                return;
+            }
+
+            try {
+                // Here you would typically send data to Supabase
+                // For now, we'll show a success message
+                showMessage('Appointment scheduled successfully!', 'success');
+                form.reset();
+                appointmentDateInput.min = today;
+
+                // Optionally redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            } catch (error) {
+                showMessage('Error scheduling appointment: ' + error.message, 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+        }
+
+        // Update appointment time format display
+        document.getElementById('appointment_time').addEventListener('change', function() {
+            if (this.value) {
+                const [hours, minutes] = this.value.split(':');
+                const hour = parseInt(hours);
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const displayHour = hour % 12 || 12;
+                console.log(`Selected time: ${displayHour}:${minutes} ${ampm}`);
+            }
+        });
+    </script>
+</body>
+</html>

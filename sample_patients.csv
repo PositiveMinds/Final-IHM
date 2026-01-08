@@ -1,0 +1,11 @@
+full_name,age,gender,phone,email,primary_condition,region,facility
+David Kipkemboi,45,M,256701234567,david.kipkemboi@email.com,HIV,Karamoja,Soroti Regional Hospital
+Janet Mwangi,38,F,256702345678,janet.mwangi@email.com,Diabetes,Central,Kampala National Hospital
+Peter Okwanyo,52,M,256703456789,peter.okwanyo@email.com,Hypertension,Eastern,Jinja Medical Center
+Grace Kariuki,29,F,256704567890,grace.kariuki@email.com,Maternal Health,Central,Nairobi City Hospital
+Samuel Kipchoge,61,M,256705678901,samuel.kipchoge@email.com,Mixed (HIV+Diabetes),Rift Valley,Nakuru Medical Center
+Rose Ochieng,34,F,256706789012,rose.ochieng@email.com,HIV,Western,Kisumu Regional Hospital
+Michael Akumu,47,M,256707890123,michael.akumu@email.com,Hypertension,Western,Kisimu Hospital
+Elizabeth Sivo,41,F,256708901234,elizabeth.sivo@email.com,Diabetes,North Eastern,Garissa Medical Center
+John Kiplagat,56,M,256709012345,john.kiplagat@example.com,Asthma,Rift Valley,Eldoret Hospital
+Mary Koech,35,F,256710123456,mary.koech@example.com,Mixed (HIV+Diabetes),Central,Thika Hospital

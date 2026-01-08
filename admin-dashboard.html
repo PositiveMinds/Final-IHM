@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - HealthFlow</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        .card-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+            text-align: center;
+        }
+        .card-btn:hover {
+            opacity: 0.9;
+        }
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        .info-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .info-section p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .stat-card p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 30px;
+        }
+        .footer a {
+            color: white;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+        .back-btn {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-btn">← Back to Home</a>
+            <h1>HealthFlow Admin Dashboard</h1>
+            <p>Manage Facilities, Patients, and Appointments</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Facility Management Card -->
+            <a href="facilities-register.html" class="card">
+                <div class="card-icon">🏥</div>
+                <h2>Manage Facilities</h2>
+                <p>Register new health facilities, update facility information, and manage facility details across your network.</p>
+                <span class="card-btn">Register Facility</span>
+            </a>
+
+            <!-- Patient Management Card -->
+            <a href="patients-register.html" class="card">
+                <div class="card-icon">👥</div>
+                <h2>Register Patients</h2>
+                <p>Add new patients to the system, update patient profiles, and track patient health information securely.</p>
+                <span class="card-btn">Add Patient</span>
+            </a>
+
+            <!-- Appointments Card -->
+            <a href="appointments-register.html" class="card">
+                <div class="card-icon">📅</div>
+                <h2>Schedule Appointments</h2>
+                <p>Create and manage patient appointments, set reminders, and track appointment statuses in real-time.</p>
+                <span class="card-btn">Schedule Appointment</span>
+            </a>
+
+            <!-- View Patients Card -->
+            <a href="patients.html" class="card">
+                <div class="card-icon">📋</div>
+                <h2>View Patient Records</h2>
+                <p>Browse all registered patients, view detailed records, search by criteria, and manage patient data.</p>
+                <span class="card-btn">View Records</span>
+            </a>
+
+            <!-- Dashboard Card -->
+            <a href="dashboard.html" class="card">
+                <div class="card-icon">📊</div>
+                <h2>View Analytics Dashboard</h2>
+                <p>Track key metrics, view patient statistics, appointment trends, and facility performance indicators.</p>
+                <span class="card-btn">View Dashboard</span>
+            </a>
+
+            <!-- User Management Card -->
+            <a href="register.html" class="card">
+                <div class="card-icon">🔐</div>
+                <h2>User Management</h2>
+                <p>Register new system users, manage access levels, and maintain user accounts for your organization.</p>
+                <span class="card-btn">Manage Users</span>
+            </a>
+        </div>
+
+        <div class="info-section">
+            <h2>Quick Statistics</h2>
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <h3 id="facilityCount">0</h3>
+                    <p>Facilities Registered</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="patientCount">0</h3>
+                    <p>Patients in System</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="appointmentCount">0</h3>
+                    <p>Upcoming Appointments</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="activePatients">0</h3>
+                    <p>Active Patients</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>Getting Started</h2>
+            <p><strong>Step 1:</strong> Start by registering your health facilities. Each facility needs a unique facility ID and name.</p>
+            <p><strong>Step 2:</strong> Register your patients with their demographic information, primary health conditions, and facility assignment.</p>
+            <p><strong>Step 3:</strong> Schedule appointments for patients and track their appointment status throughout the system.</p>
+            <p><strong>Step 4:</strong> Use the analytics dashboard to monitor patient outcomes, appointment compliance, and facility performance.</p>
+            <p style="margin-top: 20px;"><strong>💡 Tip:</strong> You can import sample data from our Supabase setup script to get started quickly with demo data.</p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 HealthFlow. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a> | <a href="#support">Support</a></p>
+        </div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script>
+        // Fetch statistics on page load
+        async function loadStatistics() {
+            try {
+                // Fetch facilities count
+                const { data: facilities, error: facilityError } = await supabase
+                    .from('facilities')
+                    .select('id');
+                
+                // Fetch patients count
+                const { data: patients, error: patientError } = await supabase
+                    .from('patients')
+                    .select('id');
+                
+                // Fetch active patients
+                const { data: activePatients, error: activeError } = await supabase
+                    .from('patients')
+                    .select('id')
+                    .eq('status', 'Active');
+                
+                // Fetch appointments count
+                const { data: appointments, error: appointmentError } = await supabase
+                    .from('appointments')
+                    .select('id');
+                
+                // Update the statistics
+                if (!facilityError && facilities) {
+                    document.getElementById('facilityCount').textContent = facilities.length;
+                }
+                if (!patientError && patients) {
+                    document.getElementById('patientCount').textContent = patients.length;
+                }
+                if (!appointmentError && appointments) {
+                    document.getElementById('appointmentCount').textContent = appointments.length;
+                }
+                if (!activeError && activePatients) {
+                    document.getElementById('activePatients').textContent = activePatients.length;
+                }
+            } catch (error) {
+                console.log('Statistics loaded (offline mode)');
+            }
+        }
+        
+        // Load statistics when page loads
+        window.addEventListener('load', loadStatistics);
+    </script>
+</body>
+</html>

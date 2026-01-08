@@ -1,0 +1,31 @@
+patient_id,first_name,last_name,date_of_birth,gender,phone_number,email,facility_id,primary_condition,status,notes
+PT-001,James,Okoro,1982-04-15,Male,+256712345678,james.okoro@email.com,facility-kampala-hc1,HIV,Active,Stable condition - Viral load suppressed
+PT-002,Mary,Mugisha,1986-07-22,Female,+256787654321,mary.mugisha@email.com,facility-fortportal-hc1,Diabetes,Active,Needs follow-up lab tests
+PT-003,John,Okonkwo,1968-11-08,Male,+256701234567,john.okonkwo@email.com,facility-mbarara-hc1,Hypertension,Active,BP monitoring needed
+PT-004,Grace,Kamau,1995-08-30,Female,+256765432109,grace.kamau@email.com,facility-jinja-hc1,Maternal Health,Active,Stable condition
+PT-005,Peter,Adeyemi,1972-02-14,Male,+256778123456,peter.adeyemi@email.com,facility-arua-hc1,HIV,At Risk,Medication adjustment required
+PT-006,Anna,Nkosi,1988-05-19,Female,+256702567890,anna.nkosi@email.com,facility-masaka-hc1,HIV,Active,Viral suppression achieved
+PT-007,David,Mwangi,1976-09-03,Male,+256716789012,david.mwangi@email.com,facility-soroti-hc1,HIV,Active,Patient reports improvement
+PT-008,Sarah,Mensah,1990-12-11,Female,+256789345678,sarah.mensah@email.com,facility-kampala-hc1,Diabetes,Active,Needs follow-up lab tests
+PT-009,Michael,Kaunda,1965-03-25,Male,+256705432109,michael.kaunda@email.com,facility-fortportal-hc1,Hypertension,Active,BP monitoring needed
+PT-010,Rebecca,Banda,1982-06-17,Female,+256717890123,rebecca.banda@email.com,facility-mbarara-hc1,HIV,Active,Stable condition
+PT-011,Henry,Kibaki,1963-10-31,Male,+256704567890,henry.kibaki@email.com,facility-jinja-hc1,Diabetes,Active,Medication adjustment required
+PT-012,Linda,Nyerere,1987-04-09,Female,+256718234567,linda.nyerere@email.com,facility-arua-hc1,HIV,At Risk,Requires counseling
+PT-013,Charles,Mandela,1971-01-27,Male,+256703456789,charles.mandela@email.com,facility-masaka-hc1,HIV,Active,Viral suppression achieved
+PT-014,Alice,Dlamini,1984-08-14,Female,+256719456789,alice.dlamini@email.com,facility-soroti-hc1,HIV,Active,Patient reports improvement
+PT-015,Robert,Achieng,1978-07-21,Male,+256706789012,robert.achieng@email.com,facility-kampala-hc1,Maternal Health,Active,Stable condition
+PT-016,Jane,Obi,1992-02-05,Female,+256715678901,jane.obi@email.com,facility-fortportal-hc1,HIV,At Risk,Needs follow-up lab tests
+PT-017,Paul,Senghor,1967-06-11,Male,+256708901234,paul.senghor@email.com,facility-mbarara-hc1,Hypertension,Active,BP monitoring needed
+PT-018,Elizabeth,Kenyatta,1981-09-23,Female,+256716234567,elizabeth.kenyatta@email.com,facility-jinja-hc1,Diabetes,Active,Medication adjustment required
+PT-019,Joseph,Habyarimana,1975-11-18,Male,+256707123456,joseph.habyarimana@email.com,facility-arua-hc1,HIV,Active,Stable condition
+PT-020,Margaret,Chiluba,1986-03-08,Female,+256720123456,margaret.chiluba@email.com,facility-masaka-hc1,HIV,At Risk,Viral suppression achieved
+PT-021,Thomas,Kwame,1969-12-20,Male,+256709234567,thomas.kwame@email.com,facility-soroti-hc1,HIV,Active,Patient reports improvement
+PT-022,Victoria,Mensah,1983-05-16,Female,+256721234567,victoria.mensah@email.com,facility-kampala-hc1,Diabetes,Active,Needs follow-up lab tests
+PT-023,William,Adepoju,1964-02-28,Male,+256710345678,william.adepoju@email.com,facility-fortportal-hc1,Hypertension,Active,BP monitoring needed
+PT-024,Diana,Akosua,1989-10-02,Female,+256722345678,diana.akosua@email.com,facility-mbarara-hc1,HIV,Active,Medication adjustment required
+PT-025,Kenneth,Boateng,1974-08-19,Male,+256711456789,kenneth.boateng@email.com,facility-jinja-hc1,Maternal Health,Active,Stable condition
+PT-026,Patricia,Quartey,1987-07-14,Female,+256723456789,patricia.quartey@email.com,facility-arua-hc1,HIV,Active,Viral suppression achieved
+PT-027,George,Osei,1970-03-22,Male,+256712567890,george.osei@email.com,facility-masaka-hc1,HIV,At Risk,Needs follow-up lab tests
+PT-028,Helen,Ansah,1985-09-06,Female,+256724567890,helen.ansah@email.com,facility-soroti-hc1,Diabetes,Active,Patient reports improvement
+PT-029,Samuel,Agyeman,1977-04-13,Male,+256713678901,samuel.agyeman@email.com,facility-kampala-hc1,Hypertension,Active,BP monitoring needed
+PT-030,Caroline,Asiedu,1980-12-29,Female,+256725678901,caroline.asiedu@email.com,facility-fortportal-hc1,HIV,Active,Stable condition
