@@ -3381,35 +3381,446 @@ body.dark-mode {
   color: #f9fafb;
 }
 
+/* Dark Mode - Navbar */
+body.dark-mode .premium-navbar {
+  background: rgba(17, 24, 39, 0.98) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .premium-navbar .nav-link {
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .premium-navbar .nav-link:hover {
+  color: #5b8dee !important;
+  background: rgba(91, 141, 238, 0.1);
+}
+
+/* Dark Mode - Sections */
 body.dark-mode .section-light {
   background: #1f2937;
+  color: #f9fafb;
+}
+
+body.dark-mode .section-dark {
+  background: #111827;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Cards */
+body.dark-mode .card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .feature-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
 }
 
 body.dark-mode .testimonial-card {
   background: #374151;
   color: white;
+  border-color: #4b5563;
 }
 
 body.dark-mode .testimonial-text {
   color: rgba(255, 255, 255, 0.75);
 }
 
+body.dark-mode .testimonial-rating {
+  color: #fbbf24;
+}
+
 body.dark-mode .kb-card {
   background: #374151;
   color: white;
+  border-color: #4b5563;
 }
 
 body.dark-mode .kb-card h5 {
   color: white;
 }
 
-body.dark-mode .logo-card {
+body.dark-mode .kb-link {
+  color: #5b8dee;
+}
+
+body.dark-mode .case-study-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Forms */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+  background: #4b5563;
+  border-color: #5b8dee;
+  color: #f9fafb;
+}
+
+body.dark-mode .form-label {
+  color: #e5e7eb;
+}
+
+body.dark-mode .form-control::placeholder {
+  color: #9ca3af;
+}
+
+/* Dark Mode - Input Fields */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="phone"],
+body.dark-mode textarea {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode input[type="text"]::placeholder,
+body.dark-mode input[type="email"]::placeholder,
+body.dark-mode input[type="password"]::placeholder,
+body.dark-mode input[type="phone"]::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Dark Mode - Dropdowns */
+body.dark-mode .dropdown-menu {
   background: #374151;
   border-color: #4b5563;
 }
 
-body.dark-mode .kb-link {
+body.dark-mode .dropdown-item {
+  color: #e5e7eb;
+}
+
+body.dark-mode .dropdown-item:hover,
+body.dark-mode .dropdown-item:focus {
+  background: #4b5563;
   color: #5b8dee;
+}
+
+/* Dark Mode - Accordion */
+body.dark-mode .accordion-button {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+body.dark-mode .accordion-button:not(.collapsed) {
+  background: #4b5563;
+  color: #5b8dee;
+}
+
+body.dark-mode .accordion-button:focus {
+  border-color: #5b8dee;
+  box-shadow: 0 0 0 0.25rem rgba(91, 141, 238, 0.25);
+}
+
+body.dark-mode .accordion-body {
+  background: #2d3748;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+/* Dark Mode - Tables */
+body.dark-mode table {
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode thead {
+  background: #2d3748;
+  color: #f9fafb;
+}
+
+body.dark-mode tbody tr {
+  border-color: #4b5563;
+}
+
+body.dark-mode tbody tr:hover {
+  background: #374151;
+}
+
+/* Dark Mode - Logos */
+body.dark-mode .logo-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .logo-card p {
+  color: #d1d5db;
+}
+
+/* Dark Mode - Team */
+body.dark-mode .team-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .team-card h5 {
+  color: #f9fafb;
+}
+
+body.dark-mode .team-card p {
+  color: #d1d5db;
+}
+
+body.dark-mode .team-social {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark Mode - Badges */
+body.dark-mode .badge {
+  background: #4b5563;
+  color: #e5e7eb;
+}
+
+body.dark-mode .bg-light {
+  background: #374151 !important;
+}
+
+body.dark-mode .badge-primary {
+  background: #0052cc;
+  color: white;
+}
+
+/* Dark Mode - Text */
+body.dark-mode .text-muted {
+  color: #d1d5db !important;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: #f9fafb;
+}
+
+body.dark-mode .lead {
+  color: #d1d5db;
+}
+
+/* Dark Mode - Buttons */
+body.dark-mode .btn-light {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+body.dark-mode .btn-light:hover {
+  background: #4b5563;
+  color: #5b8dee;
+  border-color: #5b8dee;
+}
+
+body.dark-mode .btn-outline-light {
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+
+body.dark-mode .btn-outline-light:hover {
+  background: #374151;
+  color: #5b8dee;
+  border-color: #5b8dee;
+}
+
+/* Dark Mode - ROI Calculator */
+body.dark-mode .roi-input-card {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+body.dark-mode .roi-results-card {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+body.dark-mode .roi-metric-icon {
+  background: #4b5563;
+}
+
+body.dark-mode .form-range {
+  background: #4b5563;
+}
+
+body.dark-mode .form-range::-webkit-slider-thumb {
+  background: #5b8dee;
+}
+
+body.dark-mode .form-range::-moz-range-thumb {
+  background: #5b8dee;
+}
+
+/* Dark Mode - Modals & Overlays */
+body.dark-mode .modal-content {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .modal-header {
+  border-bottom-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .modal-body {
+  color: #e5e7eb;
+}
+
+/* Dark Mode - Carousel */
+body.dark-mode .premium-carousel-section {
+  background: #111827;
+}
+
+/* Dark Mode - Contact Form */
+body.dark-mode .form-select-dark {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Feature Cards and Boxes */
+body.dark-mode .feature-box,
+body.dark-mode .info-box,
+body.dark-mode .stats-box,
+body.dark-mode .roi-input-card,
+body.dark-mode .roi-results-card,
+body.dark-mode .care-feature {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Floating Boxes */
+body.dark-mode .floating-box {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark Mode - Stat Cards */
+body.dark-mode .stat-card {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark Mode - Feature Section Headers */
+body.dark-mode .section-heading {
+  color: #f9fafb;
+}
+
+/* Dark Mode - Button Groups & Controls */
+body.dark-mode .btn-group,
+body.dark-mode .btn-group-lg .btn {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Comparison Table */
+body.dark-mode .comparison-table {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+body.dark-mode .comparison-table th {
+  background: #2d3748;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+body.dark-mode .comparison-table td {
+  background: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+body.dark-mode .comparison-table tbody tr:hover td {
+  background: #4b5563;
+}
+
+/* Dark Mode - Trust Badges */
+body.dark-mode .trust-badge-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Saving Items */
+body.dark-mode .saving-item {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f9fafb;
+}
+
+body.dark-mode .saving-icon-wrapper {
+  background: rgba(91, 141, 238, 0.2);
+}
+
+/* Dark Mode - Video Cards */
+body.dark-mode .video-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Mobile App Section */
+body.dark-mode .mobile-feature {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+/* Dark Mode - Blog/Resource Cards */
+body.dark-mode .blog-card,
+body.dark-mode .resource-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .blog-card h5,
+body.dark-mode .resource-card h5 {
+  color: #f9fafb;
+}
+
+/* Dark Mode - Webinar Cards */
+body.dark-mode .webinar-card {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+body.dark-mode .webinar-badge {
+  background: #2d3748;
+}
+
+/* Dark Mode - List Groups */
+body.dark-mode .list-group-item {
+  background: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+body.dark-mode .list-group-item.active {
+  background: #0052cc;
+  border-color: #0052cc;
 }
 
 /* Responsive Mobile Dashboard */
