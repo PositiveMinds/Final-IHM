@@ -370,6 +370,11 @@
             font-size: 12px;
         }
 
+        /* Hide sidebar overlay on desktop */
+        .sidebar-overlay {
+            display: none !important;
+        }
+
         /* ===== TABLET LAYOUT (768px - 1023px) ===== */
         @media (max-width: 1023px) {
             .top-navbar {
@@ -464,10 +469,15 @@
                 bottom: 0;
                 background: rgba(0, 0, 0, 0.3);
                 z-index: 998;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
             }
 
             .sidebar-overlay.active {
                 display: block;
+                opacity: 1;
+                pointer-events: auto;
             }
 
             .main-wrapper {
