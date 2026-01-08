@@ -81,15 +81,18 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
        // Store session data
        const sessionData = {
-         id: users.id,
-         email: users.email,
-         facilityName: users.facility_name,
-         facilityId: facilityUUID || users.facility_id,
-         facilityIdCode: users.facility_id,
-         facilityRegion: facilityRegion,
-         userRole: users.user_role,
-         loginTime: new Date().toISOString(),
-       };
+          id: users.id,
+          email: users.email,
+          fullname: users.fullname,
+          username: users.username,
+          facilityName: users.facility_name,
+          facilityId: facilityUUID || users.facility_id,
+          facilityIdCode: users.facility_id,
+          facilityRegion: facilityRegion,
+          userRole: users.user_role,
+          isActive: users.is_active,
+          loginTime: new Date().toISOString(),
+        };
 
       sessionStorage.setItem("healthflow_session", JSON.stringify(sessionData));
 
@@ -98,10 +101,11 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       }
 
       // Success message
+      const displayName = users.fullname || users.facility_name || 'User';
       Swal.fire({
         icon: "success",
         title: "Welcome!",
-        text: `Welcome back, ${users.facility_name}!`,
+        text: `Welcome back, ${displayName}!`,
         confirmButtonColor: "#28a745",
         confirmButtonText: "Continue",
       }).then((result) => {
