@@ -65,34 +65,36 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       }
 
       // Fetch the actual facility UUID from the facilities table
-       let facilityUUID = null;
-       let facilityRegion = null;
-       try {
-         const { data: facility, error: facilityError } = await supabaseClient
-           .from('facilities')
-           .select('id, facility_id, region')
-           .eq('facility_id', users.facility_id)
-           .single();
-         
-         console.log("Facility lookup result:", { facility, facilityError });
-         
-         if (facility && !facilityError) {
-           facilityUUID = facility.id;
-           facilityRegion = facility.region;
-         } else if (facilityError) {
-           console.warn('Facility not found:', facilityError);
-         }
-       } catch (e) {
-         console.warn('Could not fetch facility UUID:', e);
-       }
+      let facilityUUID = null;
+      let facilityRegion = null;
+      let facilityName = users.facility_name || "Facility";
+      try {
+        const { data: facility, error: facilityError } = await supabaseClient
+          .from('facilities')
+          .select('id, facility_id, region, facility_name')
+          .eq('facility_id', users.facility_id)
+          .single();
+        
+        console.log("Facility lookup result:", { facility, facilityError });
+        
+        if (facility && !facilityError) {
+          facilityUUID = facility.id;
+          facilityRegion = facility.region;
+          facilityName = facility.facility_name || facilityName;
+        } else if (facilityError) {
+          console.warn('Facility not found:', facilityError);
+        }
+      } catch (e) {
+        console.warn('Could not fetch facility UUID:', e);
+      }
 
-       // Store session data
-       const sessionData = {
+      // Store session data
+      const sessionData = {
           id: users.id,
           email: users.email,
-          fullname: users.fullname,
+          fullname: users.fullname || facilityName,
           username: users.username,
-          facilityName: users.facility_name,
+          facilityName: facilityName,
           facilityId: facilityUUID || users.facility_id,
           facilityIdCode: users.facility_id,
           facilityRegion: facilityRegion,
@@ -117,10 +119,10 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         confirmButtonText: "Continue",
       }).then((result) => {
         if (result.isConfirmed) {
-          // Add small delay to ensure localStorage is written, then redirect
+          // Add delay to ensure localStorage is written, then redirect
           setTimeout(() => {
             window.location.href = "dashboard.html";
-          }, 500);
+          }, 1000);
         }
       });
     } else {

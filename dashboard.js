@@ -15,10 +15,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 1000);
 });
 
+// Toggle profile dropdown menu
+window.toggleProfileMenu = function() {
+    const dropdown = document.getElementById("profileDropdown");
+    if (dropdown) {
+        dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+    }
+};
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function(event) {
+    const dropdown = document.getElementById("profileDropdown");
+    const userInitials = document.getElementById("userInitials");
+    
+    if (dropdown && userInitials && !dropdown.contains(event.target) && !userInitials.contains(event.target)) {
+        dropdown.style.display = "none";
+    }
+});
+
 // Setup sidebar toggle
 function setupSidebarToggle() {
-    const sidebarToggle = document.getElementById("sidebarToggle");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const sidebarToggle = document.querySelector(".sidebar-toggle");
+    const sidebar = document.querySelector(".sidebar");
+    const sidebarOverlay = document.querySelector(".sidebar-overlay");
 
     if (sidebarToggle) {
         sidebarToggle.addEventListener("click", function (e) {
@@ -27,46 +46,66 @@ function setupSidebarToggle() {
             window.toggleSidebar();
         });
     }
+
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
-            window.toggleSidebar();
+            window.closeSidebar();
         });
     }
 
-    // Close sidebar when clicking on sidebar links
-    const sidebarLinks = document.querySelectorAll(".sidebar-link");
+    // Close sidebar when clicking on sidebar links (mobile only)
+    const sidebarLinks = document.querySelectorAll(".sidebar-menu a");
     sidebarLinks.forEach((link) => {
-        if (!link.hasAttribute("data-bs-toggle")) {
-            link.addEventListener("click", function (e) {
-                // Only close sidebar if it's on mobile
-                if (window.innerWidth <= 767) {
-                    setTimeout(function () {
-                        const sidebar = document.querySelector(".sidebar");
-                        const overlay = document.getElementById("sidebarOverlay");
-                        if (sidebar) sidebar.classList.remove("active");
-                        if (overlay) overlay.classList.remove("active");
-                    }, 100);
-                }
-            });
-        }
+        link.addEventListener("click", function () {
+            if (window.innerWidth <= 767) {
+                setTimeout(function () {
+                    window.closeSidebar();
+                }, 100);
+            }
+        });
     });
 }
 
-// Toggle sidebar visibility (global function for onclick handlers)
+// Toggle sidebar visibility (global function)
 window.toggleSidebar = function () {
     const sidebar = document.querySelector(".sidebar");
-    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const overlay = document.querySelector(".sidebar-overlay");
 
     if (sidebar) {
-        sidebar.classList.toggle("active");
+        if (sidebar.classList.contains("active")) {
+            window.closeSidebar();
+        } else {
+            window.openSidebar();
+        }
     }
-    if (sidebarOverlay) {
-        sidebarOverlay.classList.toggle("active");
-    }
+};
 
-    return false;
+// Open sidebar
+window.openSidebar = function () {
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.querySelector(".sidebar-overlay");
+    
+    if (sidebar) {
+        sidebar.classList.add("active");
+    }
+    if (overlay) {
+        overlay.classList.add("active");
+    }
+};
+
+// Close sidebar
+window.closeSidebar = function () {
+    const sidebar = document.querySelector(".sidebar");
+    const overlay = document.querySelector(".sidebar-overlay");
+    
+    if (sidebar) {
+        sidebar.classList.remove("active");
+    }
+    if (overlay) {
+        overlay.classList.remove("active");
+    }
 };
 
 // Setup patient ID generator
@@ -122,33 +161,28 @@ function checkSession() {
 
 // Display user information in header
 function displayUserInfo(userData) {
-    const initials = userData.facilityName
+    const facilityName = userData.facilityName || userData.fullname || "User";
+    const initials = facilityName
         .split(" ")
         .map((word) => word[0])
         .join("")
         .toUpperCase()
         .slice(0, 2);
 
-    const userAvatar = document.querySelector(".user-avatar");
+    const userAvatar = document.getElementById("userInitials");
     if (userAvatar) {
         userAvatar.textContent = initials;
     }
 
-    const userDetailsDiv = document.querySelector(".user-details");
-    if (userDetailsDiv) {
-        userDetailsDiv.innerHTML = `
-      <small>${userData.userRole}</small>
-      <div title="${userData.facilityName}">${userData.facilityName}</div>
-      <small style="color: #666; font-size: 10px;">
-        ${userData.facilityRegion || "N/A"} • ${userData.facilityId || "N/A"}
-      </small>
-    `;
+    const userRoleDisplay = document.getElementById("userRoleDisplay");
+    if (userRoleDisplay) {
+        userRoleDisplay.textContent = userData.userRole || "User";
     }
 
     // Display facility information in the dashboard card
     const facilityNameDisplay = document.getElementById("facilityNameDisplay");
     if (facilityNameDisplay) {
-        facilityNameDisplay.textContent = userData.facilityName || "N/A";
+        facilityNameDisplay.textContent = (userData.facilityName || userData.fullname || "N/A");
     }
 
     const facilityIdDisplay = document.getElementById("facilityIdDisplay");
@@ -195,6 +229,27 @@ function initializeDashboard() {
     if (overviewLink) {
         overviewLink.classList.add("active");
     }
+    
+    // Debug log
+    setTimeout(() => {
+        const overview = document.getElementById('overview');
+        const statsGrid = document.querySelector('.stats-grid');
+        const statCards = document.querySelectorAll('.stat-card');
+        const firstCardValue = document.querySelector('.stat-card .stat-value');
+        
+        console.log('Dashboard initialized:');
+        console.log('- Overview section exists:', !!overview);
+        console.log('- Overview is active:', overview ? overview.classList.contains('active') : false);
+        console.log('- Stats grid exists:', !!statsGrid);
+        console.log('- Stats grid visible:', statsGrid ? getComputedStyle(statsGrid).display !== 'none' : false);
+        console.log('- Stat cards count:', statCards.length);
+        
+        if (firstCardValue) {
+            console.log('- First card value text:', firstCardValue.textContent);
+            console.log('- First card value color:', getComputedStyle(firstCardValue).color);
+            console.log('- First card value display:', getComputedStyle(firstCardValue).display);
+        }
+    }, 100);
 }
 
 // Show/hide sections (global function for onclick handlers)
@@ -248,6 +303,7 @@ async function loadFacilityStats() {
 
         if (!supabaseClient) {
             console.error("Supabase client not initialized");
+            showDatabaseError("Supabase client not initialized. Check supabase-config.js");
             return;
         }
 
@@ -263,7 +319,9 @@ async function loadFacilityStats() {
             })
             .eq("facility_id", facilityId);
 
-        if (!patientsError && totalPatients !== null) {
+        if (patientsError) {
+            throw patientsError;
+        } else if (totalPatients !== null) {
             updateStatCard("totalPatients", totalPatients);
         }
 
@@ -280,7 +338,8 @@ async function loadFacilityStats() {
             .eq("facility_id", facilityId)
             .eq("status", "Active");
 
-        if (!activeError && activePatients !== null) {
+        if (activeError) throw activeError;
+        if (activePatients !== null) {
             updateStatCard("activePatients", activePatients);
         }
 
@@ -297,7 +356,8 @@ async function loadFacilityStats() {
             .eq("facility_id", facilityId)
             .eq("status", "At Risk");
 
-        if (!atRiskError && atRiskPatients !== null) {
+        if (atRiskError) throw atRiskError;
+        if (atRiskPatients !== null) {
             updateStatCard("atRiskPatients", atRiskPatients);
         }
 
@@ -314,7 +374,8 @@ async function loadFacilityStats() {
             .eq("facility_id", facilityId)
             .eq("primary_condition", "HIV");
 
-        if (!hivError && hivPatients !== null) {
+        if (hivError) throw hivError;
+        if (hivPatients !== null) {
             updateStatCard("hivPatients", hivPatients);
         }
 
@@ -331,12 +392,23 @@ async function loadFacilityStats() {
             })
             .limit(5);
 
-        if (!recentError && recentPatients) {
+        if (recentError) throw recentError;
+        if (recentPatients) {
             displayRecentPatients(recentPatients);
         }
     } catch (error) {
-        console.error("Error loading facility stats:", error);
+        console.error("Error loading facility stats:", error.message);
+        showDatabaseError(error.message);
     }
+}
+
+// Show database error dialog
+function showDatabaseError(message) {
+    const errorMsg = message.includes("CORS") 
+        ? message + "\n\nSee SUPABASE_CORS_SETUP.md for configuration help."
+        : message + "\n\nCheck your Supabase connection.";
+    
+    console.error("Database Error:", errorMsg);
 }
 
 // Update stat card with value
@@ -411,6 +483,7 @@ async function loadAllPatients() {
 
         if (!supabaseClient) {
             console.error("Supabase client not initialized");
+            showDatabaseError("Supabase client not initialized. Check supabase-config.js");
             return;
         }
 
@@ -427,8 +500,7 @@ async function loadAllPatients() {
             });
 
         if (error) {
-            console.error("Error loading patients:", error);
-            return;
+            throw error;
         }
 
         // Display patients
@@ -442,7 +514,8 @@ async function loadAllPatients() {
       } patients`;
         }
     } catch (error) {
-        console.error("Error loading all patients:", error);
+        console.error("Error loading all patients:", error.message);
+        showDatabaseError(error.message);
     }
 }
 

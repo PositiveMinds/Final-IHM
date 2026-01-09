@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats Grid Debug</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .debug-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #0052CC;
+            border-bottom: 2px solid #0052CC;
+            padding-bottom: 10px;
+        }
+        .test-item {
+            background: #fafafa;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+            border-radius: 4px;
+        }
+        .test-item.pass {
+            border-left-color: #28a745;
+            background: #f0f9f5;
+        }
+        .test-item.fail {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        .test-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .test-result {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .pass .test-result {
+            color: #28a745;
+        }
+        .fail .test-result {
+            color: #dc3545;
+        }
+        .details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>📊 Stats Grid Debug Report</h1>
+        <p>Run this test in the browser console after opening dashboard.html</p>
+        
+        <div id="results"></div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <h3>Manual Test Commands</h3>
+            <p>Copy and paste these into browser console (F12):</p>
+            <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;">
+// Check overview section
+document.getElementById('overview').classList.contains('active')
+
+// Get stats grid
+const sg = document.querySelector('.stats-grid')
+
+// Check visibility
+sg.offsetHeight
+getComputedStyle(sg).display
+getComputedStyle(sg).visibility
+
+// Check stat cards
+document.querySelectorAll('.stat-card').length
+document.querySelectorAll('.stat-card')[0].offsetHeight
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        function runTests() {
+            const results = [];
+            const resultDiv = document.getElementById('results');
+            
+            // Test 1: Overview section
+            const overview = document.getElementById('overview');
+            const test1Pass = !!overview;
+            results.push({
+                name: 'Overview Section Exists',
+                pass: test1Pass,
+                details: test1Pass ? 'Element found' : 'Element not found in page'
+            });
+            
+            // Test 2: Overview is active
+            const test2Pass = overview && overview.classList.contains('active');
+            results.push({
+                name: 'Overview Section is Active',
+                pass: test2Pass,
+                details: overview ? `Classes: ${overview.className}` : 'N/A'
+            });
+            
+            // Test 3: Stats grid exists
+            const statsGrid = document.querySelector('.stats-grid');
+            const test3Pass = !!statsGrid;
+            results.push({
+                name: 'Stats Grid Exists',
+                pass: test3Pass,
+                details: test3Pass ? 'Element found' : 'Element not found'
+            });
+            
+            if (statsGrid) {
+                // Test 4: Stats grid visibility
+                const style = window.getComputedStyle(statsGrid);
+                const test4Pass = style.display !== 'none' && style.visibility !== 'hidden';
+                results.push({
+                    name: 'Stats Grid is Visible',
+                    pass: test4Pass,
+                    details: `display: ${style.display}, visibility: ${style.visibility}`
+                });
+                
+                // Test 5: Stats grid height
+                const height = statsGrid.offsetHeight;
+                const test5Pass = height > 0;
+                results.push({
+                    name: 'Stats Grid Has Height',
+                    pass: test5Pass,
+                    details: `Height: ${height}px`
+                });
+                
+                // Test 6: Stat cards exist
+                const cards = statsGrid.querySelectorAll('.stat-card');
+                const test6Pass = cards.length === 4;
+                results.push({
+                    name: 'Stat Cards Count',
+                    pass: test6Pass,
+                    details: `Found ${cards.length} cards (expected 4)`
+                });
+                
+                // Test 7-10: Individual card heights
+                cards.forEach((card, i) => {
+                    const cardHeight = card.offsetHeight;
+                    const cardPass = cardHeight > 0;
+                    const title = card.querySelector('h6')?.textContent || 'Unknown';
+                    results.push({
+                        name: `Card ${i+1}: ${title}`,
+                        pass: cardPass,
+                        details: `Height: ${cardHeight}px, Display: ${window.getComputedStyle(card).display}`
+                    });
+                });
+            }
+            
+            // Render results
+            let html = '';
+            results.forEach(test => {
+                html += `
+                    <div class="test-item ${test.pass ? 'pass' : 'fail'}">
+                        <span class="test-label">${test.pass ? '✓' : '✗'} ${test.name}</span>
+                        <span class="test-result">${test.pass ? 'PASS' : 'FAIL'}</span>
+                        <div class="details">${test.details}</div>
+                    </div>
+                `;
+            });
+            
+            resultDiv.innerHTML = html || '<p style="color: #999;">No stats grid found on this page. Navigate to dashboard.html first.</p>';
+        }
+        
+        // Run tests after page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runTests);
+        } else {
+            runTests();
+        }
+    </script>
+</body>
+</html>

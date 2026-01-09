@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,12 +19,12 @@
             padding: 0;
             overflow-x: hidden;
         }
-        
+
         /* Ensure AirDatepicker appears above modals */
         .air-datepicker {
             z-index: 2000 !important;
         }
-        
+
         .air-datepicker-global-container {
             z-index: 2000 !important;
         }
@@ -36,7 +37,7 @@
         .top-navbar {
             background: white;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 12px 15px;
+            padding: 0 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -45,6 +46,9 @@
             z-index: 1000;
             flex-wrap: wrap;
             gap: 10px;
+            height: 60px;
+            min-height: 60px;
+            max-height: 60px;
         }
 
         .top-navbar h3 {
@@ -58,9 +62,21 @@
             display: none;
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             color: #0052CC;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(0, 82, 204, 0.1);
+            transform: scale(1.1);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
         }
 
         .user-info {
@@ -71,7 +87,7 @@
             justify-content: flex-end;
         }
 
-        .user-info > div {
+        .user-info>div {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -143,55 +159,95 @@
         .main-wrapper {
             display: flex;
             min-height: calc(100vh - 60px);
+            position: relative;
         }
 
         .sidebar {
-            background: white;
-            padding: 15px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            padding: 20px 0;
             width: 250px;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.08);
             overflow-y: auto;
-            transition: transform 0.3s ease, left 0.3s ease;
             position: relative;
             display: flex;
             flex-direction: column;
+            border-right: 1px solid #e5e7eb;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+            transition: transform 0.3s ease, margin-left 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         .sidebar-menu {
             list-style: none;
             padding: 0;
             margin: 0;
+            flex: 1;
         }
 
         .sidebar-menu li {
-            margin-bottom: 8px;
+            margin: 0;
+            padding: 0;
         }
 
         .sidebar-menu a {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
-            color: #666;
+            padding: 12px 20px;
+            color: #475569;
             text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 14px;
+            font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            position: relative;
+            margin: 4px 8px;
+            border-radius: 10px;
         }
 
-        .sidebar-menu a:hover,
+        .sidebar-menu a:hover {
+            background: rgba(0, 82, 204, 0.08);
+            color: #0052CC;
+            padding-left: 24px;
+        }
+
         .sidebar-menu a.active {
-            background: #f0f4ff;
+            background: linear-gradient(135deg, rgba(0, 82, 204, 0.15) 0%, rgba(91, 141, 238, 0.1) 100%);
             color: #0052CC;
             font-weight: 600;
+            border-left: 3px solid #0052CC;
+            padding-left: 17px;
+            box-shadow: inset 0 2px 4px rgba(0, 82, 204, 0.1);
         }
 
         .sidebar-menu i {
-            margin-right: 10px;
-            width: 18px;
+            margin-right: 12px;
+            width: 20px;
             flex-shrink: 0;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .sidebar-menu a:hover i {
+            transform: scale(1.15);
         }
 
         .main-content {
@@ -200,13 +256,84 @@
             overflow-y: auto;
         }
 
+        /* Mobile sidebar */
+        @media screen and (max-width: 767px) {
+            .sidebar {
+                position: fixed !important;
+                left: -250px !important;
+                top: 60px !important;
+                height: calc(100vh - 60px) !important;
+                z-index: 999 !important;
+                width: 250px !important;
+                transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                border-radius: 0 !important;
+                box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15) !important;
+                padding: 20px 0 !important;
+                overflow-y: auto !important;
+                display: flex !important;
+            }
+
+            .sidebar.active {
+                left: 0 !important;
+            }
+
+            .sidebar-toggle {
+                display: block !important;
+            }
+
+            /* Overlay when sidebar is open */
+            .sidebar-overlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 0, 0, 0.4) !important;
+                z-index: 998 !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                pointer-events: none !important;
+            }
+
+            .sidebar-overlay.active {
+                opacity: 1 !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
+            }
+        }
+
+        /* Desktop sidebar - visible */
+        @media (min-width: 768px) {
+            .sidebar {
+                position: relative !important;
+                left: 0 !important;
+                top: auto !important;
+                height: auto !important;
+                z-index: auto;
+                display: flex !important;
+            }
+
+            .sidebar-toggle {
+                display: none !important;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
         .section {
             display: none;
             animation: fadeIn 0.3s ease-in;
+            width: 100%;
+            visibility: hidden;
         }
 
         .section.active {
             display: block;
+            visibility: visible;
+            opacity: 1;
         }
 
         @keyframes fadeIn {
@@ -214,6 +341,7 @@
                 opacity: 0;
                 transform: translateY(10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -221,46 +349,79 @@
         }
 
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+            gap: 18px !important;
+            margin-bottom: 25px !important;
+            width: 100% !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: transparent !important;
+            padding: 24px !important;
+            border-radius: 12px !important;
+            border: none !important;
         }
 
         .stat-card {
-            background: white;
-            padding: 18px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #0052CC;
-            transition: transform 0.3s, box-shadow 0.3s;
+            background: white !important;
+            padding: 20px 16px !important;
+            border-radius: 10px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            border-left: 4px solid #0052CC !important;
+            transition: transform 0.3s, box-shadow 0.3s !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            min-height: 140px !important;
+            text-align: center !important;
+            gap: 4px !important;
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         }
 
         .stat-card h6 {
-            color: #999;
-            font-size: 11px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #999 !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.8px !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            line-height: 1.3 !important;
         }
 
         .stat-card .stat-value {
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            font-weight: bold;
-            color: #0052CC;
-            margin-bottom: 6px;
-            line-height: 1;
+            font-size: clamp(1.8rem, 6vw, 2.2rem) !important;
+            font-weight: 700 !important;
+            color: #0052CC !important;
+            margin: 6px 0 4px 0 !important;
+            padding: 0 !important;
+            line-height: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            text-align: center !important;
         }
 
         .stat-card .stat-change {
-            font-size: 12px;
-            color: #666;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+            color: #666 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            text-align: center !important;
+            line-height: 1.4 !important;
         }
 
         .stat-card.success {
@@ -417,8 +578,9 @@
             }
 
             .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 12px;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+                gap: 14px !important;
+                padding: 18px !important;
             }
 
             .content-card {
@@ -472,9 +634,9 @@
                 left: -250px;
                 top: 60px;
                 height: calc(100vh - 60px);
-                width: 250px;
-                z-index: 999;
+                z-index: 9999;
                 border-right: 1px solid #e0e0e0;
+                display: flex;
                 transition: left 0.3s ease;
             }
 
@@ -490,7 +652,7 @@
                 right: 0;
                 bottom: 0;
                 background: rgba(0, 0, 0, 0.3);
-                z-index: 998;
+                z-index: 9998;
                 opacity: 0;
                 transition: opacity 0.3s ease;
                 pointer-events: none;
@@ -512,12 +674,14 @@
             }
 
             .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                grid-template-columns: 1fr !important;
+                gap: 12px !important;
+                padding: 16px !important;
             }
 
             .stat-card {
-                padding: 15px;
+                padding: 16px 14px !important;
+                min-height: 130px !important;
             }
 
             .stat-card h6 {
@@ -576,7 +740,7 @@
                 margin-left: -6px;
             }
 
-            .row > [class*='col-'] {
+            .row>[class*='col-'] {
                 padding-right: 6px;
                 padding-left: 6px;
                 margin-bottom: 10px;
@@ -605,11 +769,13 @@
             }
 
             .stats-grid {
-                gap: 8px;
+                gap: 10px !important;
+                padding: 14px !important;
             }
 
             .stat-card {
-                padding: 12px;
+                padding: 14px 12px !important;
+                min-height: 120px !important;
             }
 
             .stat-card h6 {
@@ -663,12 +829,14 @@
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+                padding: 14px !important;
             }
 
             .stat-card {
-                padding: 12px;
+                padding: 14px 12px !important;
+                min-height: 110px !important;
             }
 
             .stat-card h6 {
@@ -950,7 +1118,9 @@
             border-top: 1px solid #f0f0f0;
         }
 
-        .btn-view, .btn-edit, .btn-delete {
+        .btn-view,
+        .btn-edit,
+        .btn-delete {
             flex: 1;
             padding: 6px;
             border: none;
@@ -1073,6 +1243,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1376,8 +1547,9 @@
             border: 6px solid transparent;
             border-bottom-color: #1f2937;
         }
-        </style>
+    </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Top Navigation Bar -->
@@ -1385,483 +1557,520 @@
             <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <h3><i class="fas fa-hospital me-2"></i> HealthFlow Dashboard</h3>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="logo/logo.png" alt="HealthFlow Logo" style="height: 55px;">
+                <h3 style="margin: 0;"><span style="color: #05696B;">Health</span><span
+                        style="color: #EDB23D;">Flow</span></h3>
+            </div>
             <div class="user-info">
-                <div class="user-avatar" id="userInitials">YF</div>
-                <div class="user-details">
-                    <small>Logged in as</small>
-                    <div id="facilityName">Your Facility</div>
+                <div style="position: relative;">
+                    <button class="user-avatar" id="userInitials" onclick="toggleProfileMenu()"
+                        style="background: linear-gradient(135deg, #0052CC 0%, #5B8DEE 100%); border: none; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">YF</button>
+                    <div class="profile-dropdown" id="profileDropdown"
+                        style="display: none; position: absolute; top: 45px; right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; z-index: 1001;">
+                        <div style="padding: 12px 16px; border-bottom: 1px solid #eee;">
+                            <div
+                                style="color: #999; font-size: 11px; text-transform: uppercase; font-weight: 600; margin-bottom: 4px;">
+                                User Role</div>
+                            <div id="userRoleDisplay" style="font-weight: 600; color: #0052CC; font-size: 13px;">
+                                Administrator</div>
+                        </div>
+                        <button onclick="logout()"
+                            style="width: 100%; padding: 12px 16px; background: none; border: none; color: #dc3545; font-weight: 600; text-align: left; cursor: pointer; font-size: 13px; transition: background 0.2s;">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </button>
+                    </div>
                 </div>
-                <button class="logout-btn" onclick="logout()">
-                    <i class="fas fa-sign-out-alt me-1"></i> Logout
-                </button>
             </div>
         </div>
 
         <!-- Sidebar Overlay (for mobile) -->
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="window.closeSidebar && window.closeSidebar()"></div>
 
         <div class="main-wrapper">
             <!-- Sidebar -->
             <div class="sidebar" id="sidebar">
-                    <ul class="sidebar-menu">
-                        <li><a href="#" onclick="showSection('overview', event)" class="sidebar-link active">
+                <ul class="sidebar-menu">
+                    <li><a href="#" onclick="showSection('overview', event)" class="sidebar-link active">
                             <i class="fas fa-chart-line"></i> Overview
                         </a></li>
-                        <li><a href="#" onclick="showSection('patients', event)" class="sidebar-link">
+                    <li><a href="#" onclick="showSection('patients', event)" class="sidebar-link">
                             <i class="fas fa-users"></i> Patients
                         </a></li>
-                        <li><a href="#" onclick="showSection('appointments', event)" class="sidebar-link">
+                    <li><a href="#" onclick="showSection('appointments', event)" class="sidebar-link">
                             <i class="fas fa-calendar-check"></i> Appointments
                         </a></li>
-                        <li><a href="#" onclick="showSection('hiv', event)" class="sidebar-link">
+                    <li><a href="#" onclick="showSection('hiv', event)" class="sidebar-link">
                             <i class="fas fa-ribbon"></i> HIV Management
                         </a></li>
-                        <li><a href="#" onclick="showSection('reports', event)" class="sidebar-link">
+                    <li><a href="#" onclick="showSection('reports', event)" class="sidebar-link">
                             <i class="fas fa-file-alt"></i> Reports
                         </a></li>
-                        <li style="border-top: 1px solid #e0e0e0; margin-top: 10px; padding-top: 10px;">
-                            <a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#facilityModal">
-                                <i class="fas fa-hospital"></i> Register Facility
-                            </a>
-                        </li>
-                        <li><a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#patientWizardModal">
+                    <li style="border-top: 1px solid #e0e0e0; margin-top: 10px; padding-top: 10px;">
+                        <a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#facilityModal">
+                            <i class="fas fa-hospital"></i> Register Facility
+                        </a>
+                    </li>
+                    <li><a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#patientWizardModal">
                             <i class="fas fa-user-plus"></i> Register Patient
                         </a></li>
-                        <li><a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                    <li><a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#appointmentModal">
                             <i class="fas fa-calendar-plus"></i> Schedule Appointment
                         </a></li>
-                        <li><a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#userRegistrationModal">
+                    <li><a href="#" class="sidebar-link" data-bs-toggle="modal" data-bs-target="#userRegistrationModal">
                             <i class="fas fa-user-shield"></i> Register User
                         </a></li>
-                        <li style="border-top: 1px solid #e0e0e0; margin-top: 10px; padding-top: 10px;">
-                            <a href="#" onclick="showSection('import', event)" class="sidebar-link">
-                                <i class="fas fa-file-import"></i> Import Data
-                            </a>
-                        </li>
-                        <li><a href="#" onclick="showSection('settings', event)" class="sidebar-link">
+                    <li style="border-top: 1px solid #e0e0e0; margin-top: 10px; padding-top: 10px;">
+                        <a href="#" onclick="showSection('import', event)" class="sidebar-link">
+                            <i class="fas fa-file-import"></i> Import Data
+                        </a>
+                    </li>
+                    <li><a href="#" onclick="showSection('settings', event)" class="sidebar-link">
                             <i class="fas fa-cog"></i> Settings
                         </a></li>
-                    </ul>
+                </ul>
             </div>
 
             <!-- Main Content -->
             <div class="main-content">
-                    <!-- OVERVIEW SECTION -->
-                    <div id="overview" class="section active">
-                        <div class="page-title">
-                            <h4>Welcome to Your Dashboard</h4>
-                            <p>Track your facility's performance and patient data at a glance</p>
-                        </div>
-
-                        <!-- Facility Information Card -->
-                        <div style="background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%); border-left: 5px solid #0052CC; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0, 82, 204, 0.08);">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px;">
-                                <!-- Facility Name -->
-                                <div style="display: flex; align-items: flex-start; gap: 12px; padding-right: 25px; border-right: 2px solid rgba(0, 82, 204, 0.15);">
-                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #0052CC 0%, #5B8DEE 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="fas fa-hospital" style="color: white; font-size: 18px;"></i>
-                                    </div>
-                                    <div>
-                                        <small style="color: #0052CC; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Facility Name</small>
-                                        <div id="facilityNameDisplay" style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin-top: 6px; line-height: 1.3;">Loading...</div>
-                                    </div>
-                                </div>
-                                <!-- Region -->
-                                <div style="display: flex; align-items: flex-start; gap: 12px; padding-right: 25px; border-right: 2px solid rgba(0, 82, 204, 0.15);">
-                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #28a745 0%, #6ec956 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="fas fa-map-marker-alt" style="color: white; font-size: 18px;"></i>
-                                    </div>
-                                    <div>
-                                        <small style="color: #28a745; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Region</small>
-                                        <div id="facilityRegionDisplay" style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin-top: 6px;">Loading...</div>
-                                    </div>
-                                </div>
-                                <!-- Facility ID -->
-                                <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #ffc107 0%, #ffb43a 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i class="fas fa-hashtag" style="color: white; font-size: 18px;"></i>
-                                    </div>
-                                    <div>
-                                        <small style="color: #ff9800; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Facility ID</small>
-                                        <div id="facilityIdDisplay" style="font-size: 14px; font-weight: 700; color: #0052CC; margin-top: 6px; font-family: 'Courier New', monospace; letter-spacing: 0.3px; word-break: break-all;">Loading...</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                        <div class="stats-grid">
-                            <div class="stat-card success">
-                                <h6>Total Patients</h6>
-                                <div class="stat-value">1,247</div>
-                                <div class="stat-change"><i class="fas fa-arrow-up"></i> +45 this month</div>
-                            </div>
-                            <div class="stat-card warning">
-                                <h6>Pending Appointments</h6>
-                                <div class="stat-value">32</div>
-                                <div class="stat-change">5 today</div>
-                            </div>
-                            <div class="stat-card">
-                                <h6>Active HIV Cases</h6>
-                                <div class="stat-value">456</div>
-                                <div class="stat-change">98% on ART</div>
-                            </div>
-                            <div class="stat-card danger">
-                                <h6>No-Shows This Month</h6>
-                                <div class="stat-value">12</div>
-                                <div class="stat-change"><i class="fas fa-arrow-down"></i> -8 vs last month</div>
-                            </div>
-                        </div>
-
-                        <div class="content-card">
-                            <h5><i class="fas fa-history me-2"></i> Recent Activity</h5>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Activity</th>
-                                        <th>Patient</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Jan 8, 2026</td>
-                                        <td>Patient Check-in</td>
-                                        <td>John Mwangi</td>
-                                        <td><span class="badge-custom badge-success">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 7, 2026</td>
-                                        <td>Viral Load Updated</td>
-                                        <td>Sarah Kipchoge</td>
-                                        <td><span class="badge-custom badge-success">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 6, 2026</td>
-                                        <td>Appointment Scheduled</td>
-                                        <td>James Ochieng</td>
-                                        <td><span class="badge-custom badge-warning">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Jan 5, 2026</td>
-                                        <td>Medication Refilled</td>
-                                        <td>Grace Otieno</td>
-                                        <td><span class="badge-custom badge-success">Completed</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                <!-- OVERVIEW SECTION -->
+                <div id="overview" class="section active">
+                    <div class="page-title">
+                        <h4>Welcome to Your Dashboard</h4>
+                        <p>Track your facility's performance and patient data at a glance</p>
                     </div>
 
-                    <!-- PATIENTS SECTION -->
-                    <div id="patients" class="section">
-                        <div class="page-title">
-                            <h4><i class="fas fa-users me-2"></i>Patient Management</h4>
-                            <p id="patientCount">Total: 0 patients</p>
-                        </div>
-
-                        <!-- Search and Filters -->
-                        <div class="content-card">
-                            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;">
-                                <div class="search-box">
-                                    <input type="text" id="searchInput" placeholder="Search by name, ID, or phone...">
+                    <!-- Facility Information Card -->
+                    <div
+                        style="background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%); border-left: 5px solid #0052CC; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0, 82, 204, 0.08);">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px;">
+                            <!-- Facility Name -->
+                            <div
+                                style="display: flex; align-items: flex-start; gap: 12px; padding-right: 25px; border-right: 2px solid rgba(0, 82, 204, 0.15);">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #0052CC 0%, #5B8DEE 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-hospital" style="color: white; font-size: 18px;"></i>
                                 </div>
-                                <button class="btn btn-primary" onclick="openAddPatientModal()" style="white-space: nowrap;">
-                                    <i class="fas fa-user-plus me-2"></i> Add Patient
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Filters -->
-                        <div class="filters">
-                            <div class="filter-group">
-                                <label>Status:</label>
-                                <select id="statusFilter">
-                                    <option value="">All</option>
-                                    <option value="Active">Active</option>
-                                    <option value="At Risk">At Risk</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>Condition:</label>
-                                <select id="conditionFilter">
-                                    <option value="">All</option>
-                                    <option value="HIV">HIV</option>
-                                    <option value="Diabetes">Diabetes</option>
-                                    <option value="Hypertension">Hypertension</option>
-                                    <option value="Maternal Health">Maternal Health</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Patients Grid -->
-                        <div class="patients-grid" id="patientsContainer">
-                            <div class="empty-state" style="grid-column: 1 / -1;">
-                                <i class="fas fa-users"></i>
-                                <h5>No patients yet</h5>
-                                <p>Click "Add Patient" to register your first patient</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- APPOINTMENTS SECTION -->
-                    <div id="appointments" class="section">
-                        <div class="page-title">
-                            <h4>Appointment Management</h4>
-                            <p>Schedule and track patient appointments</p>
-                        </div>
-
-                        <div class="content-card">
-                            <h5><i class="fas fa-calendar-alt me-2"></i> Upcoming Appointments</h5>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Patient</th>
-                                        <th>Date & Time</th>
-                                        <th>Type</th>
-                                        <th>Provider</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Peter Njoroge</td>
-                                        <td>Jan 10, 2026 - 10:00 AM</td>
-                                        <td>Follow-up</td>
-                                        <td>Dr. Omondi</td>
-                                        <td><span class="badge-custom badge-success">Confirmed</span></td>
-                                        <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Mary Karanja</td>
-                                        <td>Jan 10, 2026 - 2:30 PM</td>
-                                        <td>Lab Test</td>
-                                        <td>Nurse Sara</td>
-                                        <td><span class="badge-custom badge-warning">Pending</span></td>
-                                        <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>David Kipkemboi</td>
-                                        <td>Jan 11, 2026 - 9:00 AM</td>
-                                        <td>Consultation</td>
-                                        <td>Dr. Kamau</td>
-                                        <td><span class="badge-custom badge-success">Confirmed</span></td>
-                                        <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- HIV MANAGEMENT SECTION -->
-                    <div id="hiv" class="section">
-                        <div class="page-title">
-                            <h4>HIV Management</h4>
-                            <p>Monitor and track HIV patient cohorts</p>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <h6>Total on ART</h6>
-                                <div class="stat-value">456</div>
-                                <div class="stat-change">98% of cohort</div>
-                            </div>
-                            <div class="stat-card success">
-                                <h6>Undetectable VL</h6>
-                                <div class="stat-value">422</div>
-                                <div class="stat-change">92.5% suppressed</div>
-                            </div>
-                            <div class="stat-card danger">
-                                <h6>High Viral Load</h6>
-                                <div class="stat-value">12</div>
-                                <div class="stat-change">Needs intervention</div>
-                            </div>
-                            <div class="stat-card warning">
-                                <h6>Lost to Follow-up</h6>
-                                <div class="stat-value">8</div>
-                                <div class="stat-change">In last 3 months</div>
-                            </div>
-                        </div>
-
-                        <div class="content-card">
-                            <h5><i class="fas fa-triangle-exclamation me-2"></i> Patients Requiring Attention</h5>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Patient Name</th>
-                                        <th>Last Viral Load</th>
-                                        <th>VL Status</th>
-                                        <th>Last Visit</th>
-                                        <th>Action Required</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Moses Ouma</td>
-                                        <td>5,400 copies/mL</td>
-                                        <td><span class="badge-custom badge-danger">High</span></td>
-                                        <td>Dec 15, 2025</td>
-                                        <td><button class="btn btn-sm btn-danger">Schedule Counseling</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Alice Wanjiru</td>
-                                        <td>Last 6 months - No test</td>
-                                        <td><span class="badge-custom badge-warning">Pending</span></td>
-                                        <td>Oct 10, 2025</td>
-                                        <td><button class="btn btn-sm btn-warning">Schedule Test</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Richard Ochieng</td>
-                                        <td>Undetectable</td>
-                                        <td><span class="badge-custom badge-success">Suppressed</span></td>
-                                        <td>Jan 5, 2026</td>
-                                        <td><button class="btn btn-sm btn-success">Continue Care</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- REPORTS SECTION -->
-                    <div id="reports" class="section">
-                        <div class="page-title">
-                            <h4>Reports & Analytics</h4>
-                            <p>Generate and view facility performance reports</p>
-                        </div>
-
-                        <div class="content-card">
-                            <h5><i class="fas fa-file-download me-2"></i> Available Reports</h5>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">Monthly Performance Report</h6>
-                                        <p class="text-muted mb-3">Overview of facility metrics for the current month</p>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-download me-1"></i> Download
-                                        </button>
-                                    </div>
+                                <div>
+                                    <small
+                                        style="color: #0052CC; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Facility
+                                        Name</small>
+                                    <div id="facilityNameDisplay"
+                                        style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin-top: 6px; line-height: 1.3;">
+                                        Loading...</div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">Patient Demographics Report</h6>
-                                        <p class="text-muted mb-3">Detailed breakdown of patient demographics and conditions</p>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-download me-1"></i> Download
-                                        </button>
-                                    </div>
+                            </div>
+                            <!-- Region -->
+                            <div
+                                style="display: flex; align-items: flex-start; gap: 12px; padding-right: 25px; border-right: 2px solid rgba(0, 82, 204, 0.15);">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #28a745 0%, #6ec956 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-map-marker-alt" style="color: white; font-size: 18px;"></i>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">HIV Cohort Report</h6>
-                                        <p class="text-muted mb-3">Comprehensive HIV management and treatment outcomes</p>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-download me-1"></i> Download
-                                        </button>
-                                    </div>
+                                <div>
+                                    <small
+                                        style="color: #28a745; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Region</small>
+                                    <div id="facilityRegionDisplay"
+                                        style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin-top: 6px;">
+                                        Loading...</div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">Compliance Report</h6>
-                                        <p class="text-muted mb-3">Data quality and compliance metrics</p>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-download me-1"></i> Download
-                                        </button>
-                                    </div>
+                            </div>
+                            <!-- Facility ID -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div
+                                    style="width: 40px; height: 40px; background: linear-gradient(135deg, #ffc107 0%, #ffb43a 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-hashtag" style="color: white; font-size: 18px;"></i>
+                                </div>
+                                <div>
+                                    <small
+                                        style="color: #ff9800; font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Facility
+                                        ID</small>
+                                    <div id="facilityIdDisplay"
+                                        style="font-size: 14px; font-weight: 700; color: #0052CC; margin-top: 6px; font-family: 'Courier New', monospace; letter-spacing: 0.3px; word-break: break-all;">
+                                        Loading...</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- DATA IMPORT SECTION -->
-                    <div id="import" class="section">
-                        <div class="page-title">
-                            <h4>Import Data</h4>
-                            <p>Import patient and appointment data from CSV files</p>
-                        </div>
 
-                        <div class="content-card">
-                            <h5><i class="fas fa-upload me-2"></i> Quick Import</h5>
-                            <p class="text-muted">Select a CSV file to import patient or appointment data to your facility.</p>
-                            <button class="btn btn-primary" id="importDataBtn">
-                                <i class="fas fa-file-import me-2"></i> Open Import Tool
+
+                    <div class="stats-grid">
+                        <div class="stat-card success">
+                            <h6>Total Patients</h6>
+                            <div class="stat-value">1,247</div>
+                            <div class="stat-change"><i class="fas fa-arrow-up"></i> +45 this month</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <h6>Pending Appointments</h6>
+                            <div class="stat-value">32</div>
+                            <div class="stat-change">5 today</div>
+                        </div>
+                        <div class="stat-card">
+                            <h6>Active HIV Cases</h6>
+                            <div class="stat-value">456</div>
+                            <div class="stat-change">98% on ART</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <h6>No-Shows This Month</h6>
+                            <div class="stat-value">12</div>
+                            <div class="stat-change"><i class="fas fa-arrow-down"></i> -8 vs last month</div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-history me-2"></i> Recent Activity</h5>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Patient</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Jan 8, 2026</td>
+                                    <td>Patient Check-in</td>
+                                    <td>John Mwangi</td>
+                                    <td><span class="badge-custom badge-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 7, 2026</td>
+                                    <td>Viral Load Updated</td>
+                                    <td>Sarah Kipchoge</td>
+                                    <td><span class="badge-custom badge-success">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 6, 2026</td>
+                                    <td>Appointment Scheduled</td>
+                                    <td>James Ochieng</td>
+                                    <td><span class="badge-custom badge-warning">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Jan 5, 2026</td>
+                                    <td>Medication Refilled</td>
+                                    <td>Grace Otieno</td>
+                                    <td><span class="badge-custom badge-success">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PATIENTS SECTION -->
+                <div id="patients" class="section">
+                    <div class="page-title">
+                        <h4><i class="fas fa-users me-2"></i>Patient Management</h4>
+                        <p id="patientCount">Total: 0 patients</p>
+                    </div>
+
+                    <!-- Search and Filters -->
+                    <div class="content-card">
+                        <div
+                            style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; align-items: center;">
+                            <div class="search-box">
+                                <input type="text" id="searchInput" placeholder="Search by name, ID, or phone...">
+                            </div>
+                            <button class="btn btn-primary" onclick="openAddPatientModal()"
+                                style="white-space: nowrap;">
+                                <i class="fas fa-user-plus me-2"></i> Add Patient
                             </button>
                         </div>
+                    </div>
 
-                        <div class="content-card">
-                            <h5><i class="fas fa-info-circle me-2"></i> Import Requirements</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>Patient Data Requirements</h6>
-                                    <ul class="small text-muted">
-                                        <li>CSV format with headers</li>
-                                        <li>Required: full_name, age, gender, phone, email, primary_condition</li>
-                                        <li>Optional: region, facility</li>
-                                        <li>Maximum 1000 records per import</li>
-                                    </ul>
+                    <!-- Filters -->
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>Status:</label>
+                            <select id="statusFilter">
+                                <option value="">All</option>
+                                <option value="Active">Active</option>
+                                <option value="At Risk">At Risk</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Condition:</label>
+                            <select id="conditionFilter">
+                                <option value="">All</option>
+                                <option value="HIV">HIV</option>
+                                <option value="Diabetes">Diabetes</option>
+                                <option value="Hypertension">Hypertension</option>
+                                <option value="Maternal Health">Maternal Health</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Patients Grid -->
+                    <div class="patients-grid" id="patientsContainer">
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-users"></i>
+                            <h5>No patients yet</h5>
+                            <p>Click "Add Patient" to register your first patient</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- APPOINTMENTS SECTION -->
+                <div id="appointments" class="section">
+                    <div class="page-title">
+                        <h4>Appointment Management</h4>
+                        <p>Schedule and track patient appointments</p>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-calendar-alt me-2"></i> Upcoming Appointments</h5>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Provider</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Peter Njoroge</td>
+                                    <td>Jan 10, 2026 - 10:00 AM</td>
+                                    <td>Follow-up</td>
+                                    <td>Dr. Omondi</td>
+                                    <td><span class="badge-custom badge-success">Confirmed</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Mary Karanja</td>
+                                    <td>Jan 10, 2026 - 2:30 PM</td>
+                                    <td>Lab Test</td>
+                                    <td>Nurse Sara</td>
+                                    <td><span class="badge-custom badge-warning">Pending</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td>David Kipkemboi</td>
+                                    <td>Jan 11, 2026 - 9:00 AM</td>
+                                    <td>Consultation</td>
+                                    <td>Dr. Kamau</td>
+                                    <td><span class="badge-custom badge-success">Confirmed</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary">Edit</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- HIV MANAGEMENT SECTION -->
+                <div id="hiv" class="section">
+                    <div class="page-title">
+                        <h4>HIV Management</h4>
+                        <p>Monitor and track HIV patient cohorts</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h6>Total on ART</h6>
+                            <div class="stat-value">456</div>
+                            <div class="stat-change">98% of cohort</div>
+                        </div>
+                        <div class="stat-card success">
+                            <h6>Undetectable VL</h6>
+                            <div class="stat-value">422</div>
+                            <div class="stat-change">92.5% suppressed</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <h6>High Viral Load</h6>
+                            <div class="stat-value">12</div>
+                            <div class="stat-change">Needs intervention</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <h6>Lost to Follow-up</h6>
+                            <div class="stat-value">8</div>
+                            <div class="stat-change">In last 3 months</div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-triangle-exclamation me-2"></i> Patients Requiring Attention</h5>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Last Viral Load</th>
+                                    <th>VL Status</th>
+                                    <th>Last Visit</th>
+                                    <th>Action Required</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Moses Ouma</td>
+                                    <td>5,400 copies/mL</td>
+                                    <td><span class="badge-custom badge-danger">High</span></td>
+                                    <td>Dec 15, 2025</td>
+                                    <td><button class="btn btn-sm btn-danger">Schedule Counseling</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Alice Wanjiru</td>
+                                    <td>Last 6 months - No test</td>
+                                    <td><span class="badge-custom badge-warning">Pending</span></td>
+                                    <td>Oct 10, 2025</td>
+                                    <td><button class="btn btn-sm btn-warning">Schedule Test</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Richard Ochieng</td>
+                                    <td>Undetectable</td>
+                                    <td><span class="badge-custom badge-success">Suppressed</span></td>
+                                    <td>Jan 5, 2026</td>
+                                    <td><button class="btn btn-sm btn-success">Continue Care</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- REPORTS SECTION -->
+                <div id="reports" class="section">
+                    <div class="page-title">
+                        <h4>Reports & Analytics</h4>
+                        <p>Generate and view facility performance reports</p>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-file-download me-2"></i> Available Reports</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 border rounded">
+                                    <h6 class="mb-2">Monthly Performance Report</h6>
+                                    <p class="text-muted mb-3">Overview of facility metrics for the current month</p>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
                                 </div>
-                                <div class="col-md-6">
-                                    <h6>Appointment Data Requirements</h6>
-                                    <ul class="small text-muted">
-                                        <li>CSV format with headers</li>
-                                        <li>Required: patient_id, full_name, next_appointment, appointment_time, status</li>
-                                        <li>Optional: primary_condition, notes, facility</li>
-                                        <li>Date format: DD/MM/YYYY</li>
-                                    </ul>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 border rounded">
+                                    <h6 class="mb-2">Patient Demographics Report</h6>
+                                    <p class="text-muted mb-3">Detailed breakdown of patient demographics and conditions
+                                    </p>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 border rounded">
+                                    <h6 class="mb-2">HIV Cohort Report</h6>
+                                    <p class="text-muted mb-3">Comprehensive HIV management and treatment outcomes</p>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="p-3 border rounded">
+                                    <h6 class="mb-2">Compliance Report</h6>
+                                    <p class="text-muted mb-3">Data quality and compliance metrics</p>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download me-1"></i> Download
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- SETTINGS SECTION -->
-                    <div id="settings" class="section">
-                        <div class="page-title">
-                            <h4>Facility Settings</h4>
-                            <p>Manage your facility configuration</p>
-                        </div>
+                <!-- DATA IMPORT SECTION -->
+                <div id="import" class="section">
+                    <div class="page-title">
+                        <h4>Import Data</h4>
+                        <p>Import patient and appointment data from CSV files</p>
+                    </div>
 
-                        <div class="content-card">
-                            <h5><i class="fas fa-building me-2"></i> Facility Information</h5>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Facility Name</label>
-                                    <input type="text" class="form-control" id="facilityNameInput" placeholder="Your Facility Name">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" placeholder="facility@email.com">
-                                </div>
+                    <div class="content-card">
+                        <h5><i class="fas fa-upload me-2"></i> Quick Import</h5>
+                        <p class="text-muted">Select a CSV file to import patient or appointment data to your facility.
+                        </p>
+                        <button class="btn btn-primary" id="importDataBtn">
+                            <i class="fas fa-file-import me-2"></i> Open Import Tool
+                        </button>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-info-circle me-2"></i> Import Requirements</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Patient Data Requirements</h6>
+                                <ul class="small text-muted">
+                                    <li>CSV format with headers</li>
+                                    <li>Required: full_name, age, gender, phone, email, primary_condition</li>
+                                    <li>Optional: region, facility</li>
+                                    <li>Maximum 1000 records per import</li>
+                                </ul>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Phone</label>
-                                    <input type="tel" class="form-control" placeholder="+256 700 000 000">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Location</label>
-                                    <input type="text" class="form-control" placeholder="City, Region">
-                                </div>
-                            </div>
-                            <button class="btn btn-primary">
-                                <i class="fas fa-save me-2"></i> Save Changes
-                            </button>
-                        </div>
-
-                        <div class="content-card">
-                            <h5><i class="fas fa-lock me-2"></i> Security Settings</h5>
-                            <div class="mb-3">
-                                <label class="form-label">Change Password</label>
-                                <input type="password" class="form-control" placeholder="Current password">
-                                <input type="password" class="form-control mt-2" placeholder="New password">
-                                <input type="password" class="form-control mt-2" placeholder="Confirm new password">
-                                <button class="btn btn-primary mt-3">Update Password</button>
+                            <div class="col-md-6">
+                                <h6>Appointment Data Requirements</h6>
+                                <ul class="small text-muted">
+                                    <li>CSV format with headers</li>
+                                    <li>Required: patient_id, full_name, next_appointment, appointment_time, status</li>
+                                    <li>Optional: primary_condition, notes, facility</li>
+                                    <li>Date format: DD/MM/YYYY</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- SETTINGS SECTION -->
+                <div id="settings" class="section">
+                    <div class="page-title">
+                        <h4>Facility Settings</h4>
+                        <p>Manage your facility configuration</p>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-building me-2"></i> Facility Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Facility Name</label>
+                                <input type="text" class="form-control" id="facilityNameInput"
+                                    placeholder="Your Facility Name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" placeholder="facility@email.com">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" placeholder="+256 700 000 000">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" placeholder="City, Region">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Save Changes
+                        </button>
+                    </div>
+
+                    <div class="content-card">
+                        <h5><i class="fas fa-lock me-2"></i> Security Settings</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Change Password</label>
+                            <input type="password" class="form-control" placeholder="Current password">
+                            <input type="password" class="form-control mt-2" placeholder="New password">
+                            <input type="password" class="form-control mt-2" placeholder="Confirm new password">
+                            <button class="btn btn-primary mt-3">Update Password</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1880,7 +2089,8 @@
                         <div class="mb-3">
                             <label class="form-label">Facility ID <span style="color: red;">*</span></label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="facility_id" id="facilityIdInput" placeholder="e.g., facility-kampala-001" required>
+                                <input type="text" class="form-control" name="facility_id" id="facilityIdInput"
+                                    placeholder="e.g., facility-kampala-001" required>
                                 <button type="button" class="btn btn-outline-primary" id="generateFacilityIdBtn">
                                     <i class="fas fa-magic"></i> Generate
                                 </button>
@@ -1890,7 +2100,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Facility Name <span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" name="facility_name" id="facilityNameInput" placeholder="e.g., Kampala Regional Referral Hospital" required>
+                            <input type="text" class="form-control" name="facility_name" id="facilityNameInput"
+                                placeholder="e.g., Kampala Regional Referral Hospital" required>
                         </div>
 
                         <div class="mb-3">
@@ -1933,12 +2144,14 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Patient ID <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="patient_id" placeholder="e.g., PAT1001" required>
+                                <input type="text" class="form-control" name="patient_id" placeholder="e.g., PAT1001"
+                                    required>
                                 <small class="text-muted">Must match existing patient ID</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Patient Name <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="patient_name" placeholder="Patient full name" required>
+                                <input type="text" class="form-control" name="patient_name"
+                                    placeholder="Patient full name" required>
                             </div>
                         </div>
 
@@ -1948,7 +2161,8 @@
                             <div class="col-md-6">
                                 <label class="form-label">Appointment Date <span style="color: red;">*</span></label>
                                 <div class="input-group date" id="appointmentDatePicker" data-target-input="nearest">
-                                    <input type="text" class="form-control" id="appointmentDate" name="appointment_date" placeholder="YYYY-MM-DD" required>
+                                    <input type="text" class="form-control" id="appointmentDate" name="appointment_date"
+                                        placeholder="YYYY-MM-DD" required>
                                     <span class="input-group-text">
                                         <i class="fas fa-calendar"></i>
                                     </span>
@@ -1975,8 +2189,10 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Last Appointment Date</label>
-                                <div class="input-group date" id="lastAppointmentDatePicker" data-target-input="nearest">
-                                    <input type="text" class="form-control" id="lastAppointmentDate" name="last_appointment" placeholder="YYYY-MM-DD">
+                                <div class="input-group date" id="lastAppointmentDatePicker"
+                                    data-target-input="nearest">
+                                    <input type="text" class="form-control" id="lastAppointmentDate"
+                                        name="last_appointment" placeholder="YYYY-MM-DD">
                                     <span class="input-group-text">
                                         <i class="fas fa-calendar"></i>
                                     </span>
@@ -1989,13 +2205,16 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Facility <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="facility" placeholder="e.g., Kampala Regional Referral Hospital" required>
+                                <input type="text" class="form-control" name="facility"
+                                    placeholder="e.g., Kampala Regional Referral Hospital" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Facility ID Code <span style="color: red;">*</span></label>
                                 <div class="input-group-facility">
-                                    <input type="text" class="form-control" id="patientFacilityIdCode" name="facility_id_code" placeholder="Auto-generated" required readonly>
-                                    <button type="button" id="generatePatientFacilityBtn" class="btn-generate-facility">Gen</button>
+                                    <input type="text" class="form-control" id="patientFacilityIdCode"
+                                        name="facility_id_code" placeholder="Auto-generated" required readonly>
+                                    <button type="button" id="generatePatientFacilityBtn"
+                                        class="btn-generate-facility">Gen</button>
                                 </div>
                             </div>
                         </div>
@@ -2018,13 +2237,15 @@
 
                         <div class="mb-3">
                             <label class="form-label">Clinical Notes</label>
-                            <textarea class="form-control" name="notes" placeholder="Add any clinical notes or special requirements..." rows="3"></textarea>
+                            <textarea class="form-control" name="notes"
+                                placeholder="Add any clinical notes or special requirements..." rows="3"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="appointmentSubmitBtn">Schedule Appointment</button>
+                    <button type="button" class="btn btn-primary" id="appointmentSubmitBtn">Schedule
+                        Appointment</button>
                 </div>
             </div>
         </div>
@@ -2046,11 +2267,13 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Full Name <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="fullname" placeholder="e.g., John Doe" required>
+                                <input type="text" class="form-control" name="fullname" placeholder="e.g., John Doe"
+                                    required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Username <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="username" placeholder="e.g., johndoe" required>
+                                <input type="text" class="form-control" name="username" placeholder="e.g., johndoe"
+                                    required>
                             </div>
                         </div>
 
@@ -2058,18 +2281,22 @@
                         <h6 class="mb-3"><i class="fas fa-lock me-2"></i> Account Information</h6>
                         <div class="mb-3">
                             <label class="form-label">Email Address <span style="color: red;">*</span></label>
-                            <input type="email" class="form-control" name="email" placeholder="user@example.com" required>
+                            <input type="email" class="form-control" name="email" placeholder="user@example.com"
+                                required>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Password <span style="color: red;">*</span></label>
-                                <input type="password" class="form-control" id="userPassword" name="password" placeholder="Enter password" required>
-                                <small class="text-muted">Minimum 8 characters, include uppercase, lowercase, and numbers</small>
+                                <input type="password" class="form-control" id="userPassword" name="password"
+                                    placeholder="Enter password" required>
+                                <small class="text-muted">Minimum 8 characters, include uppercase, lowercase, and
+                                    numbers</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Confirm Password <span style="color: red;">*</span></label>
-                                <input type="password" class="form-control" id="userConfirmPassword" name="confirm_password" placeholder="Confirm password" required>
+                                <input type="password" class="form-control" id="userConfirmPassword"
+                                    name="confirm_password" placeholder="Confirm password" required>
                             </div>
                         </div>
 
@@ -2078,7 +2305,8 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Facility Name <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="facility_name" id="userFacilityName" readonly>
+                                <input type="text" class="form-control" name="facility_name" id="userFacilityName"
+                                    readonly>
                                 <small class="text-muted">Auto-populated from your facility</small>
                             </div>
                             <div class="col-md-6">
@@ -2132,8 +2360,11 @@
                     <!-- Progress Bar -->
                     <div class="mb-4">
                         <div class="progress" style="height: 25px;">
-                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 20%; background: #0052CC;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
-                                <span id="progressText" style="color: white; font-weight: bold; font-size: 12px;">Step 1/5</span>
+                            <div class="progress-bar" id="progressBar" role="progressbar"
+                                style="width: 20%; background: #0052CC;" aria-valuenow="20" aria-valuemin="0"
+                                aria-valuemax="100">
+                                <span id="progressText" style="color: white; font-weight: bold; font-size: 12px;">Step
+                                    1/5</span>
                             </div>
                         </div>
                     </div>
@@ -2147,8 +2378,10 @@
                                     <div class="mb-3">
                                         <label class="form-label">Patient ID <span style="color: red;">*</span></label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="patient_id" id="patientIdInput" placeholder="e.g., PAT1001" required>
-                                            <button type="button" class="btn btn-outline-primary" id="generatePatientIdBtn" onclick="generatePatientId()">
+                                            <input type="text" class="form-control" name="patient_id"
+                                                id="patientIdInput" placeholder="e.g., PAT1001" required>
+                                            <button type="button" class="btn btn-outline-primary"
+                                                id="generatePatientIdBtn" onclick="generatePatientId()">
                                                 <i class="fas fa-magic"></i> Generate
                                             </button>
                                         </div>
@@ -2156,9 +2389,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Registration Date <span style="color: red;">*</span></label>
-                                        <div class="input-group date" id="registeredDatePicker" data-target-input="nearest">
-                                            <input type="text" class="form-control" id="registeredDate" name="registered_date" placeholder="YYYY-MM-DD" required>
+                                        <label class="form-label">Registration Date <span
+                                                style="color: red;">*</span></label>
+                                        <div class="input-group date" id="registeredDatePicker"
+                                            data-target-input="nearest">
+                                            <input type="text" class="form-control" id="registeredDate"
+                                                name="registered_date" placeholder="YYYY-MM-DD" required>
                                             <span class="input-group-text">
                                                 <i class="fas fa-calendar"></i>
                                             </span>
@@ -2170,13 +2406,15 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">First Name <span style="color: red;">*</span></label>
-                                        <input type="text" class="form-control" name="first_name" placeholder="First name" required>
+                                        <input type="text" class="form-control" name="first_name"
+                                            placeholder="First name" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Last Name <span style="color: red;">*</span></label>
-                                        <input type="text" class="form-control" name="last_name" placeholder="Last name" required>
+                                        <input type="text" class="form-control" name="last_name" placeholder="Last name"
+                                            required>
                                     </div>
                                 </div>
                             </div>
@@ -2184,7 +2422,8 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">Age <span style="color: red;">*</span></label>
-                                        <input type="number" class="form-control" name="age" min="0" max="150" placeholder="Age in years" required>
+                                        <input type="number" class="form-control" name="age" min="0" max="150"
+                                            placeholder="Age in years" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -2205,7 +2444,8 @@
                             <h5 class="mb-4"><i class="fas fa-phone me-2"></i> Contact Information</h5>
                             <div class="mb-3">
                                 <label class="form-label">Phone Number</label>
-                                <input type="text" class="form-control" name="phone_number" placeholder="e.g., 256712345678">
+                                <input type="text" class="form-control" name="phone_number"
+                                    placeholder="e.g., 256712345678">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email Address</label>
@@ -2232,13 +2472,16 @@
                             <h5 class="mb-4"><i class="fas fa-hospital me-2"></i> Facility Assignment</h5>
                             <div class="mb-3">
                                 <label class="form-label">Facility <span style="color: red;">*</span></label>
-                                <input type="text" class="form-control" name="facility" placeholder="e.g., Kampala Regional Referral Hospital" required>
+                                <input type="text" class="form-control" name="facility"
+                                    placeholder="e.g., Kampala Regional Referral Hospital" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Facility ID Code <span style="color: red;">*</span></label>
                                 <div class="input-group-facility">
-                                    <input type="text" class="form-control" id="wizardFacilityIdCode" name="facility_id_code" placeholder="Auto-generated" required readonly>
-                                    <button type="button" id="generateWizardFacilityBtn" class="btn-generate-facility">Gen</button>
+                                    <input type="text" class="form-control" id="wizardFacilityIdCode"
+                                        name="facility_id_code" placeholder="Auto-generated" required readonly>
+                                    <button type="button" id="generateWizardFacilityBtn"
+                                        class="btn-generate-facility">Gen</button>
                                 </div>
                             </div>
                         </div>
@@ -2271,7 +2514,8 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label">ART Adherence %</label>
-                                        <input type="text" class="form-control" name="art_adherence_percent" placeholder="e.g., 95%">
+                                        <input type="text" class="form-control" name="art_adherence_percent"
+                                            placeholder="e.g., 95%">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -2367,7 +2611,9 @@
             days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             daysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             daysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-            months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+                'October', 'November', 'December'
+            ],
             monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             today: 'Today',
             clear: 'Clear',
@@ -2379,24 +2625,62 @@
     <script src="supabase-config.js"></script>
     <script src="import-data.js"></script>
     <script src="dashboard.js"></script>
-    
+
     <!-- Verify sidebar functions are loaded -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('====== SIDEBAR DEBUG ======');
             console.log('Dashboard.js functions loaded:');
             console.log('toggleSidebar:', typeof window.toggleSidebar);
             console.log('showSection:', typeof window.showSection);
             console.log('logout:', typeof window.logout);
-            
+
             // Test sidebar elements exist
             const sidebar = document.querySelector('.sidebar');
             const toggle = document.getElementById('sidebarToggle');
             const overlay = document.getElementById('sidebarOverlay');
-            
-            console.log('Sidebar elements:');
-            console.log('Sidebar:', sidebar ? 'Found' : 'NOT FOUND');
-            console.log('Toggle button:', toggle ? 'Found' : 'NOT FOUND');
-            console.log('Overlay:', overlay ? 'Found' : 'NOT FOUND');
+
+            console.log('\nSidebar elements:');
+            console.log('Sidebar:', sidebar ? 'Found ✓' : 'NOT FOUND ✗');
+            console.log('Toggle button:', toggle ? 'Found ✓' : 'NOT FOUND ✗');
+            console.log('Overlay:', overlay ? 'Found ✓' : 'NOT FOUND ✗');
+
+            if (sidebar) {
+                console.log('\nSidebar computed style:');
+                const style = window.getComputedStyle(sidebar);
+                console.log('Position:', style.position);
+                console.log('Left:', style.left);
+                console.log('Width:', style.width);
+                console.log('Display:', style.display);
+                console.log('ZIndex:', style.zIndex);
+            }
+
+            if (toggle) {
+                console.log('\nToggle button computed style:');
+                const style = window.getComputedStyle(toggle);
+                console.log('Display:', style.display);
+                console.log('Cursor:', style.cursor);
+            }
+
+            // Test toggle function manually
+            window.testSidebarToggle = function () {
+                console.log('\n====== TESTING TOGGLE ======');
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                console.log('Before toggle:');
+                console.log('Sidebar has active class:', sidebar.classList.contains('active'));
+                console.log('Overlay has active class:', overlay.classList.contains('active'));
+
+                window.toggleSidebar();
+
+                console.log('After toggle:');
+                console.log('Sidebar has active class:', sidebar.classList.contains('active'));
+                console.log('Overlay has active class:', overlay.classList.contains('active'));
+            };
+
+            console.log('\n====== TO TEST ======');
+            console.log('Run in console: testSidebarToggle()');
+            console.log('====== END DEBUG ======\n');
         });
     </script>
 
@@ -2426,21 +2710,56 @@
             try {
                 if (!supabaseClient) {
                     console.error('Supabase client not initialized');
+                    showError('Supabase Configuration Error',
+                        'Database connection not initialized. Check supabase-config.js');
                     return;
                 }
 
-                const { data, error } = await supabaseClient
+                const {
+                    data,
+                    error
+                } = await supabaseClient
                     .from('patients')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .order('created_at', {
+                        ascending: false
+                    });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase Error:', error.message);
+                    showError('Database Connection Error', error.message +
+                        '\n\nSee SUPABASE_CORS_SETUP.md for configuration help.');
+                    return;
+                }
 
                 patients = data || [];
                 displayPatients(patients);
             } catch (error) {
-                console.error('Error loading patients:', error);
+                console.error('Error loading patients:', error.message);
+                let errorMsg = error.message;
+                if (error.message.includes('NetworkError')) {
+                    errorMsg =
+                        'Network Error: Unable to reach database.\n\nCheck SUPABASE_CORS_SETUP.md for CORS configuration.';
+                } else if (error.message.includes('CORS')) {
+                    errorMsg =
+                        'CORS Configuration Error: Supabase CORS not configured for this domain.\n\nFollow SUPABASE_CORS_SETUP.md to fix.';
+                }
+                showError('Connection Failed', errorMsg);
             }
+        }
+
+        function showError(title, message) {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#0052CC',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    // Log to console as well
+                    console.error(`${title}: ${message}`);
+                }
+            });
         }
 
         function displayPatients(patientsToDisplay) {
@@ -2464,21 +2783,21 @@
 
             // Attach event listeners
             document.querySelectorAll('.btn-view').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const patientId = this.getAttribute('data-patient-id');
                     viewPatientDetails(patientId);
                 });
             });
 
             document.querySelectorAll('.btn-edit').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const patientId = this.getAttribute('data-patient-id');
                     editPatient(patientId);
                 });
             });
 
             document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const patientId = this.getAttribute('data-patient-id');
                     deletePatient(patientId);
                 });
@@ -2537,7 +2856,7 @@
             const conditionFilter = document.getElementById('conditionFilter').value;
 
             filteredPatients = patients.filter(patient => {
-                const matchesSearch = 
+                const matchesSearch =
                     patient.first_name.toLowerCase().includes(searchTerm) ||
                     patient.last_name.toLowerCase().includes(searchTerm) ||
                     patient.patient_id.toLowerCase().includes(searchTerm) ||
@@ -2611,12 +2930,22 @@
                         return false;
                     }
 
-                    return { firstName, lastName, status };
+                    return {
+                        firstName,
+                        lastName,
+                        status
+                    };
                 }
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const { error } = await supabaseClient
+                        if (!supabaseClient) {
+                            throw new Error('Supabase client not available');
+                        }
+
+                        const {
+                            error
+                        } = await supabaseClient
                             .from('patients')
                             .update({
                                 first_name: result.value.firstName,
@@ -2630,8 +2959,8 @@
                         Swal.fire('Success', 'Patient updated successfully', 'success');
                         loadPatients();
                     } catch (error) {
-                        console.error('Error updating patient:', error);
-                        Swal.fire('Error', 'Failed to update patient', 'error');
+                        console.error('Error updating patient:', error.message);
+                        showError('Update Failed', error.message + '\n\nCheck SUPABASE_CORS_SETUP.md');
                     }
                 }
             });
@@ -2651,7 +2980,13 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const { error } = await supabaseClient
+                        if (!supabaseClient) {
+                            throw new Error('Supabase client not available');
+                        }
+
+                        const {
+                            error
+                        } = await supabaseClient
                             .from('patients')
                             .delete()
                             .eq('id', patientId);
@@ -2661,8 +2996,8 @@
                         Swal.fire('Deleted', 'Patient has been deleted.', 'success');
                         loadPatients();
                     } catch (error) {
-                        console.error('Error deleting patient:', error);
-                        Swal.fire('Error', 'Failed to delete patient', 'error');
+                        console.error('Error deleting patient:', error.message);
+                        showError('Delete Failed', error.message + '\n\nCheck SUPABASE_CORS_SETUP.md');
                     }
                 }
             });
@@ -2673,7 +3008,9 @@
             // The existing patient registration wizard will be used
             const accordion = document.getElementById('accordionExample');
             if (accordion) {
-                accordion.scrollIntoView({ behavior: 'smooth' });
+                accordion.scrollIntoView({
+                    behavior: 'smooth'
+                });
             }
         }
 
@@ -2714,10 +3051,10 @@
         }
 
         // Facility Modal Handler
-        document.getElementById('facilitySubmitBtn').addEventListener('click', function() {
+        document.getElementById('facilitySubmitBtn').addEventListener('click', function () {
             const form = document.getElementById('facilityForm');
             const messageDiv = document.getElementById('facilityMessage');
-            
+
             // Validate form
             if (!form.checkValidity()) {
                 messageDiv.className = 'alert alert-danger';
@@ -2728,9 +3065,9 @@
 
             const formData = new FormData(form);
             const facilityData = Object.fromEntries(formData);
-            
+
             console.log('Facility data:', facilityData);
-            
+
             Swal.fire({
                 title: 'Success!',
                 text: 'Facility registered successfully',
@@ -2745,10 +3082,10 @@
         });
 
         // Appointment Modal Handler
-        document.getElementById('appointmentSubmitBtn').addEventListener('click', function() {
+        document.getElementById('appointmentSubmitBtn').addEventListener('click', function () {
             const form = document.getElementById('appointmentForm');
             const messageDiv = document.getElementById('appointmentMessage');
-            
+
             // Validate form
             if (!form.checkValidity()) {
                 messageDiv.className = 'alert alert-danger';
@@ -2759,10 +3096,11 @@
 
             const formData = new FormData(form);
             const appointmentData = Object.fromEntries(formData);
-            
+
             // Validate date logic
             const appointmentDate = new Date(appointmentData.appointment_date);
-            const lastAppointmentDate = appointmentData.last_appointment ? new Date(appointmentData.last_appointment) : null;
+            const lastAppointmentDate = appointmentData.last_appointment ? new Date(appointmentData
+                .last_appointment) : null;
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -2774,7 +3112,7 @@
             }
 
             console.log('Appointment data:', appointmentData);
-            
+
             Swal.fire({
                 title: 'Success!',
                 text: 'Appointment scheduled successfully',
@@ -2809,7 +3147,7 @@
         const totalSteps = 5;
 
         // Initialize wizard when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Setup event listeners for wizard buttons
             const nextBtn = document.getElementById('nextBtn');
             if (nextBtn) {
@@ -2977,32 +3315,33 @@
         }
 
         // Reset wizard when modal is shown
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('patientWizardModal');
             console.log('Attaching modal listener, modal exists:', !!modal);
-            
+
             // Attach click handlers to buttons that open the modal
             const modalButtons = document.querySelectorAll('[data-bs-target="#patientWizardModal"]');
             console.log('Modal trigger buttons found:', modalButtons.length);
             modalButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     console.log('Patient modal button clicked');
                 });
             });
-            
+
             // Also attach to appointment modal
             const appointmentModal = document.getElementById('appointmentModal');
             console.log('Appointment modal exists:', !!appointmentModal);
-            
+
             if (appointmentModal) {
-                appointmentModal.addEventListener('show.bs.modal', function(event) {
+                appointmentModal.addEventListener('show.bs.modal', function (event) {
                     console.log('Appointment modal show.bs.modal event fired');
-                    
+
                     setTimeout(() => {
                         if (typeof AirDatepicker !== 'undefined') {
                             const today = new Date();
-                            
-                            const appointmentDateEl = document.getElementById('appointmentDate');
+
+                            const appointmentDateEl = document.getElementById(
+                                'appointmentDate');
                             if (appointmentDateEl && !appointmentDateEl.air_datepicker) {
                                 const picker = new AirDatepicker(appointmentDateEl, {
                                     dateFormat: 'yyyy-MM-dd',
@@ -3011,13 +3350,14 @@
                                     inline: false,
                                     locale: englishLocale
                                 });
-                                appointmentDateEl.addEventListener('click', function(e) {
+                                appointmentDateEl.addEventListener('click', function (e) {
                                     e.preventDefault();
                                     picker.show();
                                 });
                             }
-                            
-                            const lastAppointmentEl = document.getElementById('lastAppointmentDate');
+
+                            const lastAppointmentEl = document.getElementById(
+                                'lastAppointmentDate');
                             if (lastAppointmentEl && !lastAppointmentEl.air_datepicker) {
                                 const picker = new AirDatepicker(lastAppointmentEl, {
                                     dateFormat: 'yyyy-MM-dd',
@@ -3026,7 +3366,7 @@
                                     inline: false,
                                     locale: englishLocale
                                 });
-                                lastAppointmentEl.addEventListener('click', function(e) {
+                                lastAppointmentEl.addEventListener('click', function (e) {
                                     e.preventDefault();
                                     picker.show();
                                 });
@@ -3035,267 +3375,278 @@
                     }, 100);
                 });
             }
-            
+
             if (modal) {
-                modal.addEventListener('show.bs.modal', function(event) {
+                modal.addEventListener('show.bs.modal', function (event) {
                     console.log('Patient modal show.bs.modal event fired', event);
-             if (currentStep !== 1) {
-                currentStep = 1;
-                updateWizard();
-            }
-            // Set registered date to today when modal opens
-            const registeredDateInput = document.getElementById('registeredDate');
-            if (registeredDateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                registeredDateInput.value = today;
-            }
-            // Initialize airdate pickers when modal opens
-            setTimeout(() => {
-                console.log('AirDatepicker available:', typeof AirDatepicker !== 'undefined');
-                if (typeof AirDatepicker !== 'undefined') {
-                    const today = new Date();
-                    
-                    const registeredEl = document.getElementById('registeredDate');
-                    console.log('Registered date input found:', !!registeredEl);
-                    if (registeredEl) {
-                        // Destroy existing instance if any
-                        if (registeredEl.air_datepicker) {
-                            registeredEl.air_datepicker.destroy();
-                        }
-                        try {
-                            const picker = new AirDatepicker(registeredEl, {
-                                dateFormat: 'yyyy-MM-dd',
-                                autoClose: true,
-                                minDate: new Date(1900, 0, 1),
-                                maxDate: today,
-                                inline: false,
-                                locale: englishLocale
-                            });
-                            console.log('Registered date picker created:', !!picker);
-                            // Add click handler to open picker
-                            registeredEl.addEventListener('click', function(e) {
-                                console.log('Registered date input clicked');
-                                console.log('Picker locale:', picker.locale);
-                                picker.show();
-                            });
-                        } catch (e) {
-                            console.error('Error creating registered date picker:', e);
-                        }
+                    if (currentStep !== 1) {
+                        currentStep = 1;
+                        updateWizard();
                     }
-                    
-                    const appointmentEl = document.getElementById('appointmentDate');
-                    console.log('Appointment date input found:', !!appointmentEl);
-                    if (appointmentEl) {
-                        if (appointmentEl.air_datepicker) {
-                            appointmentEl.air_datepicker.destroy();
-                        }
-                        try {
-                            const picker = new AirDatepicker(appointmentEl, {
-                                dateFormat: 'yyyy-MM-dd',
-                                autoClose: true,
-                                minDate: today,
-                                inline: false,
-                                locale: englishLocale
-                            });
-                            console.log('Appointment date picker created');
-                            // Add click handler to open picker
-                            appointmentEl.addEventListener('click', function() {
-                                console.log('Appointment date input clicked');
-                                picker.show();
-                            });
-                        } catch (e) {
-                            console.error('Error creating appointment date picker:', e);
-                        }
+                    // Set registered date to today when modal opens
+                    const registeredDateInput = document.getElementById('registeredDate');
+                    if (registeredDateInput) {
+                        const today = new Date().toISOString().split('T')[0];
+                        registeredDateInput.value = today;
                     }
-                    
-                    const lastAppointmentEl = document.getElementById('lastAppointmentDate');
-                    console.log('Last appointment date input found:', !!lastAppointmentEl);
-                    if (lastAppointmentEl) {
-                        if (lastAppointmentEl.air_datepicker) {
-                            lastAppointmentEl.air_datepicker.destroy();
+                    // Initialize airdate pickers when modal opens
+                    setTimeout(() => {
+                        console.log('AirDatepicker available:', typeof AirDatepicker !==
+                            'undefined');
+                        if (typeof AirDatepicker !== 'undefined') {
+                            const today = new Date();
+
+                            const registeredEl = document.getElementById('registeredDate');
+                            console.log('Registered date input found:', !!registeredEl);
+                            if (registeredEl) {
+                                // Destroy existing instance if any
+                                if (registeredEl.air_datepicker) {
+                                    registeredEl.air_datepicker.destroy();
+                                }
+                                try {
+                                    const picker = new AirDatepicker(registeredEl, {
+                                        dateFormat: 'yyyy-MM-dd',
+                                        autoClose: true,
+                                        minDate: new Date(1900, 0, 1),
+                                        maxDate: today,
+                                        inline: false,
+                                        locale: englishLocale
+                                    });
+                                    console.log('Registered date picker created:', !!picker);
+                                    // Add click handler to open picker
+                                    registeredEl.addEventListener('click', function (e) {
+                                        console.log('Registered date input clicked');
+                                        console.log('Picker locale:', picker.locale);
+                                        picker.show();
+                                    });
+                                } catch (e) {
+                                    console.error('Error creating registered date picker:', e);
+                                }
+                            }
+
+                            const appointmentEl = document.getElementById('appointmentDate');
+                            console.log('Appointment date input found:', !!appointmentEl);
+                            if (appointmentEl) {
+                                if (appointmentEl.air_datepicker) {
+                                    appointmentEl.air_datepicker.destroy();
+                                }
+                                try {
+                                    const picker = new AirDatepicker(appointmentEl, {
+                                        dateFormat: 'yyyy-MM-dd',
+                                        autoClose: true,
+                                        minDate: today,
+                                        inline: false,
+                                        locale: englishLocale
+                                    });
+                                    console.log('Appointment date picker created');
+                                    // Add click handler to open picker
+                                    appointmentEl.addEventListener('click', function () {
+                                        console.log('Appointment date input clicked');
+                                        picker.show();
+                                    });
+                                } catch (e) {
+                                    console.error('Error creating appointment date picker:', e);
+                                }
+                            }
+
+                            const lastAppointmentEl = document.getElementById(
+                                'lastAppointmentDate');
+                            console.log('Last appointment date input found:', !!
+                                lastAppointmentEl);
+                            if (lastAppointmentEl) {
+                                if (lastAppointmentEl.air_datepicker) {
+                                    lastAppointmentEl.air_datepicker.destroy();
+                                }
+                                try {
+                                    const picker = new AirDatepicker(lastAppointmentEl, {
+                                        dateFormat: 'yyyy-MM-dd',
+                                        autoClose: true,
+                                        maxDate: today,
+                                        inline: false,
+                                        locale: englishLocale
+                                    });
+                                    console.log('Last appointment date picker created');
+                                    // Add click handler to open picker
+                                    lastAppointmentEl.addEventListener('click', function () {
+                                        console.log(
+                                            'Last appointment date input clicked');
+                                        picker.show();
+                                    });
+                                } catch (e) {
+                                    console.error(
+                                        'Error creating last appointment date picker:', e);
+                                }
+                            }
                         }
-                        try {
-                            const picker = new AirDatepicker(lastAppointmentEl, {
-                                dateFormat: 'yyyy-MM-dd',
-                                autoClose: true,
-                                maxDate: today,
-                                inline: false,
-                                locale: englishLocale
-                            });
-                            console.log('Last appointment date picker created');
-                            // Add click handler to open picker
-                            lastAppointmentEl.addEventListener('click', function() {
-                                console.log('Last appointment date input clicked');
-                                picker.show();
-                            });
-                        } catch (e) {
-                            console.error('Error creating last appointment date picker:', e);
-                        }
-                    }
-                }
-            }, 100);
+                    }, 100);
                 });
             }
         });
 
         // Initialize patient management when page loads
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             setTimeout(initializePatientManagement, 500);
         });
-        </script>
-        <script src="user-registration.js"></script>
-        <script src="facility-registration.js"></script>
+    </script>
+    <script src="user-registration.js"></script>
+    <script src="facility-registration.js"></script>
 
-        <!-- Floating Action Button (FAB) -->
-        <div class="fab-container" id="fabContainer">
-            <div class="fab-menu" id="fabMenu">
-                <div class="fab-menu-title">
-                    <i class="fas fa-bolt"></i> Quick Actions
-                </div>
-                <div class="fab-menu-divider"></div>
-                <div class="fab-menu-items">
-                    <button class="fab-menu-item patient" data-bs-toggle="modal" data-bs-target="#patientWizardModal" data-tooltip="Register a new patient in the system">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Add Patient</span>
-                    </button>
-                    <button class="fab-menu-item appointment" data-bs-toggle="modal" data-bs-target="#appointmentModal" data-tooltip="Schedule an appointment for a patient">
-                        <i class="fas fa-calendar-plus"></i>
-                        <span>Schedule</span>
-                    </button>
-                    <button class="fab-menu-item facility" data-bs-toggle="modal" data-bs-target="#facilityModal" data-tooltip="Register a new healthcare facility">
-                        <i class="fas fa-hospital"></i>
-                        <span>Add Facility</span>
-                    </button>
-                    <button class="fab-menu-item user" data-bs-toggle="modal" data-bs-target="#userRegistrationModal" data-tooltip="Add a new user account to your facility">
-                        <i class="fas fa-user-shield"></i>
-                        <span>Add User</span>
-                    </button>
-                    <button class="fab-menu-item import" onclick="showSection('import', event)" data-tooltip="Import patient and appointment data from CSV">
-                        <i class="fas fa-file-import"></i>
-                        <span>Import</span>
-                    </button>
-                </div>
+    <!-- Floating Action Button (FAB) -->
+    <div class="fab-container" id="fabContainer">
+        <div class="fab-menu" id="fabMenu">
+            <div class="fab-menu-title">
+                <i class="fas fa-bolt"></i> Quick Actions
             </div>
-            <button class="fab-main" id="fabMainBtn" title="Quick Actions Menu">
-                <i class="fas fa-plus"></i>
-            </button>
+            <div class="fab-menu-divider"></div>
+            <div class="fab-menu-items">
+                <button class="fab-menu-item patient" data-bs-toggle="modal" data-bs-target="#patientWizardModal"
+                    data-tooltip="Register a new patient in the system">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add Patient</span>
+                </button>
+                <button class="fab-menu-item appointment" data-bs-toggle="modal" data-bs-target="#appointmentModal"
+                    data-tooltip="Schedule an appointment for a patient">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Schedule</span>
+                </button>
+                <button class="fab-menu-item facility" data-bs-toggle="modal" data-bs-target="#facilityModal"
+                    data-tooltip="Register a new healthcare facility">
+                    <i class="fas fa-hospital"></i>
+                    <span>Add Facility</span>
+                </button>
+                <button class="fab-menu-item user" data-bs-toggle="modal" data-bs-target="#userRegistrationModal"
+                    data-tooltip="Add a new user account to your facility">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Add User</span>
+                </button>
+                <button class="fab-menu-item import" onclick="showSection('import', event)"
+                    data-tooltip="Import patient and appointment data from CSV">
+                    <i class="fas fa-file-import"></i>
+                    <span>Import</span>
+                </button>
+            </div>
         </div>
+        <button class="fab-main" id="fabMainBtn" title="Quick Actions Menu">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
 
-        <!-- FAB Script -->
-        <script>
-            // Initialize FAB functionality
-            document.addEventListener('DOMContentLoaded', function() {
-                const fabMainBtn = document.getElementById('fabMainBtn');
-                const fabMenu = document.getElementById('fabMenu');
-                const fabContainer = document.getElementById('fabContainer');
+    <!-- FAB Script -->
+    <script>
+        // Initialize FAB functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const fabMainBtn = document.getElementById('fabMainBtn');
+            const fabMenu = document.getElementById('fabMenu');
+            const fabContainer = document.getElementById('fabContainer');
 
-                // Toggle FAB menu on click
-                fabMainBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    fabMainBtn.classList.toggle('active');
-                    fabMenu.classList.toggle('active');
-                    
-                    // Adjust tooltips when menu is opened
-                    if (fabMenu.classList.contains('active')) {
-                        adjustTooltipPositions();
-                    }
-                });
+            // Toggle FAB menu on click
+            fabMainBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                fabMainBtn.classList.toggle('active');
+                fabMenu.classList.toggle('active');
 
-                // Close FAB when a menu item is clicked
-                const fabMenuItems = fabMenu.querySelectorAll('.fab-menu-item');
-                fabMenuItems.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        fabMainBtn.classList.remove('active');
-                        fabMenu.classList.remove('active');
-                    });
-
-                    // Adjust tooltip position on hover
-                    btn.addEventListener('mouseenter', function() {
-                        adjustTooltipPosition(btn);
-                    });
-                });
-
-                // Close FAB when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!fabContainer.contains(e.target)) {
-                        fabMainBtn.classList.remove('active');
-                        fabMenu.classList.remove('active');
-                    }
-                });
-
-                // Close FAB when pressing Escape
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        fabMainBtn.classList.remove('active');
-                        fabMenu.classList.remove('active');
-                    }
-                });
-
-                // Adjust tooltip on window resize
-                window.addEventListener('resize', adjustTooltipPositions);
+                // Adjust tooltips when menu is opened
+                if (fabMenu.classList.contains('active')) {
+                    adjustTooltipPositions();
+                }
             });
 
-            // Function to adjust tooltip position for a single button
-            function adjustTooltipPosition(btn) {
-                const tooltip = btn.getAttribute('data-tooltip');
-                const rect = btn.getBoundingClientRect();
-                const fabMenu = document.getElementById('fabMenu');
-                
-                // Create a temporary tooltip element to measure its width
-                const tempTooltip = document.createElement('div');
-                tempTooltip.style.position = 'fixed';
-                tempTooltip.style.visibility = 'hidden';
-                tempTooltip.style.padding = '10px 14px';
-                tempTooltip.style.borderRadius = '6px';
-                tempTooltip.style.fontSize = '12px';
-                tempTooltip.style.fontWeight = '500';
-                tempTooltip.style.whiteSpace = 'nowrap';
-                tempTooltip.style.background = '#1f2937';
-                tempTooltip.style.color = 'white';
-                tempTooltip.textContent = tooltip;
-                document.body.appendChild(tempTooltip);
-                
-                const tooltipWidth = tempTooltip.offsetWidth;
-                const tooltipHeight = tempTooltip.offsetHeight;
-                document.body.removeChild(tempTooltip);
-                
-                const tooltipLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
-                const tooltipTop = rect.top - tooltipHeight - 16;
-                
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                
-                let adjustedClass = '';
-                
-                // Check if tooltip goes outside left edge
-                if (tooltipLeft < 10) {
-                    adjustedClass = 'tooltip-right';
+            // Close FAB when a menu item is clicked
+            const fabMenuItems = fabMenu.querySelectorAll('.fab-menu-item');
+            fabMenuItems.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    fabMainBtn.classList.remove('active');
+                    fabMenu.classList.remove('active');
+                });
+
+                // Adjust tooltip position on hover
+                btn.addEventListener('mouseenter', function () {
+                    adjustTooltipPosition(btn);
+                });
+            });
+
+            // Close FAB when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!fabContainer.contains(e.target)) {
+                    fabMainBtn.classList.remove('active');
+                    fabMenu.classList.remove('active');
                 }
-                // Check if tooltip goes outside right edge
-                else if (tooltipLeft + tooltipWidth > viewportWidth - 10) {
-                    adjustedClass = 'tooltip-left';
+            });
+
+            // Close FAB when pressing Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    fabMainBtn.classList.remove('active');
+                    fabMenu.classList.remove('active');
                 }
-                // Check if tooltip goes outside top edge
-                else if (tooltipTop < 10) {
-                    adjustedClass = 'tooltip-bottom';
-                }
-                
-                // Remove all tooltip position classes
-                btn.classList.remove('tooltip-right', 'tooltip-left', 'tooltip-bottom');
-                
-                // Add the appropriate class if needed
-                if (adjustedClass) {
-                    btn.classList.add(adjustedClass);
-                }
+            });
+
+            // Adjust tooltip on window resize
+            window.addEventListener('resize', adjustTooltipPositions);
+        });
+
+        // Function to adjust tooltip position for a single button
+        function adjustTooltipPosition(btn) {
+            const tooltip = btn.getAttribute('data-tooltip');
+            const rect = btn.getBoundingClientRect();
+            const fabMenu = document.getElementById('fabMenu');
+
+            // Create a temporary tooltip element to measure its width
+            const tempTooltip = document.createElement('div');
+            tempTooltip.style.position = 'fixed';
+            tempTooltip.style.visibility = 'hidden';
+            tempTooltip.style.padding = '10px 14px';
+            tempTooltip.style.borderRadius = '6px';
+            tempTooltip.style.fontSize = '12px';
+            tempTooltip.style.fontWeight = '500';
+            tempTooltip.style.whiteSpace = 'nowrap';
+            tempTooltip.style.background = '#1f2937';
+            tempTooltip.style.color = 'white';
+            tempTooltip.textContent = tooltip;
+            document.body.appendChild(tempTooltip);
+
+            const tooltipWidth = tempTooltip.offsetWidth;
+            const tooltipHeight = tempTooltip.offsetHeight;
+            document.body.removeChild(tempTooltip);
+
+            const tooltipLeft = rect.left + rect.width / 2 - tooltipWidth / 2;
+            const tooltipTop = rect.top - tooltipHeight - 16;
+
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            let adjustedClass = '';
+
+            // Check if tooltip goes outside left edge
+            if (tooltipLeft < 10) {
+                adjustedClass = 'tooltip-right';
+            }
+            // Check if tooltip goes outside right edge
+            else if (tooltipLeft + tooltipWidth > viewportWidth - 10) {
+                adjustedClass = 'tooltip-left';
+            }
+            // Check if tooltip goes outside top edge
+            else if (tooltipTop < 10) {
+                adjustedClass = 'tooltip-bottom';
             }
 
-            // Function to adjust all tooltips
-            function adjustTooltipPositions() {
-                const fabMenuItems = document.querySelectorAll('.fab-menu-item');
-                fabMenuItems.forEach(item => {
-                    adjustTooltipPosition(item);
-                });
+            // Remove all tooltip position classes
+            btn.classList.remove('tooltip-right', 'tooltip-left', 'tooltip-bottom');
+
+            // Add the appropriate class if needed
+            if (adjustedClass) {
+                btn.classList.add(adjustedClass);
             }
-        </script>
-        </body>
-        </html>
+        }
+
+        // Function to adjust all tooltips
+        function adjustTooltipPositions() {
+            const fabMenuItems = document.querySelectorAll('.fab-menu-item');
+            fabMenuItems.forEach(item => {
+                adjustTooltipPosition(item);
+            });
+        }
+    </script>
+</body>
+
+</html>

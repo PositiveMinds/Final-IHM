@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Stat Values</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #0052CC;
+            border-bottom: 2px solid #0052CC;
+            padding-bottom: 10px;
+        }
+        .result {
+            background: #fafbfc;
+            padding: 12px;
+            margin: 10px 0;
+            border-left: 4px solid #0052CC;
+            border-radius: 4px;
+        }
+        .result.success {
+            border-left-color: #28a745;
+            background: #f0f9f5;
+        }
+        .result.error {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Stat Values Checker</h1>
+        
+        <div id="results"></div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+            <h2>Direct Console Commands</h2>
+            <p>Paste these directly into browser console (F12) to test stat values:</p>
+            <pre>
+// Get all stat card values
+Array.from(document.querySelectorAll('.stat-value')).map(el => ({
+  text: el.textContent,
+  color: getComputedStyle(el).color,
+  display: getComputedStyle(el).display,
+  visibility: getComputedStyle(el).visibility
+}))
+
+// Get each value individually
+console.log('Total Patients:', document.querySelectorAll('.stat-value')[0]?.textContent)
+console.log('Pending Apps:', document.querySelectorAll('.stat-value')[1]?.textContent)
+console.log('HIV Cases:', document.querySelectorAll('.stat-value')[2]?.textContent)
+console.log('No-Shows:', document.querySelectorAll('.stat-value')[3]?.textContent)
+
+// Check if values exist in HTML
+document.body.innerHTML.includes('1,247') ? '✓ Found 1,247' : '✗ Not found'
+document.body.innerHTML.includes('32') ? '✓ Found 32' : '✗ Not found'
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        // Run on page load
+        function runChecks() {
+            const results = document.getElementById('results');
+            let html = '';
+            
+            // Check 1: Stat values in HTML
+            const hasValue1 = document.body.innerHTML.includes('1,247');
+            const hasValue2 = document.body.innerHTML.includes('32');
+            const hasValue3 = document.body.innerHTML.includes('456');
+            const hasValue4 = document.body.innerHTML.includes('12');
+            
+            html += `<div class="result ${hasValue1 && hasValue2 && hasValue3 && hasValue4 ? 'success' : 'error'}">
+                <strong>1. Values in HTML</strong><br>
+                - 1,247 (Total Patients): ${hasValue1 ? '✓' : '✗'}<br>
+                - 32 (Pending): ${hasValue2 ? '✓' : '✗'}<br>
+                - 456 (HIV): ${hasValue3 ? '✓' : '✗'}<br>
+                - 12 (No-Shows): ${hasValue4 ? '✓' : '✗'}
+            </div>`;
+            
+            // Check 2: DOM elements
+            const statCards = document.querySelectorAll('.stat-card');
+            const statValues = document.querySelectorAll('.stat-value');
+            
+            html += `<div class="result ${statValues.length === 4 ? 'success' : 'error'}">
+                <strong>2. DOM Elements</strong><br>
+                - Stat cards found: ${statCards.length} (expected: 4)<br>
+                - Stat values found: ${statValues.length} (expected: 4)
+            </div>`;
+            
+            // Check 3: Text content
+            if (statValues.length > 0) {
+                const values = Array.from(statValues).map(el => el.textContent.trim());
+                html += `<div class="result ${values.length > 0 && values[0] ? 'success' : 'error'}">
+                    <strong>3. Stat Value Text Content</strong><br>
+                    ${values.map((v, i) => `- Card ${i+1}: "${v}"`).join('<br>')}
+                </div>`;
+                
+                // Check 4: CSS Styles
+                const firstValue = statValues[0];
+                const color = getComputedStyle(firstValue).color;
+                const display = getComputedStyle(firstValue).display;
+                const visibility = getComputedStyle(firstValue).visibility;
+                const fontSize = getComputedStyle(firstValue).fontSize;
+                
+                html += `<div class="result ${display !== 'none' && visibility !== 'hidden' ? 'success' : 'error'}">
+                    <strong>4. CSS Computed Styles (First Card Value)</strong><br>
+                    - Display: <code>${display}</code> ${display !== 'none' ? '✓' : '✗'}<br>
+                    - Visibility: <code>${visibility}</code> ${visibility !== 'hidden' ? '✓' : '✗'}<br>
+                    - Font Size: <code>${fontSize}</code><br>
+                    - Color: <code>${color}</code> (should be blue)
+                </div>`;
+                
+                // Check 5: Element dimensions
+                const parent = statCards[0];
+                const parentHeight = parent?.offsetHeight || 0;
+                const parentDisplay = getComputedStyle(parent).display;
+                
+                html += `<div class="result ${parentHeight > 0 ? 'success' : 'error'}">
+                    <strong>5. Card Container (First Card)</strong><br>
+                    - Display: <code>${parentDisplay}</code><br>
+                    - Height: <code>${parentHeight}px</code> ${parentHeight > 0 ? '✓' : '✗'}<br>
+                    - Width: <code>${parent?.offsetWidth || 0}px</code>
+                </div>`;
+            }
+            
+            results.innerHTML = html || '<p style="color: #999;">Loading...</p>';
+        }
+        
+        // Run checks on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runChecks);
+        } else {
+            // Give dashboard.js time to initialize
+            setTimeout(runChecks, 500);
+        }
+    </script>
+</body>
+</html>

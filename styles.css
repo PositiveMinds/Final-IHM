@@ -914,8 +914,7 @@ body.dark-mode .dropdown-menu .dropdown-item:hover {
 }
 
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-10px);
+  border-left-color: #5b8dee;
 }
 
 .stat-card h3 {
@@ -3859,19 +3858,30 @@ body.dark-mode .comparison-table tbody td:first-child {
   pointer-events: all;
 }
 
+/* Hide sidebar overlay on desktop */
 .sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  transition: background 0.3s ease;
+   display: none;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.4);
+   z-index: 998;
+   opacity: 0;
+   visibility: hidden;
+   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+   pointer-events: none;
+}
+
+@media (max-width: 767px) {
+   .sidebar-overlay {
+       display: block;
+   }
 }
 
 .mobile-sidebar.active .sidebar-overlay {
-  background: rgba(0, 0, 0, 0.6);
+   background: rgba(0, 0, 0, 0.6);
 }
 
 .sidebar-content {
