@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Management - HealthFlow</title>
+    <link rel="icon" type="image/png" href="logo/favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --logo-health: #EAB34B;
+            --logo-flow: #15696B;
+            --sidebar-width: 250px;
+            --sidebar-width-collapsed: 80px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-collapsed {
+            margin-left: var(--sidebar-width-collapsed);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--logo-flow) 0%, #0f3a3c 100%);
+            color: white;
+            padding: 2rem 0;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+            z-index: 600;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-width-collapsed);
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .sidebar-logo span {
+            display: block;
+            line-height: 1.2;
+        }
+
+        .sidebar-logo .health {
+            color: var(--logo-health);
+        }
+
+        .sidebar-logo .flow {
+            color: var(--logo-health);
+            font-size: 0.8rem;
+        }
+
+        .sidebar.collapsed .sidebar-logo span {
+            display: none;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu-item {
+            padding: 0;
+            margin: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .sidebar-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-menu-link:hover {
+            background-color: rgba(234, 179, 75, 0.2);
+            color: var(--logo-health);
+        }
+
+        .sidebar-menu-link.active {
+            background-color: var(--logo-health);
+            color: var(--logo-flow);
+        }
+
+        .sidebar-menu-label {
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-menu-label {
+            display: none;
+        }
+
+        /* ===== NAVBAR ===== */
+        .dashboard-navbar {
+            background: white;
+            border-bottom: 2px solid var(--logo-flow);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            padding: 2rem;
+            margin-top: 60px;
+        }
+
+        .page-title {
+            color: var(--logo-flow);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== TABS ===== */
+        .nav-tabs {
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .nav-tabs .nav-link {
+            color: #6c757d;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: var(--logo-flow);
+            border-bottom-color: var(--logo-flow);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--logo-flow);
+            border-bottom-color: var(--logo-flow);
+            background: transparent;
+        }
+
+        /* ===== FORMS ===== */
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .form-section h4 {
+            color: var(--logo-flow);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-section h4 i {
+            color: var(--logo-health);
+        }
+
+        .form-group label {
+            color: var(--logo-flow);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--logo-flow);
+            box-shadow: 0 0 0 0.2rem rgba(21, 105, 107, 0.15);
+        }
+
+        .btn-primary-custom {
+            background: var(--logo-flow);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-custom:hover {
+            background: #0f4449;
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: var(--logo-health);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #d9992a;
+            color: white;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-width-collapsed);
+            }
+
+            body.sidebar-collapsed {
+                margin-left: var(--sidebar-width-collapsed);
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .form-section {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .form-buttons {
+                flex-direction: column;
+            }
+
+            .form-buttons button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="health">Health</span>
+            <span class="flow">Flow</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="sidebar-menu-item">
+                <a href="dashboard.html" class="sidebar-menu-link">
+                    <i class="fas fa-home"></i>
+                    <span class="sidebar-menu-label">Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="forms.html" class="sidebar-menu-link active">
+                    <i class="fas fa-wpforms"></i>
+                    <span class="sidebar-menu-label">Forms</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="#analytics" class="sidebar-menu-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sidebar-menu-label">Analytics</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="#settings" class="sidebar-menu-link">
+                    <i class="fas fa-cog"></i>
+                    <span class="sidebar-menu-label">Settings</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Top Navbar -->
+    <nav class="dashboard-navbar">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="color: var(--logo-health); font-weight: 700;">Health</span>
+            <span style="color: var(--logo-flow); font-weight: 700;">Flow</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title"><i class="fas fa-wpforms"></i> Data Management Forms</h1>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients-content" type="button" role="tab">
+                    <i class="fas fa-users me-2"></i>Patients
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments-content" type="button" role="tab">
+                    <i class="fas fa-calendar-check me-2"></i>Appointments
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="facilities-tab" data-bs-toggle="tab" data-bs-target="#facilities-content" type="button" role="tab">
+                    <i class="fas fa-hospital me-2"></i>Facilities
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-content" type="button" role="tab">
+                    <i class="fas fa-user-tie me-2"></i>Users
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- PATIENTS TAB -->
+            <div class="tab-pane fade show active" id="patients-content" role="tabpanel">
+                <div class="form-section">
+                    <h4><i class="fas fa-user-plus"></i> Add New Patient</h4>
+                    <form id="patientsForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="patientFirstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="patientFirstName" name="first_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="patientLastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="patientLastName" name="last_name" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="patientEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="patientEmail" name="email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="patientPhone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="patientPhone" name="phone_number" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="patientDOB" class="form-label">Date of Birth *</label>
+                                <input type="date" class="form-control" id="patientDOB" name="date_of_birth" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="patientGender" class="form-label">Gender *</label>
+                                <select class="form-select" id="patientGender" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="patientNationalID" class="form-label">National ID</label>
+                                <input type="text" class="form-control" id="patientNationalID" name="national_id">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="patientAddress" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="patientAddress" name="address">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="patientCity" class="form-label">City</label>
+                                <input type="text" class="form-control" id="patientCity" name="city">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="patientDistrict" class="form-label">District</label>
+                                <input type="text" class="form-control" id="patientDistrict" name="district">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="patientStatus" class="form-label">Status *</label>
+                                <select class="form-select" id="patientStatus" name="status" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="Discharged">Discharged</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="patientNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="patientNotes" name="notes" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-save me-2"></i>Add Patient
+                            </button>
+                            <button type="reset" class="btn btn-secondary-custom">
+                                <i class="fas fa-redo me-2"></i>Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- APPOINTMENTS TAB -->
+            <div class="tab-pane fade" id="appointments-content" role="tabpanel">
+                <div class="form-section">
+                    <h4><i class="fas fa-calendar-plus"></i> Schedule New Appointment</h4>
+                    <form id="appointmentsForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentPatient" class="form-label">Patient *</label>
+                                <select class="form-select" id="appointmentPatient" name="patient_id" required>
+                                    <option value="">Select Patient</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentDate" class="form-label">Appointment Date *</label>
+                                <input type="date" class="form-control" id="appointmentDate" name="appointment_date" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentTime" class="form-label">Appointment Time *</label>
+                                <input type="time" class="form-control" id="appointmentTime" name="appointment_time" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentType" class="form-label">Type *</label>
+                                <select class="form-select" id="appointmentType" name="appointment_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Regular">Regular Checkup</option>
+                                    <option value="Follow-up">Follow-up</option>
+                                    <option value="Lab">Lab Test</option>
+                                    <option value="Consultation">Consultation</option>
+                                    <option value="Vaccination">Vaccination</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentProvider" class="form-label">Healthcare Provider</label>
+                                <input type="text" class="form-control" id="appointmentProvider" name="provider_name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="appointmentStatus" class="form-label">Status *</label>
+                                <select class="form-select" id="appointmentStatus" name="status" required>
+                                    <option value="Scheduled">Scheduled</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="No-Show">No-Show</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="appointmentReason" class="form-label">Reason for Visit</label>
+                            <textarea class="form-control" id="appointmentReason" name="reason_for_visit" rows="3"></textarea>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-calendar-check me-2"></i>Schedule Appointment
+                            </button>
+                            <button type="reset" class="btn btn-secondary-custom">
+                                <i class="fas fa-redo me-2"></i>Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FACILITIES TAB -->
+            <div class="tab-pane fade" id="facilities-content" role="tabpanel">
+                <div class="form-section">
+                    <h4><i class="fas fa-hospital-alt"></i> Add New Facility</h4>
+                    <form id="facilitiesForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="facilityName" class="form-label">Facility Name *</label>
+                                <input type="text" class="form-control" id="facilityName" name="facility_name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="facilityID" class="form-label">Facility ID *</label>
+                                <input type="text" class="form-control" id="facilityID" name="facility_id" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="facilityType" class="form-label">Facility Type *</label>
+                                <select class="form-select" id="facilityType" name="facility_type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Hospital">Hospital</option>
+                                    <option value="Clinic">Clinic</option>
+                                    <option value="Health Center">Health Center</option>
+                                    <option value="Pharmacy">Pharmacy</option>
+                                    <option value="Lab">Laboratory</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="facilityRegion" class="form-label">Region *</label>
+                                <input type="text" class="form-control" id="facilityRegion" name="region" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="facilityEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="facilityEmail" name="email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="facilityPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="facilityPhone" name="phone_number">
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="facilityAddress" class="form-label">Address *</label>
+                            <input type="text" class="form-control" id="facilityAddress" name="address" required>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-save me-2"></i>Add Facility
+                            </button>
+                            <button type="reset" class="btn btn-secondary-custom">
+                                <i class="fas fa-redo me-2"></i>Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- USERS TAB -->
+            <div class="tab-pane fade" id="users-content" role="tabpanel">
+                <div class="form-section">
+                    <h4><i class="fas fa-user-plus"></i> Add New User</h4>
+                    <form id="usersForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="userName" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="userName" name="fullname" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="userUsername" class="form-label">Username *</label>
+                                <input type="text" class="form-control" id="userUsername" name="username" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="userEmail" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="userEmail" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="userFacility" class="form-label">Facility *</label>
+                                <select class="form-select" id="userFacility" name="facility_id" required>
+                                    <option value="">Select Facility</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="userPassword" class="form-label">Password *</label>
+                                <input type="password" class="form-control" id="userPassword" name="password" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="userConfirmPassword" class="form-label">Confirm Password *</label>
+                                <input type="password" class="form-control" id="userConfirmPassword" name="confirm_password" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="userRole" class="form-label">Role *</label>
+                                <select class="form-select" id="userRole" name="user_role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="Administrator">Administrator</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Nurse">Nurse</option>
+                                    <option value="Receptionist">Receptionist</option>
+                                    <option value="Lab Technician">Lab Technician</option>
+                                    <option value="Pharmacist">Pharmacist</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="userStatus" class="form-label">Status *</label>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" id="userStatus" name="is_active" checked>
+                                    <label class="form-check-label" for="userStatus">
+                                        Active User
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="fas fa-user-plus me-2"></i>Add User
+                            </button>
+                            <button type="reset" class="btn btn-secondary-custom">
+                                <i class="fas fa-redo me-2"></i>Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Check authentication
+        function checkAuthentication() {
+            const session = localStorage.getItem('healthflow_session');
+            if (!session) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Load facilities and patients on page load
+        async function loadSelectOptions() {
+            try {
+                // Load facilities for users form and appointments
+                const { data: facilities } = await supabaseClient.from('facilities').select('id, facility_name');
+                if (facilities) {
+                    const facilitySelects = ['userFacility'];
+                    facilitySelects.forEach(selectId => {
+                        const select = document.getElementById(selectId);
+                        if (select) {
+                            facilities.forEach(f => {
+                                const option = document.createElement('option');
+                                option.value = f.id;
+                                option.textContent = f.facility_name;
+                                select.appendChild(option);
+                            });
+                        }
+                    });
+                }
+
+                // Load patients for appointments form
+                const { data: patients } = await supabaseClient.from('patients').select('id, first_name, last_name');
+                if (patients) {
+                    const patientSelect = document.getElementById('appointmentPatient');
+                    if (patientSelect) {
+                        patients.forEach(p => {
+                            const option = document.createElement('option');
+                            option.value = p.id;
+                            option.textContent = `${p.first_name} ${p.last_name}`;
+                            patientSelect.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading select options:', error);
+            }
+        }
+
+        // Form submission handlers
+        document.getElementById('patientsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitForm('patients', 'patientsForm', 'Patient');
+        });
+
+        document.getElementById('appointmentsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitForm('appointments', 'appointmentsForm', 'Appointment');
+        });
+
+        document.getElementById('facilitiesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await submitForm('facilities', 'facilitiesForm', 'Facility');
+        });
+
+        document.getElementById('usersForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(document.getElementById('usersForm'));
+            const userData = {
+                fullname: formData.get('fullname'),
+                username: formData.get('username'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                facility_id: formData.get('facility_id'),
+                user_role: formData.get('user_role'),
+                is_active: document.getElementById('userStatus').checked
+            };
+
+            // Validate passwords match
+            if (formData.get('password') !== formData.get('confirm_password')) {
+                Swal.fire('Error', 'Passwords do not match', 'error');
+                return;
+            }
+
+            await submitUser(userData, 'usersForm');
+        });
+
+        async function submitForm(table, formId, itemName) {
+            const formData = new FormData(document.getElementById(formId));
+            const data = Object.fromEntries(formData);
+
+            try {
+                const { error } = await supabaseClient.from(table).insert([data]);
+                if (error) throw error;
+
+                Swal.fire('Success', `${itemName} added successfully!`, 'success');
+                document.getElementById(formId).reset();
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        async function submitUser(userData, formId) {
+            try {
+                const { error } = await supabaseClient.from('users').insert([userData]);
+                if (error) throw error;
+
+                Swal.fire('Success', 'User added successfully!', 'success');
+                document.getElementById(formId).reset();
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            checkAuthentication();
+            loadSelectOptions();
+        });
+    </script>
+</body>
+</html>

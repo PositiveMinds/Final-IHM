@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealthFlow - Facility Login</title>
+    <title>HealthFlow - Login</title>
+    <link rel="icon" type="image/png" href="logo/favicon.png">
+    <link rel="apple-touch-icon" href="logo/favicon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
@@ -13,130 +15,239 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0052CC 0%, #5B8DEE 100%);
+            background: linear-gradient(135deg, #EAB34B 0%, #15696B 100%);
         }
-        
+
         .login-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            max-width: 450px;
             width: 100%;
+            max-width: 420px;
             padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.5s ease-out;
         }
-        
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
-        
-        .login-header h1 {
+
+        .login-logo {
+            height: 60px;
+            margin-bottom: 20px;
+        }
+
+        .login-title {
             font-size: 28px;
-            font-weight: bold;
-            color: #0052CC;
+            font-weight: 700;
             margin-bottom: 10px;
         }
-        
-        .login-header p {
-            color: #666;
+
+        .login-subtitle {
+            color: #6c757d;
             font-size: 14px;
+            margin-bottom: 0;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
-        .form-group label {
+
+        .form-label {
             font-weight: 600;
-            color: #333;
+            color: #111827;
             margin-bottom: 8px;
+            display: block;
         }
-        
+
         .form-control {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+            padding: 12px 16px;
+            border: 1.5px solid #e5e7eb;
             border-radius: 8px;
             font-size: 14px;
+            transition: all 0.3s ease;
         }
-        
+
         .form-control:focus {
             border-color: #0052CC;
-            box-shadow: 0 0 0 0.2rem rgba(0, 82, 204, 0.25);
+            box-shadow: 0 0 0 3px rgba(5, 82, 204, 0.1);
+            outline: none;
         }
-        
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #0052CC 0%, #5B8DEE 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: transform 0.2s;
+            accent-color: #0052CC;
         }
-        
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 82, 204, 0.3);
+
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
         }
-        
+
         .forgot-password {
             text-align: right;
-            margin-top: 15px;
+            margin-bottom: 20px;
         }
-        
+
         .forgot-password a {
             color: #0052CC;
             text-decoration: none;
-            font-size: 13px;
-        }
-        
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-        
-        .demo-credentials {
-            background: #f0f4ff;
-            border: 1px solid #dfe4f1;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 13px;
-        }
-        
-        .demo-credentials h6 {
-            color: #0052CC;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .demo-credentials p {
-            margin: 5px 0;
-            color: #555;
-        }
-        
-        .demo-credentials code {
-            background: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            color: #d63384;
+            transition: color 0.3s ease;
         }
 
-        .back-to-home {
+        .forgot-password a:hover {
+            color: #0041A3;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #15696B;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(5, 82, 204, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .signup-link {
             text-align: center;
-            margin-top: 20px;
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 0;
         }
 
-        .back-to-home a {
+        .signup-link a {
             color: #0052CC;
             text-decoration: none;
-            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s ease;
         }
 
-        .back-to-home a:hover {
+        .signup-link a:hover {
+            color: #0041A3;
             text-decoration: underline;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: #d1d5db;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            padding: 0 12px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .form-control.with-icon {
+            padding-left: 40px;
+        }
+
+        /* Dark mode support */
+        body.dark-mode .login-card {
+            background: #1f2937;
+            color: white;
+        }
+
+        body.dark-mode .form-label {
+            color: #f3f4f6;
+        }
+
+        body.dark-mode .form-control {
+            background: #111827;
+            color: white;
+            border-color: #374151;
+        }
+
+        body.dark-mode .form-control:focus {
+            border-color: #0052CC;
+        }
+
+        body.dark-mode .login-subtitle {
+            color: #9ca3af;
+        }
+
+        body.dark-mode .checkbox-wrapper label {
+            color: #d1d5db;
+        }
+
+        body.dark-mode .signup-link {
+            color: #9ca3af;
+        }
+
+        body.dark-mode .divider {
+            color: #374151;
+        }
+
+        body.dark-mode .divider::before,
+        body.dark-mode .divider::after {
+            background: #374151;
+        }
+
+        body.dark-mode .divider span {
+            color: #6b7280;
         }
     </style>
 </head>
@@ -144,59 +255,102 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h1><span style="color: #0052CC;">Health</span><span style="color: #5B8DEE;">Flow</span></h1>
-                <p>Facility Management System</p>
+                <div class="login-logo text-center">
+                    <img src="logo/logo.png" alt="HealthFlow Logo" height="80">
+                </div>
+                <h1 class="login-title">
+                    <span style="color: var(--logo-health);">Health</span><span style="color: var(--logo-flow);">Flow</span>
+                </h1>
+                <p class="login-subtitle">Healthcare Automation Platform</p>
             </div>
 
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="facilityEmail">Facility Email</label>
-                    <input type="email" class="form-control" id="facilityEmail" placeholder="your@facility.com" required>
+                    <label class="form-label" for="facilityEmail">
+                        <i class="fas fa-envelope me-2"></i>Facility Email
+                    </label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input 
+                            type="email" 
+                            class="form-control with-icon" 
+                            id="facilityEmail" 
+                            placeholder="Enter your facility email"
+                            required
+                        >
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                    <label class="form-label" for="password">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <div class="input-group">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input 
+                            type="password" 
+                            class="form-control with-icon" 
+                            id="password" 
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
                 </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="rememberMe">
-                    <label class="form-check-label" for="rememberMe">
-                        Remember me
-                    </label>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#forgot-password-modal">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt me-2"></i> Login
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
                 </button>
             </form>
 
-            <div class="forgot-password">
-                <a href="#"><i class="fas fa-key me-1"></i> Forgot Password?</a>
+            <div class="divider">
+                <span>New to HealthFlow?</span>
             </div>
 
-            <div class="demo-credentials">
-                <h6><i class="fas fa-flask me-2"></i> Demo Credentials</h6>
-                <p><strong>Email:</strong> <code>demo@facility.com</code></p>
-                <p><strong>Password:</strong> <code>Demo123!</code></p>
-                <p style="margin-top: 10px; color: #999; font-size: 12px;">Use these to explore the dashboard</p>
-            </div>
+            <a href="index.html#multi-step-demo" class="btn btn-outline-primary w-100" style="border-radius: 8px; font-weight: 600;">
+                <i class="fas fa-user-plus me-2"></i>Get Demo Access
+            </a>
 
-            <div class="back-to-home">
-                <p class="text-muted mb-2">Don't have an account?</p>
-                <a href="register.html"><i class="fas fa-user-plus me-1"></i> Create New Account</a>
-            </div>
-
-            <div class="back-to-home" style="margin-top: 10px;">
-                <a href="index.html"><i class="fas fa-home me-1"></i> Back to Home</a>
-            </div>
+            <p class="signup-link mt-4">
+                Don't have an account? <a href="index.html#contact">Contact Support</a>
+            </p>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="login.js"></script>
+
+    <script>
+        // Dark mode toggle
+        function toggleDarkMode() {
+            const body = document.body;
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            }
+        }
+
+        // Check dark mode preference on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
 </body>
 </html>
