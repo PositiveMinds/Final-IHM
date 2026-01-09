@@ -100,7 +100,7 @@ function setupPatientIdGenerator() {
 
 // Check if user has valid session
 function checkSession() {
-    const session = sessionStorage.getItem("healthflow_session");
+    const session = localStorage.getItem("healthflow_session");
 
     if (!session) {
         // No valid session, redirect to login
@@ -114,7 +114,7 @@ function checkSession() {
         return true;
     } catch (e) {
         console.error("Invalid session data:", e);
-        sessionStorage.clear();
+        localStorage.removeItem("healthflow_session");
         window.location.href = "login.html";
         return false;
     }
@@ -138,6 +138,10 @@ function displayUserInfo(userData) {
     if (userDetailsDiv) {
         userDetailsDiv.innerHTML = `
       <small>${userData.userRole}</small>
+      <div title="${userData.facilityName}">${userData.facilityName}</div>
+      <small style="color: #666; font-size: 10px;">
+        ${userData.facilityRegion || "N/A"} • ${userData.facilityId || "N/A"}
+      </small>
     `;
     }
 
@@ -236,7 +240,7 @@ window.showSection = function (sectionId, event) {
 // Load facility statistics from Supabase
 async function loadFacilityStats() {
     try {
-        const session = sessionStorage.getItem("healthflow_session");
+        const session = localStorage.getItem("healthflow_session");
         if (!session) return;
 
         const userData = JSON.parse(session);
@@ -399,7 +403,7 @@ function displayRecentPatients(patientsData) {
 // Load all patients
 async function loadAllPatients() {
     try {
-        const session = sessionStorage.getItem("healthflow_session");
+        const session = localStorage.getItem("healthflow_session");
         if (!session) return;
 
         const userData = JSON.parse(session);
@@ -688,7 +692,7 @@ function editPatient(patientId) {
 // Generate new patient ID with pattern: timestamp-facility-initials-random (with hyphens)
 function generateNewPatientId() {
     try {
-        const session = sessionStorage.getItem("healthflow_session");
+        const session = localStorage.getItem("healthflow_session");
         if (!session) return;
 
         const userData = JSON.parse(session);
@@ -753,7 +757,7 @@ function handleLogout() {
     }).then((result) => {
         if (result.isConfirmed) {
             // Clear session data
-            sessionStorage.removeItem("healthflow_session");
+            localStorage.removeItem("healthflow_session");
             localStorage.removeItem("healthflow_email");
 
             // Show logout message

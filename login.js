@@ -38,6 +38,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       .single();
 
     if (searchError || !users) {
+      console.error("User search error:", searchError);
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -46,6 +47,8 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       });
       return;
     }
+    
+    console.log("User found:", users);
 
     // Verify password using Supabase Auth (simulated comparison)
     // Note: In production, use bcryptjs to compare hashed passwords
@@ -71,9 +74,13 @@ document.getElementById("loginForm").addEventListener("submit", async function (
            .eq('facility_id', users.facility_id)
            .single();
          
+         console.log("Facility lookup result:", { facility, facilityError });
+         
          if (facility && !facilityError) {
            facilityUUID = facility.id;
            facilityRegion = facility.region;
+         } else if (facilityError) {
+           console.warn('Facility not found:', facilityError);
          }
        } catch (e) {
          console.warn('Could not fetch facility UUID:', e);
@@ -94,7 +101,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
           loginTime: new Date().toISOString(),
         };
 
-      sessionStorage.setItem("healthflow_session", JSON.stringify(sessionData));
+      localStorage.setItem("healthflow_session", JSON.stringify(sessionData));
 
       if (rememberMe) {
         localStorage.setItem("healthflow_email", email);
@@ -110,8 +117,10 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         confirmButtonText: "Continue",
       }).then((result) => {
         if (result.isConfirmed) {
-          // Redirect to dashboard
-          window.location.href = "dashboard.html";
+          // Add small delay to ensure localStorage is written, then redirect
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 500);
         }
       });
     } else {
@@ -143,7 +152,12 @@ async function comparePassword(plainPassword, hashedPassword) {
   // return await bcrypt.compare(plainPassword, hashedPassword);
   
   // For now, do a simple string comparison (NOT SECURE - FOR DEMO ONLY)
-  return plainPassword === hashedPassword;
+  console.log("Comparing passwords:");
+  console.log("Plain:", plainPassword);
+  console.log("Stored:", hashedPassword);
+  const match = plainPassword === hashedPassword;
+  console.log("Match:", match);
+  return match;
 }
 
 // Load remembered email if exists
