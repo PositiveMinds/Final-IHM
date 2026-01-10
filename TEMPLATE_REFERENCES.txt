@@ -1,0 +1,19 @@
+BOOTSTRAP TEMPLATE AND UI RESOURCES
+====================================
+
+Dark Medical Website Templates:
+- https://bootstrapmade.com/demo/Forma/
+- https://bootstrapmade.com/demo/Forma/
+- https://bootstrapmade.com/bootstrap-5-templates/
+
+Admin UI/UX Resources:
+- https://www.adminuiux.com/
+
+Dark Medical Website Bootstrap 5 Search:
+- https://www.google.com/search?client=firefox-b-d&hs=L0n9&sca_esv=ab35b595f7c5d5d3&sxsrf=ANbL-n7TiyWiy6cFFxWqd9k_TFSkVsVCGQ:1768049134345&udm=2&fbs=ADc_l-aN0CWEZBOHjofHoaMMDiKpjLXwDJDVZQCJ7bjQ-b49ass2ZVeawJzJM5YoZxBw18KxluQn7z-_pknf1mMgsVqqPHnNOy-NxXLZkMe20qGU-t4qZ6pptZhdaldyoIQaqu8UtPe-dA1IRljZNzEORed7R87TYPYzdz2TndqTe27rOuRBoCNKup9ySegnKvgG-fIiKoiu&q=dark+medical+website+bootstrap+5+free&sa=X&ved=2ahUKEwjO--OkgIGSAxWMNPsDHVc5KWIQtKgLegQIDhAB&biw=1869&bih=947&dpr=1&aic=0
+
+Notes:
+- Resources for designing healthcare/medical interface
+- Bootstrap 5 compatible templates
+- Dark theme UI patterns
+- Admin dashboard references
