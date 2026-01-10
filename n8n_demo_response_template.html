@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N8N Demo Response Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #252526;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            background: linear-gradient(135deg, #EAB34B 0%, #15696B 100%);
+            padding: 30px;
+            color: white;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 40px;
+            border-left: 3px solid #EAB34B;
+            padding-left: 20px;
+        }
+        .section-title {
+            color: #15696B;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .json-block {
+            background-color: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.7;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .json-key {
+            color: #9cdcfe;
+        }
+        .json-string {
+            color: #ce9178;
+        }
+        .json-value {
+            color: #b5cea8;
+        }
+        .json-bracket {
+            color: #d4d4d4;
+        }
+        .variable {
+            background-color: rgba(21, 105, 107, 0.2);
+            color: #4ec9b0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+        }
+        .example-box {
+            background-color: #1e1e1e;
+            border-left: 3px solid #15696B;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .example-title {
+            color: #4ec9b0;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .example-content {
+            color: #d4d4d4;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .highlight {
+            background-color: rgba(234, 179, 75, 0.2);
+            color: #EAB34B;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        .footer {
+            background-color: #1e1e1e;
+            padding: 20px 30px;
+            border-top: 1px solid #3e3e42;
+            font-size: 12px;
+            color: #858585;
+            text-align: center;
+        }
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        li {
+            margin-bottom: 8px;
+            color: #d4d4d4;
+        }
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            margin-right: 8px;
+            vertical-align: middle;
+            border: 1px solid #3e3e42;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #3e3e42;
+        }
+        th {
+            background-color: #2d2d30;
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #2d2d30;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>HealthFlow Demo Request Parser</h1>
+            <p>Flattened JSON response structure from N8N Gemini webhook</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Overview -->
+            <div class="section">
+                <div class="section-title">📋 Overview</div>
+                <p style="color: #d4d4d4; margin-bottom: 15px;">
+                    The N8N parser extracts demo request data from Gemini AI and returns a flat, normalized JSON structure. All fields are populated directly at the root level for easy access in downstream nodes.
+                </p>
+            </div>
+
+            <!-- Response Structure -->
+            <div class="section">
+                <div class="section-title">📦 Complete Response Structure</div>
+                <div class="json-block">
+                    <pre><span class="json-bracket">{</span>
+  <span class="json-key">"status"</span>: <span class="json-string">"success"</span>,
+  <span class="json-key">"demoId"</span>: <span class="json-string">"HF-DEMO-REQ-5C7D8B"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2026-01-10T15:22:10.871Z"</span>,
+
+  <span class="json-key">"contactName"</span>: <span class="json-string">"Muwanik Robert"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"positiveminds256@gmail.com"</span>,
+  <span class="json-key">"phone"</span>: <span class="json-string">"0775582868"</span>,
+
+  <span class="json-key">"facility"</span>: <span class="json-string">"Kitwe HCIV"</span>,
+  <span class="json-key">"facilityType"</span>: <span class="json-string">"health-center"</span>,
+  <span class="json-key">"patientLoad"</span>: <span class="json-string">"2000-5000"</span>,
+
+  <span class="json-key">"demoDate"</span>: <span class="json-string">"2026-01-12"</span>,
+  <span class="json-key">"demoTime"</span>: <span class="json-string">"morning"</span>,
+  <span class="json-key">"scheduledDateTime"</span>: <span class="json-string">"2026-01-12 10:00 AM"</span>,
+
+  <span class="json-key">"interests"</span>: <span class="json-string">"hiv, chronic, maternal"</span>,
+
+  <span class="json-key">"assignedRepresentative"</span>: <span class="json-string">"HealthFlow AI Assistant"</span>,
+  <span class="json-key">"nextSteps"</span>: <span class="json-string">"A calendar invitation with the meeting link will be sent..."</span>,
+
+  <span class="json-key">"emailSubject"</span>: <span class="json-string">"HealthFlow Demo Request Confirmation - Kitwe HCIV"</span>,
+  <span class="json-key">"emailBody"</span>: <span class="json-string">"&lt;div&gt;...HTML content...&lt;/div&gt;"</span>,
+
+  <span class="json-key">"primaryColor"</span>: <span class="json-string">"#EAB34B"</span>,
+  <span class="json-key">"accentColor"</span>: <span class="json-string">"#15696B"</span>,
+
+  <span class="json-key">"createdAt"</span>: <span class="json-string">"2026-01-10T15:22:10.871Z"</span>,
+  <span class="json-key">"source"</span>: <span class="json-string">"n8n-gemini-webhook"</span>
+<span class="json-bracket">}</span></pre>
+                </div>
+            </div>
+
+            <!-- Field Reference -->
+            <div class="section">
+                <div class="section-title">🔑 Field Reference</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field Name</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="variable">status</span></td>
+                            <td>Request processing status</td>
+                            <td>success</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">demoId</span></td>
+                            <td>Unique demo request identifier</td>
+                            <td>HF-DEMO-REQ-5C7D8B</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">contactName</span></td>
+                            <td>Full name of requestor (extracted from email)</td>
+                            <td>Muwanik Robert</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">email</span></td>
+                            <td>Contact email address</td>
+                            <td>positiveminds256@gmail.com</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">phone</span></td>
+                            <td>Contact phone number</td>
+                            <td>0775582868</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">facility</span></td>
+                            <td>Healthcare facility name</td>
+                            <td>Kitwe HCIV</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">facilityType</span></td>
+                            <td>Type of facility</td>
+                            <td>health-center</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">patientLoad</span></td>
+                            <td>Number of patients/bed capacity range</td>
+                            <td>2000-5000</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">demoDate</span></td>
+                            <td>Scheduled demo date</td>
+                            <td>2026-01-12</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">demoTime</span></td>
+                            <td>Preferred demo time</td>
+                            <td>morning</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">interests</span></td>
+                            <td>Comma-separated areas of interest</td>
+                            <td>hiv, chronic, maternal</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">assignedRepresentative</span></td>
+                            <td>Sales representative assigned to demo</td>
+                            <td>HealthFlow AI Assistant</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">emailSubject</span></td>
+                            <td>Auto-generated email subject line</td>
+                            <td>HealthFlow Demo Request Confirmation...</td>
+                        </tr>
+                        <tr>
+                            <td><span class="variable">emailBody</span></td>
+                            <td>HTML formatted email content</td>
+                            <td>&lt;div&gt;...&lt;/div&gt;</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Usage Examples -->
+            <div class="section">
+                <div class="section-title">💡 Usage Examples</div>
+                
+                <div class="example-box">
+                    <div class="example-title">Accessing Fields in N8N</div>
+                    <div class="example-content" style="font-family: 'Courier New', monospace;">
+                        <code>{{ $json.demoId }}</code> → HF-DEMO-REQ-5C7D8B<br>
+                        <code>{{ $json.contactName }}</code> → Muwanik Robert<br>
+                        <code>{{ $json.facility }}</code> → Kitwe HCIV<br>
+                        <code>{{ $json.interests }}</code> → hiv, chronic, maternal
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <div class="example-title">Using Email Fields</div>
+                    <div class="example-content">
+                        <strong>Subject Line:</strong> Use <code>$json.emailSubject</code> directly<br>
+                        <strong>Email Body:</strong> Use <code>$json.emailBody</code> as HTML content<br>
+                        <strong>Recipient:</strong> <code>$json.email</code>
+                    </div>
+                </div>
+
+                <div class="example-box">
+                    <div class="example-title">Demo Details Table</div>
+                    <div class="example-content">
+                        <strong>Date:</strong> <code>{{ $json.demoDate }}</code><br>
+                        <strong>Time:</strong> <code>{{ $json.demoTime }}</code> (or full: <code>{{ $json.scheduledDateTime }}</code>)<br>
+                        <strong>Facility:</strong> <code>{{ $json.facility }}</code> (<code>{{ $json.facilityType }}</code>)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Colors -->
+            <div class="section">
+                <div class="section-title">🎨 Brand Colors</div>
+                <p style="color: #d4d4d4; margin-bottom: 15px;">Included in response for email templating:</p>
+                <div style="display: flex; gap: 30px; margin-top: 20px;">
+                    <div>
+                        <div style="margin-bottom: 10px;">
+                            <span class="color-swatch" style="background-color: #EAB34B;"></span>
+                            <span class="variable">primaryColor</span>
+                        </div>
+                        <div style="color: #858585; font-size: 12px;">#EAB34B (Logo Health)</div>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 10px;">
+                            <span class="color-swatch" style="background-color: #15696B;"></span>
+                            <span class="variable">accentColor</span>
+                        </div>
+                        <div style="color: #858585; font-size: 12px;">#15696B (Logo Flow)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="section">
+                <div class="section-title">📝 Implementation Notes</div>
+                <ul>
+                    <li>All fields are at the root level - no nested objects for easy access</li>
+                    <li><code>contactName</code> is extracted from the email body greeting</li>
+                    <li><code>demoTime</code> is parsed from <code>scheduledDateTime</code> for convenience</li>
+                    <li><code>emailBody</code> contains pre-formatted HTML ready to send</li>
+                    <li><code>timestamp</code> and <code>createdAt</code> are ISO format for database storage</li>
+                    <li>All spaces in AI-generated keys are normalized (e.g., "Client Email" → email)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            N8N Gemini Demo Parser | HealthFlow Medical AI | 2025
+        </div>
+    </div>
+</body>
+</html>
