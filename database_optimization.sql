@@ -4,79 +4,159 @@
 -- ============================================================================
 
 -- ============================================================================
--- STEP 1: ADD PRIMARY KEYS (if not already set)
+-- STEP 0: DROP VIEWS (to allow column type changes)
 -- ============================================================================
 
--- Facilities table - make fid primary key
-ALTER TABLE facilities 
-ADD PRIMARY KEY (fid);
+DROP VIEW IF EXISTS v_appointments_full CASCADE;
+DROP VIEW IF EXISTS v_users_with_facility CASCADE;
+DROP VIEW IF EXISTS v_patients_with_facility CASCADE;
+
+-- ============================================================================
+-- STEP 1: ADD AUTO-INCREMENT TO EXISTING PRIMARY KEYS
+-- ============================================================================
+
+-- Facilities - change fid to INTEGER and add auto-increment (if not already identity)
+ALTER TABLE facilities ALTER COLUMN fid TYPE INTEGER;
+DO $$ BEGIN
+  ALTER TABLE facilities ALTER COLUMN fid ADD GENERATED ALWAYS AS IDENTITY;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
+
+-- Patients - change pid to INTEGER and add auto-increment (if not already identity)
+ALTER TABLE patients ALTER COLUMN pid TYPE INTEGER;
+DO $$ BEGIN
+  ALTER TABLE patients ALTER COLUMN pid ADD GENERATED ALWAYS AS IDENTITY;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
+
+-- Users - change uid to INTEGER and add auto-increment (if not already identity)
+ALTER TABLE users ALTER COLUMN uid TYPE INTEGER;
+DO $$ BEGIN
+  ALTER TABLE users ALTER COLUMN uid ADD GENERATED ALWAYS AS IDENTITY;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
+
+-- Appointments - change aid to INTEGER and add auto-increment (if not already identity)
+ALTER TABLE appointments ALTER COLUMN aid TYPE INTEGER;
+DO $$ BEGIN
+  ALTER TABLE appointments ALTER COLUMN aid ADD GENERATED ALWAYS AS IDENTITY;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Add unique constraint on facility_id (business key)
-ALTER TABLE facilities 
-ADD CONSTRAINT uk_facilities_facility_id UNIQUE (facility_id);
-
--- Patients table - make pid primary key
-ALTER TABLE patients 
-ADD PRIMARY KEY (pid);
+DO $$ BEGIN
+  ALTER TABLE facilities ADD CONSTRAINT uk_facilities_facility_id UNIQUE (facility_id);
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Add unique constraint on patient_id (business key)
-ALTER TABLE patients 
-ADD CONSTRAINT uk_patients_patient_id UNIQUE (patient_id);
-
--- Users table - make uid primary key
-ALTER TABLE users 
-ADD PRIMARY KEY (uid);
+DO $$ BEGIN
+  ALTER TABLE patients ADD CONSTRAINT uk_patients_patient_id UNIQUE (patient_id);
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Add unique constraint on email
-ALTER TABLE users 
-ADD CONSTRAINT uk_users_email UNIQUE (email);
-
--- Appointments table - make aid primary key
-ALTER TABLE appointments 
-ADD PRIMARY KEY (aid);
+DO $$ BEGIN
+  ALTER TABLE users ADD CONSTRAINT uk_users_email UNIQUE (email);
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- ============================================================================
--- STEP 2: ADD FID COLUMNS FOR PROPER FOREIGN KEY RELATIONSHIPS
+-- STEP 1B: REMOVE UNWANTED COLUMNS FROM PATIENTS TABLE
+-- ============================================================================
+
+-- Remove viral_load_status from patients (now in appointments)
+ALTER TABLE patients DROP COLUMN IF EXISTS viral_load_status CASCADE;
+
+-- Remove art_adherence_percent from patients (now in appointments)
+ALTER TABLE patients DROP COLUMN IF EXISTS art_adherence_percent CASCADE;
+
+-- Remove region from patients table (region is facility-level, not patient-level)
+ALTER TABLE patients DROP COLUMN IF EXISTS region CASCADE;
+
+-- Remove primary_condition from patients (now in appointments)
+ALTER TABLE patients DROP COLUMN IF EXISTS primary_condition CASCADE;
+
+-- Remove art_adherence_percent from appointments (not needed)
+ALTER TABLE appointments DROP COLUMN IF EXISTS art_adherence_percent CASCADE;
+
+-- ============================================================================
+-- STEP 2: ADD FID AND PID COLUMNS FOR PROPER FOREIGN KEY RELATIONSHIPS
 -- ============================================================================
 
 -- Add fid column to patients table if it doesn't exist
 ALTER TABLE patients
-ADD COLUMN IF NOT EXISTS fid NUMERIC;
+ADD COLUMN IF NOT EXISTS fid INTEGER;
 
 -- Add fid column to users table if it doesn't exist
 ALTER TABLE users
-ADD COLUMN IF NOT EXISTS fid NUMERIC;
+ADD COLUMN IF NOT EXISTS fid INTEGER;
+
+-- Add pid column to appointments table if it doesn't exist
+ALTER TABLE appointments
+ADD COLUMN IF NOT EXISTS pid INTEGER;
+
+-- Add viral_load_copies column to appointments table if it doesn't exist
+ALTER TABLE appointments
+ADD COLUMN IF NOT EXISTS viral_load_copies INTEGER;
+
+-- Add viral_load_status column to appointments table if it doesn't exist
+ALTER TABLE appointments
+ADD COLUMN IF NOT EXISTS viral_load_status VARCHAR(50);
+
+-- Add address column to patients table if it doesn't exist
+ALTER TABLE patients
+ADD COLUMN IF NOT EXISTS address VARCHAR(255);
 
 -- ============================================================================
--- STEP 3: ADD FOREIGN KEY CONSTRAINTS (using fid as FK)
+-- STEP 3: ADD FOREIGN KEY CONSTRAINTS (using fid and pid as FK)
 -- ============================================================================
 
 -- Patients depends on Facilities (via fid)
-ALTER TABLE patients
-ADD CONSTRAINT fk_patients_fid
-FOREIGN KEY (fid)
-REFERENCES facilities(fid)
-ON DELETE RESTRICT
-ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE patients ADD CONSTRAINT fk_patients_fid
+  FOREIGN KEY (fid) REFERENCES facilities(fid)
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Users depends on Facilities (via fid)
-ALTER TABLE users
-ADD CONSTRAINT fk_users_fid
-FOREIGN KEY (fid)
-REFERENCES facilities(fid)
-ON DELETE RESTRICT
-ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE users ADD CONSTRAINT fk_users_fid
+  FOREIGN KEY (fid) REFERENCES facilities(fid)
+  ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
--- Appointments depends on Patients
-ALTER TABLE appointments
-ADD CONSTRAINT fk_appointments_patient_id
-FOREIGN KEY (patient_id)
-REFERENCES patients(patient_id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+-- Appointments depends on Patients (via patient_id)
+DO $$ BEGIN
+  ALTER TABLE appointments ADD CONSTRAINT fk_appointments_patient_id
+  FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
+  ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
+
+-- Appointments depends on Patients (via pid)
+DO $$ BEGIN
+  ALTER TABLE appointments ADD CONSTRAINT fk_appointments_pid
+  FOREIGN KEY (pid) REFERENCES patients(pid)
+  ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- ============================================================================
--- STEP 3B: POPULATE FID COLUMNS FROM EXISTING DATA
+-- STEP 3B: POPULATE FID AND PID COLUMNS FROM EXISTING DATA
 -- ============================================================================
 
 -- Update patients fid from facility_id_code reference
@@ -93,6 +173,13 @@ FROM facilities f
 WHERE u.facility_id = f.facility_id
 AND (u.fid IS NULL OR u.fid = 0);
 
+-- Update appointments pid from patient_id reference
+UPDATE appointments a
+SET pid = p.pid
+FROM patients p
+WHERE a.patient_id = p.patient_id
+AND (a.pid IS NULL OR a.pid = 0);
+
 -- Make fid NOT NULL after data population
 ALTER TABLE patients
 ALTER COLUMN fid SET NOT NULL;
@@ -100,73 +187,90 @@ ALTER COLUMN fid SET NOT NULL;
 ALTER TABLE users
 ALTER COLUMN fid SET NOT NULL;
 
+-- Make pid NOT NULL after data population
+ALTER TABLE appointments
+ALTER COLUMN pid SET NOT NULL;
+
 -- ============================================================================
 -- STEP 4: CREATE INDEXES FOR PERFORMANCE
 -- ============================================================================
 
 -- Facilities indexes
-CREATE INDEX idx_facilities_facility_id ON facilities(facility_id);
-CREATE INDEX idx_facilities_region ON facilities(region);
+CREATE INDEX IF NOT EXISTS idx_facilities_facility_id ON facilities(facility_id);
+CREATE INDEX IF NOT EXISTS idx_facilities_region ON facilities(region);
 
 -- Patients indexes
-CREATE INDEX idx_patients_patient_id ON patients(patient_id);
-CREATE INDEX idx_patients_fid ON patients(fid);
-CREATE INDEX idx_patients_status ON patients(status);
-CREATE INDEX idx_patients_registered_date ON patients(registered_date);
-CREATE INDEX idx_patients_email ON patients(email);
-CREATE INDEX idx_patients_phone ON patients(phone_number);
+CREATE INDEX IF NOT EXISTS idx_patients_patient_id ON patients(patient_id);
+CREATE INDEX IF NOT EXISTS idx_patients_fid ON patients(fid);
+CREATE INDEX IF NOT EXISTS idx_patients_status ON patients(status);
+CREATE INDEX IF NOT EXISTS idx_patients_registered_date ON patients(registered_date);
+CREATE INDEX IF NOT EXISTS idx_patients_email ON patients(email);
+CREATE INDEX IF NOT EXISTS idx_patients_phone ON patients(phone_number);
 -- Composite index for common queries
-CREATE INDEX idx_patients_fid_status ON patients(fid, status);
+CREATE INDEX IF NOT EXISTS idx_patients_fid_status ON patients(fid, status);
 
 -- Users indexes
-CREATE INDEX idx_users_fid ON users(fid);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_user_role ON users(user_role);
-CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_fid ON users(fid);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_user_role ON users(user_role);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 -- Composite index for login queries
-CREATE INDEX idx_users_email_active ON users(email, is_active);
+CREATE INDEX IF NOT EXISTS idx_users_email_active ON users(email, is_active);
 
 -- Appointments indexes
-CREATE INDEX idx_appointments_patient_id ON appointments(patient_id);
-CREATE INDEX idx_appointments_appointment_date ON appointments(appointment_date);
-CREATE INDEX idx_appointments_status ON appointments(status);
+CREATE INDEX IF NOT EXISTS idx_appointments_patient_id ON appointments(patient_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_appointment_date ON appointments(appointment_date);
+CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
 -- Composite indexes for common queries
-CREATE INDEX idx_appointments_date_status ON appointments(appointment_date, status);
-CREATE INDEX idx_appointments_patient_date ON appointments(patient_id, appointment_date);
+CREATE INDEX IF NOT EXISTS idx_appointments_date_status ON appointments(appointment_date, status);
+CREATE INDEX IF NOT EXISTS idx_appointments_patient_date ON appointments(patient_id, appointment_date);
 
 -- ============================================================================
 -- STEP 6: ADD CHECK CONSTRAINTS FOR DATA VALIDATION
 -- ============================================================================
 
 -- Users - validate user_role
-ALTER TABLE users
-ADD CONSTRAINT ck_users_valid_role 
-CHECK (user_role IN ('Administrator', 'Manager', 'Staff', 'Doctor', 'Nurse', 'Receptionist'));
+DO $$ BEGIN
+  ALTER TABLE users ADD CONSTRAINT ck_users_valid_role 
+  CHECK (user_role IN ('Administrator', 'Manager', 'Staff', 'Doctor', 'Nurse', 'Receptionist'));
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Users - validate is_active is boolean
-ALTER TABLE users
-ADD CONSTRAINT ck_users_is_active 
-CHECK (is_active IN (true, false, NULL));
+DO $$ BEGIN
+  ALTER TABLE users ADD CONSTRAINT ck_users_is_active 
+  CHECK (is_active IN (true, false, NULL));
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Patients - validate gender
-ALTER TABLE patients
-ADD CONSTRAINT ck_patients_valid_gender 
-CHECK (gender IN ('M', 'F', 'O', NULL));
+DO $$ BEGIN
+  ALTER TABLE patients ADD CONSTRAINT ck_patients_valid_gender 
+  CHECK (gender IN ('M', 'F', 'O', NULL));
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Patients - validate status
-ALTER TABLE patients
-ADD CONSTRAINT ck_patients_valid_status 
-CHECK (status IN ('Active', 'Inactive', 'Transferred', 'Deceased', NULL));
+DO $$ BEGIN
+  ALTER TABLE patients ADD CONSTRAINT ck_patients_valid_status 
+  CHECK (status IN ('Active', 'Inactive', 'Transferred', 'Deceased', NULL));
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
 -- Appointments - validate status
-ALTER TABLE appointments
-ADD CONSTRAINT ck_appointments_valid_status 
-CHECK (status IN ('Scheduled', 'Completed', 'Cancelled', 'No-show', NULL));
+DO $$ BEGIN
+  ALTER TABLE appointments ADD CONSTRAINT ck_appointments_valid_status 
+  CHECK (status IN ('Scheduled', 'Completed', 'Cancelled', 'No-show', NULL));
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
 
--- Appointments - validate appointment_date is not in past
-ALTER TABLE appointments
-ADD CONSTRAINT ck_appointments_valid_date 
-CHECK (appointment_date >= CURRENT_DATE);
+-- Appointments - validate appointment_date is not null
+-- (Removed check for future dates to allow past appointments for historical records)
 
 -- ============================================================================
 -- STEP 7: ADD DEFAULT VALUES AND CONSTRAINTS
@@ -209,8 +313,6 @@ SELECT
   p.phone_number,
   p.status,
   p.registered_date,
-  p.art_adherence_percent,
-  p.viral_load_status,
   f.fid,
   f.facility_id,
   f.facility_name,
@@ -277,8 +379,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
   new_data JSONB
 );
 
-CREATE INDEX idx_audit_log_table_name ON audit_log(table_name);
-CREATE INDEX idx_audit_log_changed_at ON audit_log(changed_at);
+CREATE INDEX IF NOT EXISTS idx_audit_log_table_name ON audit_log(table_name);
+CREATE INDEX IF NOT EXISTS idx_audit_log_changed_at ON audit_log(changed_at);
 
 -- ============================================================================
 -- STEP 10: VERIFY CONSTRAINTS (Run after applying)

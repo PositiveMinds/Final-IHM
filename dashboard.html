@@ -146,11 +146,21 @@
             font-weight: 700;
             color: var(--logo-flow);
             margin-bottom: 0.25rem;
+            font-size: 1rem;
         }
 
         .profile-info-email {
             font-size: 0.85rem;
             color: #6c757d;
+        }
+
+        .profile-info-facility {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #f3f4f6;
+            word-break: break-word;
         }
 
         .profile-menu-item {
@@ -329,13 +339,22 @@
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            padding: 2rem;
+            padding: 1.5rem;
             margin-top: 60px;
             transition: all 0.3s ease;
         }
 
         .page-header {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .page-header h1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            margin-bottom: 0;
+            font-size: 0.95rem;
         }
 
         .page-title {
@@ -353,10 +372,13 @@
         .dashboard-card {
             background: white;
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease;
             border: 1px solid #e5e7eb;
+            min-height: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .dashboard-card:hover {
@@ -365,14 +387,14 @@
         }
 
         .card-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .card-icon.primary {
@@ -383,19 +405,22 @@
         .card-title {
             color: var(--logo-flow);
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
         }
 
         .card-value {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--logo-health);
-            margin: 0.5rem 0;
+            margin: 0.25rem 0;
+            line-height: 1.2;
         }
 
         .card-text {
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            margin: 0;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -518,6 +543,9 @@
             <span style="color: var(--logo-health);">Health</span><span style="color: var(--logo-flow);">Flow</span>
         </div>
         <div class="navbar-right">
+            <a href="index.html" class="btn btn-sm btn-outline-primary me-2" title="Back to Home">
+                <i class="fas fa-home me-1"></i>Back to Home
+            </a>
             <div class="profile-dropdown">
                 <button class="profile-toggle" id="profileToggle">
                     <div class="profile-avatar" id="profileAvatar">JD</div>
@@ -528,6 +556,7 @@
                     <div class="profile-menu-header">
                         <div class="profile-info-name" id="profileFullName">John Doe</div>
                         <div class="profile-info-email" id="profileEmail">john@example.com</div>
+                        <div class="profile-info-facility" id="profileFacilityHeader">Facility: Loading...</div>
                     </div>
                     <div class="profile-menu-item">
                         <i class="fas fa-briefcase"></i>
@@ -540,7 +569,7 @@
                         <i class="fas fa-hospital"></i>
                         <div>
                             <div style="font-size: 0.75rem; color: #9ca3af;">Facility</div>
-                            <div id="profileFacility" style="color: var(--logo-flow); font-weight: 700;">Main Hospital</div>
+                            <div id="profileFacility" style="color: var(--logo-flow); font-weight: 700; word-wrap: break-word; max-width: 200px;">Loading...</div>
                         </div>
                     </div>
                     <div class="profile-menu-divider"></div>
@@ -570,14 +599,14 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="row g-4 mb-4">
+        <div class="row g-3 mb-3">
             <div class="col-lg-3 col-md-6">
                 <div class="dashboard-card">
                     <div class="card-icon primary">
                         <i class="fas fa-users"></i>
                     </div>
                     <h3 class="card-title">Total Patients</h3>
-                    <div class="card-value">2,450</div>
+                    <div class="card-value" id="statsPatients">-</div>
                     <p class="card-text">Active patients in system</p>
                 </div>
             </div>
@@ -587,7 +616,7 @@
                         <i class="fas fa-calendar-check"></i>
                     </div>
                     <h3 class="card-title">Appointments Today</h3>
-                    <div class="card-value">34</div>
+                    <div class="card-value" id="statsAppointments">-</div>
                     <p class="card-text">Scheduled appointments</p>
                 </div>
             </div>
@@ -597,7 +626,7 @@
                         <i class="fas fa-heartbeat"></i>
                     </div>
                     <h3 class="card-title">HIV Management</h3>
-                    <div class="card-value">890</div>
+                    <div class="card-value" id="statsHIV">-</div>
                     <p class="card-text">Active HIV patients</p>
                 </div>
             </div>
@@ -607,8 +636,72 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <h3 class="card-title">Adherence Rate</h3>
-                    <div class="card-value">96%</div>
+                    <div class="card-value" id="statsAdherence">-</div>
                     <p class="card-text">Patient adherence</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chronic Conditions Stats -->
+        <div class="row g-3 mb-3">
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="dashboard-card">
+                    <div class="card-icon primary" style="background: #dc3545;">
+                        <i class="fas fa-virus"></i>
+                    </div>
+                    <h3 class="card-title">HIV/AIDS</h3>
+                    <div class="card-value" id="statsConditionHIV">-</div>
+                    <p class="card-text">HIV patients</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="dashboard-card">
+                    <div class="card-icon primary" style="background: #fd7e14;">
+                        <i class="fas fa-droplet"></i>
+                    </div>
+                    <h3 class="card-title">Diabetes</h3>
+                    <div class="card-value" id="statsConditionDiabetes">-</div>
+                    <p class="card-text">Diabetic patients</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="dashboard-card">
+                    <div class="card-icon primary" style="background: #20c997;">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="card-title">Hypertension</h3>
+                    <div class="card-value" id="statsConditionHypertension">-</div>
+                    <p class="card-text">Hypertensive patients</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="dashboard-card">
+                    <div class="card-icon primary" style="background: #6f42c1;">
+                        <i class="fas fa-lungs"></i>
+                    </div>
+                    <h3 class="card-title">Tuberculosis</h3>
+                    <div class="card-value" id="statsConditionTB">-</div>
+                    <p class="card-text">TB patients</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="dashboard-card">
+                    <div class="card-icon primary" style="background: #e83e8c;">
+                        <i class="fas fa-mosquito"></i>
+                    </div>
+                    <h3 class="card-title">Malaria</h3>
+                    <div class="card-value" id="statsConditionMalaria">-</div>
+                    <p class="card-text">Malaria cases</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="dashboard-card">
+                    <div class="card-icon primary" style="background: #17a2b8;">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h3 class="card-title">Co-infections</h3>
+                    <div class="card-value" id="statsConditionCoInfection">-</div>
+                    <p class="card-text">Co-infection cases</p>
                 </div>
             </div>
         </div>
@@ -637,31 +730,126 @@
                 <div class="tab-content">
                     <!-- Overview Tab -->
                     <div class="tab-pane fade show active" id="overview-tab">
-                        <div class="row g-4 mb-4">
-                            <div class="col-lg-6">
-                                <div class="dashboard-card">
-                                    <h3 class="card-title mb-3">Recent Activity</h3>
-                                    <div style="color: #6c757d;">
-                                        <p>No recent activity</p>
+                        <div class="row g-3 mb-3">
+                           <div class="col-lg-12">
+                               <div class="dashboard-card">
+                                   <h3 class="card-title mb-2">Quick Actions</h3>
+                                   <div class="d-flex gap-2 flex-wrap">
+                                        <button class="btn btn-sm" style="background: var(--logo-flow); color: white; border: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#patientModal">
+                                            <i class="fas fa-plus me-1"></i>New Patient
+                                        </button>
+                                        <button class="btn btn-sm" style="background: var(--logo-flow); color: white; border: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+                                            <i class="fas fa-calendar-plus me-1"></i>Schedule
+                                        </button>
+                                        <button class="btn btn-sm" style="background: var(--logo-health); color: white; border: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#facilityModal">
+                                            <i class="fas fa-hospital me-1"></i>Add Facility
+                                        </button>
+                                        <button class="btn btn-sm" style="background: var(--logo-health); color: white; border: none; padding: 0.4rem 0.8rem; font-size: 0.85rem;" data-bs-toggle="modal" data-bs-target="#userModal">
+                                            <i class="fas fa-user-plus me-1"></i>New User
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                        </div>
+
+                        <!-- Recent Patients Table -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-12">
                                 <div class="dashboard-card">
-                                    <h3 class="card-title mb-3">Quick Actions</h3>
-                                    <div class="d-flex gap-2 flex-wrap">
-                                        <button class="btn btn-sm" style="background: var(--logo-flow); color: white; border: none;" data-bs-toggle="modal" data-bs-target="#patientModal">
-                                            <i class="fas fa-plus me-2"></i>New Patient
-                                        </button>
-                                        <button class="btn btn-sm" style="background: var(--logo-flow); color: white; border: none;" data-bs-toggle="modal" data-bs-target="#appointmentModal">
-                                            <i class="fas fa-calendar-plus me-2"></i>Schedule
-                                        </button>
-                                        <button class="btn btn-sm" style="background: var(--logo-health); color: white; border: none;" data-bs-toggle="modal" data-bs-target="#facilityModal">
-                                            <i class="fas fa-hospital me-2"></i>Add Facility
-                                        </button>
-                                        <button class="btn btn-sm" style="background: var(--logo-health); color: white; border: none;" data-bs-toggle="modal" data-bs-target="#userModal">
-                                            <i class="fas fa-user-plus me-2"></i>New User
-                                        </button>
+                                    <h3 class="card-title mb-3"><i class="fas fa-users me-2" style="color: var(--logo-health);"></i>Recent Patients</h3>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead style="background: var(--logo-flow); color: white;">
+                                                <tr>
+                                                    <th>Patient ID</th>
+                                                    <th>Name</th>
+                                                    <th>Age</th>
+                                                    <th>Gender</th>
+                                                    <th>Status</th>
+                                                    <th>Registered Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recentPatientsTable">
+                                                <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Appointments Table -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-12">
+                                <div class="dashboard-card">
+                                    <h3 class="card-title mb-3"><i class="fas fa-calendar-check me-2" style="color: var(--logo-health);"></i>Recent Appointments</h3>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead style="background: var(--logo-flow); color: white;">
+                                                <tr>
+                                                    <th>Patient ID</th>
+                                                    <th>Patient Name</th>
+                                                    <th>Date</th>
+                                                    <th>Time</th>
+                                                    <th>Condition</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recentAppointmentsTable">
+                                                <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Viral Load Data Table -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-12">
+                                <div class="dashboard-card">
+                                    <h3 class="card-title mb-3"><i class="fas fa-heartbeat me-2" style="color: var(--logo-health);"></i>Viral Load Monitoring</h3>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead style="background: var(--logo-flow); color: white;">
+                                                <tr>
+                                                    <th>Patient ID</th>
+                                                    <th>Patient Name</th>
+                                                    <th>Viral Load (copies)</th>
+                                                    <th>Status</th>
+                                                    <th>Test Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="viralLoadTable">
+                                                <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chronic Conditions Summary -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-lg-12">
+                                <div class="dashboard-card">
+                                    <h3 class="card-title mb-3"><i class="fas fa-stethoscope me-2" style="color: var(--logo-health);"></i>Chronic Conditions Management</h3>
+                                    <div class="table-responsive">
+                                        <table class="table table-hover table-sm">
+                                            <thead style="background: var(--logo-flow); color: white;">
+                                                <tr>
+                                                    <th>Patient ID</th>
+                                                    <th>Patient Name</th>
+                                                    <th>Primary Condition</th>
+                                                    <th>Last Visit</th>
+                                                    <th>Status</th>
+                                                    <th>Adherence</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="chronicConditionsTable">
+                                                <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -860,6 +1048,333 @@
     </main>
 
     <!-- ===== MODALS ===== -->
+
+    <!-- ===== ANALYTICS & INSIGHTS SECTION ===== -->
+    <div class="container-fluid mt-5 px-3 px-md-4">
+        <!-- KPI CARDS -->
+        <div class="row g-3 mb-2">
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="badge bg-success">+12%</span>
+                    </div>
+                    <h6 class="kpi-label">Appointment Adherence</h6>
+                    <h2 class="kpi-value" id="appointmentAdherence">85%</h2>
+                    <small class="text-muted">This month</small>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <i class="fas fa-virus-covid"></i>
+                        <span class="badge bg-info">-8%</span>
+                    </div>
+                    <h6 class="kpi-label">Viral Suppression Rate</h6>
+                    <h2 class="kpi-value" id="viralSuppression">92%</h2>
+                    <small class="text-muted">Current cohort</small>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <i class="fas fa-user-check"></i>
+                        <span class="badge bg-primary">+5%</span>
+                    </div>
+                    <h6 class="kpi-label">Patient Retention</h6>
+                    <h2 class="kpi-value" id="patientRetention">78%</h2>
+                    <small class="text-muted">12-month</small>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <i class="fas fa-hourglass-end"></i>
+                        <span class="badge bg-warning">5 days</span>
+                    </div>
+                    <h6 class="kpi-label">Avg Time to Next Appt</h6>
+                    <h2 class="kpi-value" id="avgTimeToAppt">28d</h2>
+                    <small class="text-muted">Median</small>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="badge bg-danger" id="riskBadge">12</span>
+                    </div>
+                    <h6 class="kpi-label">High-Risk Patients</h6>
+                    <h2 class="kpi-value" id="highRiskCount">12</h2>
+                    <small class="text-muted">Needing intervention</small>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-sm-6">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <i class="fas fa-users"></i>
+                        <span class="badge bg-success" id="newPatientsBadge">8</span>
+                    </div>
+                    <h6 class="kpi-label">New Patients</h6>
+                    <h2 class="kpi-value" id="newPatientsCount">8</h2>
+                    <small class="text-muted">This week</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTS SECTION -->
+        <div class="row g-3 mb-3">
+            <div class="col-lg-6">
+                <div class="alert-card alert-overdue">
+                    <div class="alert-header">
+                        <i class="fas fa-calendar-times text-danger"></i>
+                        <h5>Overdue Appointments</h5>
+                        <span class="badge bg-danger" id="overdueCount">0</span>
+                    </div>
+                    <div class="alert-list" id="overdueList">
+                        <p class="text-muted text-center py-3">No overdue appointments</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="alert-card alert-critical">
+                    <div class="alert-header">
+                        <i class="fas fa-virus-covid text-danger"></i>
+                        <h5>Critical Viral Loads</h5>
+                        <span class="badge bg-danger" id="criticalVLCount">0</span>
+                    </div>
+                    <div class="alert-list" id="criticalVLList">
+                        <p class="text-muted text-center py-3">No critical viral loads detected</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK STATS -->
+        <div class="row g-3 mb-3">
+            <div class="col-lg-4">
+                <div class="quick-stat-card">
+                    <h6 class="text-muted mb-3"><i class="fas fa-calendar-day me-2"></i>Last 7 Days</h6>
+                    <div class="stat-row">
+                        <span>Appointments Completed:</span>
+                        <strong id="last7DaysComplete">-</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>New Registrations:</span>
+                        <strong id="last7DaysNew">-</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Patients Lost to Follow-up:</span>
+                        <strong id="last7DaysLost">-</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="quick-stat-card">
+                    <h6 class="text-muted mb-3"><i class="fas fa-sun me-2"></i>Today</h6>
+                    <div class="stat-row">
+                        <span>Completed Appointments:</span>
+                        <strong id="todayComplete">-</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Scheduled for Today:</span>
+                        <strong id="todayScheduled">-</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>New Patients:</span>
+                        <strong id="todayNew">-</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="quick-stat-card">
+                    <h6 class="text-muted mb-3"><i class="fas fa-medical-clinic me-2"></i>Upcoming (7 Days)</h6>
+                    <div class="stat-row">
+                        <span>Scheduled Appointments:</span>
+                        <strong id="next7DaysAppts">-</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Follow-up Due:</span>
+                        <strong id="next7DaysFollowUp">-</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Lab Results Pending:</span>
+                        <strong id="pendingLabResults">-</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPCOMING APPOINTMENTS -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card-section">
+                    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5><i class="fas fa-calendar-alt me-2" style="color: var(--logo-flow);"></i>Upcoming Appointments (Next 30 Days)</h5>
+                            <small class="text-muted">Patients with scheduled appointments</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="filterUpcomingAppts('7')">7 Days</button>
+                        <button class="btn btn-sm btn-outline-primary active" onclick="filterUpcomingAppts('30')">30 Days</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <div class="table-controls mb-3 d-flex gap-2 flex-wrap">
+                            <input type="text" class="form-control form-control-sm flex-grow-1" id="upcomingSearch" placeholder="Search by patient name...">
+                            <select class="form-select form-select-sm" style="max-width: 150px;" id="upcomingTypeFilter">
+                                <option value="">All Types</option>
+                                <option value="Regular">Regular Checkup</option>
+                                <option value="Follow-up">Follow-up</option>
+                                <option value="Lab">Lab Test</option>
+                                <option value="Consultation">Consultation</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportTableToCSV('upcomingApptsTable', 'upcoming_appointments')">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                        </div>
+                        <table class="table table-hover" id="upcomingApptsTable">
+                            <thead>
+                                <th onclick="sortTable('upcomingApptsTable', 0)">Patient <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('upcomingApptsTable', 1)">Date <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('upcomingApptsTable', 2)">Time <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('upcomingApptsTable', 3)">Type <i class="fas fa-sort text-muted"></i></th>
+                                <th>Days Until</th>
+                            </thead>
+                            <tbody id="upcomingApptsBody">
+                                <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS SECTION -->
+        <div class="row g-3 mb-3">
+            <div class="col-lg-6">
+                <div class="card-section">
+                    <h5 class="mb-4"><i class="fas fa-chart-pie me-2" style="color: var(--logo-flow);"></i>Condition Distribution</h5>
+                    <div style="height: 300px;">
+                        <canvas id="conditionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card-section">
+                    <h5 class="mb-4"><i class="fas fa-chart-bar me-2" style="color: var(--logo-flow);"></i>Monthly Patient Registrations</h5>
+                    <div style="height: 300px;">
+                        <canvas id="registrationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-lg-12">
+                <div class="card-section">
+                    <h5 class="mb-4"><i class="fas fa-chart-line me-2" style="color: var(--logo-flow);"></i>Appointment Trends (Last 12 Months)</h5>
+                    <div style="height: 300px;">
+                        <canvas id="appointmentTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENHANCED PATIENTS TABLE -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card-section">
+                    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5><i class="fas fa-users me-2" style="color: var(--logo-flow);"></i>Patient Registry</h5>
+                            <small class="text-muted">Complete list of registered patients</small>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <div class="table-controls mb-3 d-flex gap-2 flex-wrap">
+                            <input type="text" class="form-control form-control-sm flex-grow-1" id="patientSearch" placeholder="Search by name, ID, or phone...">
+                            <select class="form-select form-select-sm" style="max-width: 120px;" id="patientStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Discharged">Discharged</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportTableToCSV('patientTable', 'patients_registry')">
+                                <i class="fas fa-download me-1"></i>CSV
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportTableToExcel('patientTable', 'patients_registry')">
+                                <i class="fas fa-file-excel me-1"></i>Excel
+                            </button>
+                        </div>
+                        <div class="pagination-info mb-2">
+                            <small class="text-muted">Showing <span id="patientCount">0</span> patients | Page <span id="currentPage">1</span></small>
+                        </div>
+                        <table class="table table-hover" id="patientTable">
+                            <thead>
+                                <th onclick="sortTable('patientTable', 0)">Name <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('patientTable', 1)">ID <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('patientTable', 2)">Phone <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('patientTable', 3)">Gender <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('patientTable', 4)">Status <i class="fas fa-sort text-muted"></i></th>
+                                <th>Actions</th>
+                            </thead>
+                            <tbody id="patientTableBody">
+                                <tr><td colspan="6" class="text-center text-muted py-3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                        <nav class="mt-3" id="patientPagination">
+                            <ul class="pagination pagination-sm"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENHANCED APPOINTMENTS TABLE -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card-section">
+                    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5><i class="fas fa-calendar-check me-2" style="color: var(--logo-flow);"></i>All Appointments</h5>
+                            <small class="text-muted">Complete appointment history</small>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <div class="table-controls mb-3 d-flex gap-2 flex-wrap">
+                            <input type="text" class="form-control form-control-sm flex-grow-1" id="appointmentSearch" placeholder="Search by patient name...">
+                            <select class="form-select form-select-sm" style="max-width: 120px;" id="appointmentStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <select class="form-select form-select-sm" style="max-width: 120px;" id="appointmentTypeFilter">
+                                <option value="">All Types</option>
+                                <option value="Regular">Regular Checkup</option>
+                                <option value="Follow-up">Follow-up</option>
+                                <option value="Lab">Lab Test</option>
+                                <option value="Consultation">Consultation</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportTableToCSV('appointmentTable', 'appointments')">
+                                <i class="fas fa-download me-1"></i>CSV
+                            </button>
+                        </div>
+                        <table class="table table-hover" id="appointmentTable">
+                            <thead>
+                                <th onclick="sortTable('appointmentTable', 0)">Patient <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('appointmentTable', 1)">Date <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('appointmentTable', 2)">Time <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('appointmentTable', 3)">Type <i class="fas fa-sort text-muted"></i></th>
+                                <th onclick="sortTable('appointmentTable', 4)">Status <i class="fas fa-sort text-muted"></i></th>
+                            </thead>
+                            <tbody id="appointmentTableBody">
+                                <tr><td colspan="5" class="text-center text-muted py-3">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Patient Modal -->
     <div class="modal fade" id="patientModal" tabindex="-1">
@@ -1122,17 +1637,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/eazychart@1.2.0/dist/eazychart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
     <script src="supabase-config.js"></script>
+    <script src="dashboard-data.js"></script>
+    <script src="dashboard-enhancements.js"></script>
     <script>
         // Check if user is logged in
-        function checkAuthentication() {
-            const session = localStorage.getItem('healthflow_session');
-            if (!session) {
-                window.location.href = 'login.html';
-                return;
-            }
-            loadUserProfile();
-        }
+         function checkAuthentication() {
+             const session = localStorage.getItem('healthflow_session');
+             console.log('Checking authentication, session:', session);
+             if (!session) {
+                 console.warn('No session found, redirecting to login');
+                 window.location.href = 'login.html';
+                 return;
+             }
+             console.log('Session found, loading profile');
+             loadUserProfile();
+         }
 
         // Load user profile from session
         function loadUserProfile() {
@@ -1148,6 +1671,7 @@
                 document.getElementById('profileName').textContent = (session.fullname || 'User').split(' ')[0];
                 document.getElementById('profileRole').textContent = session.userRole || 'User';
                 document.getElementById('profileFacility').textContent = session.facilityName || 'Facility';
+                document.getElementById('profileFacilityHeader').textContent = 'Facility: ' + (session.facilityName || 'Facility');
                 
                 // Update avatar with initials
                 const name = session.fullname || 'User';

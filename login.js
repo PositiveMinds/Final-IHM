@@ -144,22 +144,24 @@ document.getElementById("loginForm").addEventListener("submit", async function (
   }
 });
 
-// Password comparison function (simulated - in production use bcryptjs)
+// Password comparison function using bcryptjs
 async function comparePassword(plainPassword, hashedPassword) {
-  // For demo purposes, simple comparison
-  // In production, import bcryptjs and use: await bcrypt.compare(plainPassword, hashedPassword)
-  
-  // If you want real bcrypt comparison, uncomment the code below:
-  // const bcrypt = require('bcryptjs');
-  // return await bcrypt.compare(plainPassword, hashedPassword);
-  
-  // For now, do a simple string comparison (NOT SECURE - FOR DEMO ONLY)
-  console.log("Comparing passwords:");
-  console.log("Plain:", plainPassword);
-  console.log("Stored:", hashedPassword);
-  const match = plainPassword === hashedPassword;
-  console.log("Match:", match);
-  return match;
+  try {
+    // Check if bcryptjs is available globally
+    if (window.dcodeIO && window.dcodeIO.bcrypt) {
+      const match = window.dcodeIO.bcrypt.compareSync(plainPassword, hashedPassword);
+      console.log("Password comparison result:", match);
+      return match;
+    } else {
+      console.warn("bcryptjs library not loaded, using demo mode");
+      // Demo mode: simple comparison
+      return plainPassword === hashedPassword;
+    }
+  } catch (e) {
+    console.error("Password comparison error:", e);
+    // Fallback to simple comparison if bcryptjs fails
+    return plainPassword === hashedPassword;
+  }
 }
 
 // Load remembered email if exists

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test How It Works Carousel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #f8f9fa;
+            padding: 40px 0;
+        }
+        .test-section {
+            background: white;
+            padding: 40px 0;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <div class="container">
+            <h1 class="mb-5">How HealthFlow Works - Carousel Test</h1>
+            
+            <!-- Owl Carousel for Steps -->
+            <div class="how-it-works-carousel-wrapper">
+                <div class="how-it-works-carousel owl-carousel owl-theme">
+                    <!-- Step 1 -->
+                    <div class="carousel-item">
+                        <div class="step-card-enhanced">
+                            <div class="step-visual">
+                                <div class="step-icon-wrapper step-icon-1">
+                                    <i class="fas fa-database fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-counter">Step 01</div>
+                                <h3 class="fw-bold mb-3">Connect Your Data</h3>
+                                <p class="text-muted mb-4">
+                                    Link your patient database (Google Sheets, EMR, or Excel). HealthFlow reads your master patient list with all demographics, conditions, and metrics.
+                                </p>
+                                <ul class="step-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>Auto-sync patient records</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Multi-source integration</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Real-time data mapping</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="carousel-item">
+                        <div class="step-card-enhanced">
+                            <div class="step-visual">
+                                <div class="step-icon-wrapper step-icon-2">
+                                    <i class="fas fa-cogs fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-counter">Step 02</div>
+                                <h3 class="fw-bold mb-3">Configure Rules</h3>
+                                <p class="text-muted mb-4">
+                                    Define patient triggers and alert conditions. Set custom rules for missed appointments, viral loads, medication adherence, and more.
+                                </p>
+                                <ul class="step-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>Custom alert logic</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Risk scoring</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Automation workflows</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="carousel-item">
+                        <div class="step-card-enhanced">
+                            <div class="step-visual">
+                                <div class="step-icon-wrapper step-icon-3">
+                                    <i class="fas fa-rocket fa-2x"></i>
+                                </div>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-counter">Step 03</div>
+                                <h3 class="fw-bold mb-3">Automate & Scale</h3>
+                                <p class="text-muted mb-4">
+                                    HealthFlow identifies at-risk patients, generates personalized messages, sends WhatsApp/email reminders, and delivers actionable reports.
+                                </p>
+                                <ul class="step-features">
+                                    <li><i class="fas fa-check text-success me-2"></i>AI-powered insights</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Multi-channel messaging</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Automated reporting</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            console.log('Document ready');
+            
+            setTimeout(function() {
+                const carousel = $('.how-it-works-carousel');
+                console.log('Carousel found:', carousel.length);
+                
+                if (carousel.length && !carousel.hasClass('owl-loaded')) {
+                    console.log('Initializing carousel...');
+                    carousel.owlCarousel({
+                        items: 1,
+                        loop: true,
+                        margin: 30,
+                        autoplay: false,
+                        nav: true,
+                        navText: ['<i class="fas fa-chevron-left"></i>', '<i class="fas fa-chevron-right"></i>'],
+                        dots: true,
+                        stagePadding: 0,
+                        responsive: {
+                            0: { items: 1, margin: 15 },
+                            768: { items: 1.5, margin: 20 },
+                            1024: { items: 2, margin: 30 },
+                            1200: { items: 2.5, margin: 30 }
+                        }
+                    });
+                    console.log('Carousel initialized');
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
