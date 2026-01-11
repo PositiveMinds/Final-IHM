@@ -47,8 +47,6 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       });
       return;
     }
-    
-    console.log("User found:", users);
 
     // Verify password using Supabase Auth (simulated comparison)
     // Note: In production, use bcryptjs to compare hashed passwords
@@ -64,38 +62,41 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         return;
       }
 
-      // Fetch the actual facility UUID from the facilities table
-      let facilityUUID = null;
-      let facilityRegion = null;
-      let facilityName = users.facility_name || "Facility";
-      try {
-        const { data: facility, error: facilityError } = await supabaseClient
-          .from('facilities')
-          .select('id, facility_id, region, facility_name')
-          .eq('facility_id', users.facility_id)
-          .single();
+      // Fetch the actual facility info from the facilities table
+       let facilityId = null;
+       let facilityRegion = null;
+       let facilityName = users.facility_name || "Facility";
+       try {
+         const { data: facility, error: facilityError } = await supabaseClient
+           .from('facilities')
+           .select('fid, facility_id, region, facility_name')
+           .eq('fid', users.fid)
+           .single();
         
         console.log("Facility lookup result:", { facility, facilityError });
         
         if (facility && !facilityError) {
-          facilityUUID = facility.id;
+          facilityId = facility.fid;
           facilityRegion = facility.region;
           facilityName = facility.facility_name || facilityName;
         } else if (facilityError) {
           console.warn('Facility not found:', facilityError);
+          facilityId = users.fid;
         }
-      } catch (e) {
-        console.warn('Could not fetch facility UUID:', e);
-      }
+        } catch (e) {
+        console.warn('Could not fetch facility:', e);
+        facilityId = users.fid;
+        }
 
-      // Store session data
-      const sessionData = {
-          id: users.id,
+        // Store session data
+        const sessionData = {
+          id: users.uid,
           email: users.email,
           fullname: users.fullname || facilityName,
           username: users.username,
           facilityName: facilityName,
-          facilityId: facilityUUID || users.facility_id,
+          facility_id: facilityId || users.fid,
+          fid: users.fid,
           facilityIdCode: users.facility_id,
           facilityRegion: facilityRegion,
           userRole: users.user_role,
@@ -147,15 +148,20 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 // Password comparison function using bcryptjs
 async function comparePassword(plainPassword, hashedPassword) {
   try {
-    // Check if bcryptjs is available globally
-    if (window.dcodeIO && window.dcodeIO.bcrypt) {
+    // Check if password looks like a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+    const isBcryptHash = /^\$2[aby]\$/.test(hashedPassword);
+    
+    // Check if bcryptjs is available globally and password is a bcrypt hash
+    if (isBcryptHash && window.dcodeIO && window.dcodeIO.bcrypt) {
       const match = window.dcodeIO.bcrypt.compareSync(plainPassword, hashedPassword);
-      console.log("Password comparison result:", match);
+      console.log("Password comparison result (bcrypt):", match);
       return match;
     } else {
-      console.warn("bcryptjs library not loaded, using demo mode");
-      // Demo mode: simple comparison
-      return plainPassword === hashedPassword;
+      console.warn("Using plaintext password comparison (demo mode)");
+      // Demo mode: simple plaintext comparison
+      const match = plainPassword === hashedPassword;
+      console.log("Password comparison result (plaintext):", match);
+      return match;
     }
   } catch (e) {
     console.error("Password comparison error:", e);

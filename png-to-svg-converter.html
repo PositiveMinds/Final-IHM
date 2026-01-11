@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNG to SVG Converter - Logo Vectorizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-right: 12px;
+            border-radius: 2px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .upload-text {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .preview-box {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: #f9f9f9;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-box img,
+        .preview-box svg {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 8px;
+        }
+
+        .preview-label {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .control-group input,
+        .control-group select {
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-convert {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-convert:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-convert:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-download {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-download:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #667eea;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .code-section {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+
+        .code-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            max-height: 400px;
+            border: 2px solid #667eea;
+        }
+
+        .code-output code {
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 PNG to SVG Converter</h1>
+            <p>Transform your logo into colorful, scalable vector graphics</p>
+        </div>
+
+        <div class="content">
+            <!-- Upload Section -->
+            <div class="section">
+                <h2>Upload Image</h2>
+                <div class="upload-area" id="uploadArea">
+                    <span class="upload-icon">📤</span>
+                    <div class="upload-text">Click or drag your PNG/JPG</div>
+                    <div class="upload-hint">Max 10MB - PNG, JPG, GIF supported</div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="colorMode">Color Mode</label>
+                        <select id="colorMode">
+                            <option value="color">Full Color (Default)</option>
+                            <option value="posterize">Posterize (Reduced Colors)</option>
+                            <option value="bw">Black & White</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="colorCount">Colors to Use (for posterize)</label>
+                        <input type="number" id="colorCount" min="2" max="16" value="8">
+                    </div>
+                    <div class="control-group">
+                        <label for="quality">Quality (Higher = More Detail)</label>
+                        <input type="range" id="quality" min="1" max="10" value="5" style="cursor: pointer;">
+                        <span id="qualityValue">5</span>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-convert" id="convertBtn" disabled>Convert to SVG</button>
+                    <button class="btn-clear" id="clearBtn">Clear</button>
+                </div>
+                <div class="loader" id="loader">
+                    <span class="spinner"></span> Converting...
+                </div>
+                <div class="status" id="status"></div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="section">
+                <h2>Preview</h2>
+                <div>
+                    <div class="preview-label">Original Image</div>
+                    <div class="preview-box" id="previewOriginal">
+                        <span style="color: #999;">No image loaded</span>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class="preview-label">SVG Result</div>
+                    <div class="preview-box" id="previewSVG">
+                        <span style="color: #999;">Conversion result will appear here</span>
+                    </div>
+                </div>
+                <button class="btn-download" id="downloadBtn" disabled style="margin-top: 20px;">
+                    ⬇️ Download SVG
+                </button>
+            </div>
+
+            <!-- Code Section -->
+            <div class="section code-section">
+                <h2>SVG Code</h2>
+                <div class="code-output" id="codeOutput">
+                    <code id="svgCode"><!-- SVG code will appear here --></code>
+                </div>
+                <button class="copy-btn" id="copyBtn" disabled>📋 Copy Code</button>
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Use the SVG code in your HTML pages, design tools (Adobe Illustrator, Figma), or websites. SVG files scale perfectly to any size without losing quality.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentImage = null;
+        let currentSVGData = null;
+        let currentFileName = 'logo.svg';
+
+        // Quality slider update
+        document.getElementById('quality').addEventListener('input', (e) => {
+            document.getElementById('qualityValue').textContent = e.target.value;
+        });
+
+        // Upload area click
+        document.getElementById('uploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        // File input change
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showStatus('Please select a valid image file', 'error');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showStatus('File size must be less than 10MB', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImage = e.target.result;
+                currentFileName = file.name.replace(/\.[^/.]+$/, '.svg');
+                
+                // Show original preview
+                const previewOriginal = document.getElementById('previewOriginal');
+                previewOriginal.innerHTML = `<img src="${currentImage}" alt="Original">`;
+                
+                document.getElementById('convertBtn').disabled = false;
+                document.getElementById('copyBtn').disabled = true;
+                document.getElementById('downloadBtn').disabled = true;
+                
+                showStatus(`Image loaded: ${file.name}`, 'success');
+                document.getElementById('previewSVG').innerHTML = '<span style="color: #999;">Ready to convert - click Convert to SVG</span>';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Convert to SVG
+        document.getElementById('convertBtn').addEventListener('click', convertToSVG);
+
+        function convertToSVG() {
+            if (!currentImage) {
+                showStatus('Please upload an image first', 'error');
+                return;
+            }
+
+            document.getElementById('loader').classList.add('active');
+            document.getElementById('convertBtn').disabled = true;
+
+            setTimeout(() => {
+                try {
+                    const img = new Image();
+                    img.onload = function() {
+                        const colorMode = document.getElementById('colorMode').value;
+                        const quality = parseInt(document.getElementById('quality').value);
+
+                        // Create canvas - scale based on quality
+                        const scaleFactor = quality / 5; // 0.2 to 2.0
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(50, img.width * scaleFactor);
+                        canvas.height = Math.max(50, img.height * scaleFactor);
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        // Get image data
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imageData.data;
+
+                        // Apply smoothing filter
+                        applyGaussianBlur(data, canvas.width, canvas.height, 1.5);
+
+                        // Process based on color mode
+                        if (colorMode === 'bw') {
+                            for (let i = 0; i < data.length; i += 4) {
+                                const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                                const bw = gray > 128 ? 255 : 0;
+                                data[i] = bw;
+                                data[i + 1] = bw;
+                                data[i + 2] = bw;
+                            }
+                        } else if (colorMode === 'posterize') {
+                            const colorCount = parseInt(document.getElementById('colorCount').value);
+                            const levels = colorCount;
+                            const factor = 256 / levels;
+                            for (let i = 0; i < data.length; i += 4) {
+                                data[i] = Math.round(data[i] / factor) * factor;
+                                data[i + 1] = Math.round(data[i + 1] / factor) * factor;
+                                data[i + 2] = Math.round(data[i + 2] / factor) * factor;
+                            }
+                        }
+
+                        ctx.putImageData(imageData, 0, 0);
+
+                        // Generate SVG from processed canvas
+                        currentSVGData = canvasToSVG(canvas, img.width, img.height);
+
+                        // Display SVG
+                        const previewSVG = document.getElementById('previewSVG');
+                        previewSVG.innerHTML = currentSVGData;
+                        
+                        // Display code
+                        const svgCode = document.getElementById('svgCode');
+                        svgCode.textContent = formatSVGCode(currentSVGData);
+                        
+                        document.getElementById('copyBtn').disabled = false;
+                        document.getElementById('downloadBtn').disabled = false;
+                        document.getElementById('convertBtn').disabled = false;
+                        document.getElementById('loader').classList.remove('active');
+                        
+                        showStatus('✓ Conversion successful! Your SVG is ready.', 'success');
+                    };
+                    
+                    img.onerror = () => {
+                        document.getElementById('convertBtn').disabled = false;
+                        document.getElementById('loader').classList.remove('active');
+                        showStatus('Error loading image', 'error');
+                    };
+                    
+                    img.src = currentImage;
+                } catch (error) {
+                    console.error(error);
+                    document.getElementById('convertBtn').disabled = false;
+                    document.getElementById('loader').classList.remove('active');
+                    showStatus('Error: ' + error.message, 'error');
+                }
+            }, 100);
+        }
+
+        function applyGaussianBlur(data, width, height, radius) {
+            const kernel = createGaussianKernel(radius);
+            const temp = new Uint8ClampedArray(data);
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let r = 0, g = 0, b = 0, a = 0, weight = 0;
+
+                    for (let ky = -1; ky <= 1; ky++) {
+                        for (let kx = -1; kx <= 1; kx++) {
+                            const px = Math.min(Math.max(x + kx, 0), width - 1);
+                            const py = Math.min(Math.max(y + ky, 0), height - 1);
+                            const idx = (py * width + px) * 4;
+                            const w = kernel[ky + 1][kx + 1];
+
+                            r += temp[idx] * w;
+                            g += temp[idx + 1] * w;
+                            b += temp[idx + 2] * w;
+                            a += temp[idx + 3] * w;
+                            weight += w;
+                        }
+                    }
+
+                    const idx = (y * width + x) * 4;
+                    data[idx] = Math.round(r / weight);
+                    data[idx + 1] = Math.round(g / weight);
+                    data[idx + 2] = Math.round(b / weight);
+                    data[idx + 3] = Math.round(a / weight);
+                }
+            }
+        }
+
+        function createGaussianKernel(sigma) {
+            const kernel = [];
+            let sum = 0;
+
+            for (let y = -1; y <= 1; y++) {
+                kernel[y + 1] = [];
+                for (let x = -1; x <= 1; x++) {
+                    const value = Math.exp(-(x * x + y * y) / (2 * sigma * sigma));
+                    kernel[y + 1][x + 1] = value;
+                    sum += value;
+                }
+            }
+
+            for (let y = 0; y < 3; y++) {
+                for (let x = 0; x < 3; x++) {
+                    kernel[y][x] /= sum;
+                }
+            }
+
+            return kernel;
+        }
+
+        function canvasToSVG(canvas, originalWidth, originalHeight) {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            let svg = `<svg width="${originalWidth}" height="${originalHeight}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${originalWidth} ${originalHeight}">`;
+            svg += `<rect width="${originalWidth}" height="${originalHeight}" fill="white"/>`;
+
+            // Scale factors to map canvas back to original size
+            const scaleX = originalWidth / canvas.width;
+            const scaleY = originalHeight / canvas.height;
+
+            // Create rectangles for each pixel (scaled)
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const idx = (y * canvas.width + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx + 1];
+                    const b = data[idx + 2];
+                    const a = data[idx + 3];
+
+                    if (a > 200) {
+                        const px = x * scaleX;
+                        const py = y * scaleY;
+                        const color = `rgb(${r},${g},${b})`;
+                        
+                        svg += `<rect x="${px}" y="${py}" width="${scaleX}" height="${scaleY}" fill="${color}" opacity="${a / 255}" stroke="none"/>`;
+                    }
+                }
+            }
+
+            svg += '</svg>';
+            return svg;
+        }
+
+
+
+        // Download SVG
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            if (!currentSVGData) return;
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(currentSVGData));
+            element.setAttribute('download', currentFileName);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            
+            showStatus('✓ SVG downloaded successfully!', 'success');
+        });
+
+        // Copy code
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const code = document.getElementById('svgCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showStatus('✓ Code copied to clipboard!', 'success');
+            }).catch(() => {
+                showStatus('Error copying to clipboard', 'error');
+            });
+        });
+
+        // Clear all
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            currentImage = null;
+            currentSVGData = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewOriginal').innerHTML = '<span style="color: #999;">No image loaded</span>';
+            document.getElementById('previewSVG').innerHTML = '<span style="color: #999;">Conversion result will appear here</span>';
+            document.getElementById('svgCode').textContent = '<!-- SVG code will appear here -->';
+            document.getElementById('convertBtn').disabled = true;
+            document.getElementById('downloadBtn').disabled = true;
+            document.getElementById('copyBtn').disabled = true;
+            document.getElementById('status').classList.remove('show');
+            showStatus('Ready to convert a new image', 'info');
+        });
+
+        function formatSVGCode(svg) {
+            // Basic SVG formatting
+            return svg.replace(/></g, '>\n<');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    status.classList.remove('show');
+                }, 4000);
+            }
+        }
+
+        // Initial message
+        showStatus('Upload a PNG or JPG image to get started', 'info');
+    </script>
+</body>
+</html>

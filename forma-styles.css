@@ -1,0 +1,436 @@
+/* =====================================================
+   FORMA DESIGN SYSTEM - Applied to HealthFlow
+   Bootstrap 5.3.8 + Custom Forma Styling
+   ===================================================== */
+
+:root {
+    /* Forma Color Palette */
+    --forma-primary: #0d6efd;
+    --forma-secondary: #6c757d;
+    --forma-accent: #ff6b6b;
+    --forma-dark: #1a202c;
+    --forma-light: #f8f9fa;
+    --forma-border: #e2e8f0;
+    
+    /* Typography */
+    --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family-heading: 'Poppins', sans-serif;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+}
+
+/* =====================================================
+   TYPOGRAPHY
+   ===================================================== */
+
+body {
+    font-family: var(--font-family-base);
+    color: var(--forma-dark);
+    background-color: #ffffff;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    color: var(--forma-dark);
+    letter-spacing: -0.5px;
+}
+
+h1 { font-size: 3.5rem; line-height: 1.1; }
+h2 { font-size: 2.5rem; line-height: 1.2; }
+h3 { font-size: 1.875rem; line-height: 1.3; }
+h4 { font-size: 1.5rem; line-height: 1.4; }
+h5 { font-size: 1.25rem; line-height: 1.4; }
+h6 { font-size: 1rem; line-height: 1.5; }
+
+p {
+    color: #4a5568;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* =====================================================
+   NAVBAR - Forma Style
+   ===================================================== */
+
+.navbar {
+    background: #ffffff;
+    border-bottom: 1px solid var(--forma-border);
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-brand {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-family: var(--font-family-heading);
+    letter-spacing: -1px;
+}
+
+.navbar .nav-link {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--forma-secondary) !important;
+    transition: color 0.3s ease;
+    margin: 0 0.5rem;
+}
+
+.navbar .nav-link:hover {
+    color: var(--forma-primary) !important;
+}
+
+.navbar .nav-link.active {
+    color: var(--forma-primary) !important;
+}
+
+/* =====================================================
+   BUTTONS - Forma Style
+   ===================================================== */
+
+.btn {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--forma-primary) 0%, #0b5ed7 100%);
+    border-color: var(--forma-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(13, 110, 253, 0.3);
+}
+
+.btn-outline-primary {
+    border-color: var(--forma-primary);
+    color: var(--forma-primary);
+}
+
+.btn-outline-primary:hover {
+    background: var(--forma-primary);
+    border-color: var(--forma-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* =====================================================
+   CARDS - Forma Style
+   ===================================================== */
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-title {
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    color: var(--forma-dark);
+}
+
+/* =====================================================
+   SECTIONS - Forma Style
+   ===================================================== */
+
+section {
+    padding: 4rem 0;
+}
+
+.section-light {
+    background-color: var(--forma-light);
+}
+
+.section-dark {
+    background-color: var(--forma-dark);
+    color: white;
+}
+
+/* Section Headers */
+section > .container > .text-center {
+    margin-bottom: 3rem;
+}
+
+.badge {
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+.bg-primary-light {
+    background-color: #e7f1ff;
+    color: var(--forma-primary);
+}
+
+.bg-success-light {
+    background-color: #e7f5f0;
+    color: #10b981;
+}
+
+/* =====================================================
+   HERO SECTION - Forma Style
+   ===================================================== */
+
+.forma-hero {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 6rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.forma-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(13, 110, 253, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.forma-hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--forma-dark);
+}
+
+.forma-hero p {
+    font-size: 1.15rem;
+    color: #4a5568;
+    margin-bottom: 2rem;
+}
+
+/* =====================================================
+   FORMS - Forma Style
+   ===================================================== */
+
+.form-control,
+.form-select {
+    border: 1px solid var(--forma-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--forma-primary);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--forma-dark);
+    margin-bottom: 0.5rem;
+}
+
+/* =====================================================
+   TABLES - Forma Style
+   ===================================================== */
+
+.table {
+    border-collapse: collapse;
+}
+
+.table thead {
+    background-color: var(--forma-light);
+    border-bottom: 2px solid var(--forma-border);
+}
+
+.table th {
+    font-weight: 700;
+    color: var(--forma-dark);
+    padding: 1.25rem;
+}
+
+.table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--forma-border);
+}
+
+.table tbody tr:hover {
+    background-color: var(--forma-light);
+}
+
+/* =====================================================
+   ACCORDIONS - Forma Style
+   ===================================================== */
+
+.accordion-button {
+    font-weight: 600;
+    color: var(--forma-dark);
+    background-color: transparent;
+    border-radius: 8px;
+    border: 1px solid var(--forma-border);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--forma-light);
+    color: var(--forma-primary);
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    border-color: var(--forma-primary);
+    box-shadow: none;
+}
+
+.accordion-body {
+    color: #4a5568;
+    line-height: 1.8;
+}
+
+/* =====================================================
+   LISTS - Forma Style
+   ===================================================== */
+
+.list-unstyled li {
+    padding: 0.5rem 0;
+    color: #4a5568;
+}
+
+.list-unstyled li i {
+    margin-right: 0.75rem;
+    color: var(--forma-primary);
+}
+
+/* =====================================================
+   BADGES & TAGS
+   ===================================================== */
+
+.badge-success {
+    background-color: #10b981;
+}
+
+.badge-danger {
+    background-color: #ef4444;
+}
+
+.badge-warning {
+    background-color: #f59e0b;
+}
+
+/* =====================================================
+   RESPONSIVE ADJUSTMENTS
+   ===================================================== */
+
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    
+    section {
+        padding: 2.5rem 0;
+    }
+    
+    .forma-hero {
+        padding: 4rem 0;
+    }
+    
+    .forma-hero h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+    
+    .navbar {
+        padding: 1rem 0;
+    }
+}
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-up {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.animate-fade {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* =====================================================
+   UTILITIES
+   ===================================================== */
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--forma-primary) 0%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.border-radius-lg {
+    border-radius: 12px;
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}

@@ -54,7 +54,7 @@ async function loadDashboardStats() {
         // Get patient data instead
         const { data: allPatients } = await supabaseClient
             .from('patients')
-            .select('id, condition');
+            .select('id, condition, viral_load_copies');
         
         if (allPatients) {
             // Count patients by condition
@@ -72,40 +72,51 @@ async function loadDashboardStats() {
 
         const activeHivCount = conditions['HIV'] || 0;
 
-         // Fetch appointments for today
-        const today = new Date().toISOString().split('T')[0];
-        const { count: appointmentsToday } = await supabaseClient
-            .from('appointments')
+        // Calculate adherence rate from viral load suppression (VL < 100 = good adherence)
+        const suppressedCount = allPatients?.filter(p => {
+            const vl = parseInt(p.viral_load_copies);
+            return vl < 100; // VL < 100 copies indicates good adherence
+        }).length || 0;
+        const totalCount = allPatients?.length || 1;
+        const adherenceRate = Math.round((suppressedCount / totalCount) * 100);
+
+        // Fetch new patients in the current month
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        
+        const { count: newPatientsMonth } = await supabaseClient
+            .from('patients')
             .select('*', { count: 'exact', head: true })
-            .eq('appointment_date', today)
-            .eq('status', 'Scheduled');
+            .gte('patient_registration_date', monthStart)
+            .lte('patient_registration_date', monthEnd);
 
-        // Calculate adherence rate (appointments completed / total appointments)
-        const { data: allAppointments } = await supabaseClient
-            .from('appointments')
-            .select('status');
+        // Update dashboard cards (check if element exists first)
+        const statsPatients = document.getElementById('statsPatients');
+        const statsHIV = document.getElementById('statsHIV');
+        const statsAdherence = document.getElementById('statsAdherence');
+        const newPatientsCount = document.getElementById('newPatientsCount');
+        const statsConditionHIV = document.getElementById('statsConditionHIV');
+        const statsConditionDiabetes = document.getElementById('statsConditionDiabetes');
+        const statsConditionHypertension = document.getElementById('statsConditionHypertension');
+        const statsConditionTB = document.getElementById('statsConditionTB');
 
-        const completedCount = allAppointments?.filter(a => a.status === 'Completed').length || 0;
-        const totalCount = allAppointments?.length || 1;
-        const adherenceRate = Math.round((completedCount / totalCount) * 100);
-
-        // Update dashboard cards
-        document.getElementById('statsPatients').textContent = totalPatients || 0;
-        document.getElementById('statsAppointments').textContent = appointmentsToday || 0;
-        document.getElementById('statsHIV').textContent = activeHivCount || 0;
-        document.getElementById('statsAdherence').textContent = adherenceRate + '%';
+        if (statsPatients) statsPatients.textContent = totalPatients || 0;
+        if (statsHIV) statsHIV.textContent = activeHivCount || 0;
+        if (statsAdherence) statsAdherence.textContent = adherenceRate + '%';
+        if (newPatientsCount) newPatientsCount.textContent = newPatientsMonth || 0;
         
         // Update chronic condition cards
-        document.getElementById('statsConditionHIV').textContent = conditions['HIV'] || 0;
-        document.getElementById('statsConditionDiabetes').textContent = conditions['Diabetes'] || 0;
-        document.getElementById('statsConditionHypertension').textContent = conditions['Hypertension'] || 0;
-        document.getElementById('statsConditionTB').textContent = conditions['TB'] || 0;
+        if (statsConditionHIV) statsConditionHIV.textContent = conditions['HIV'] || 0;
+        if (statsConditionDiabetes) statsConditionDiabetes.textContent = conditions['Diabetes'] || 0;
+        if (statsConditionHypertension) statsConditionHypertension.textContent = conditions['Hypertension'] || 0;
+        if (statsConditionTB) statsConditionTB.textContent = conditions['TB'] || 0;
 
         console.log('Dashboard stats loaded:', {
             totalPatients,
-            appointmentsToday,
             activeHivCount,
             adherenceRate,
+            newPatientsMonth,
             conditions
         });
     } catch (error) {
@@ -119,35 +130,15 @@ async function loadRecentPatients() {
         const session = JSON.parse(localStorage.getItem('healthflow_session'));
         if (!session) return;
 
-        const facilityUUID = session.facilityId;
-        const facilityCode = session.facilityIdCode;
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
 
-        // Try fetching with UUID first, then fallback to code
+        // Fetch patients with correct column names
         let { data: patients, error } = await supabaseClient
             .from('patients')
-            .select('patient_id, first_name, last_name, age, gender, status, registered_date')
-            .eq('fid', facilityUUID)
-            .order('registered_date', { ascending: false })
+            .select('patient_no, first_name, last_name, age, gender, status, patient_registration_date')
+            .eq('fid', numericFacilityId)
+            .order('patient_registration_date', { ascending: false })
             .limit(10);
-
-        // If no results, try with facility code
-        if (!patients || patients.length === 0) {
-            ({ data: patients, error } = await supabaseClient
-                .from('patients')
-                .select('patient_id, first_name, last_name, age, gender, status, registered_date')
-                .eq('facility_id', facilityCode)
-                .order('registered_date', { ascending: false })
-                .limit(10));
-        }
-
-        // If still no results, fetch all patients
-        if (!patients || patients.length === 0) {
-            ({ data: patients, error } = await supabaseClient
-                .from('patients')
-                .select('patient_id, first_name, last_name, age, gender, status, registered_date')
-                .order('registered_date', { ascending: false })
-                .limit(10));
-        }
 
         if (error) throw error;
 
@@ -159,12 +150,12 @@ async function loadRecentPatients() {
                 patients.forEach(patient => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${patient.patient_id || 'N/A'}</td>
+                        <td>${patient.patient_no || 'N/A'}</td>
                         <td>${patient.first_name} ${patient.last_name}</td>
                         <td>${patient.age || 'N/A'}</td>
                         <td>${patient.gender || 'N/A'}</td>
                         <td><span class="badge bg-${patient.status === 'Active' ? 'success' : 'secondary'}">${patient.status || 'N/A'}</span></td>
-                        <td>${new Date(patient.registered_date).toLocaleDateString()}</td>
+                        <td>${patient.patient_registration_date ? new Date(patient.patient_registration_date).toLocaleDateString() : 'N/A'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -177,16 +168,19 @@ async function loadRecentPatients() {
     }
 }
 
-// Fetch recent appointments
+// Fetch recent appointments from patients table
 async function loadRecentAppointments() {
     try {
         const session = JSON.parse(localStorage.getItem('healthflow_session'));
         if (!session) return;
 
-        const { data: appointments, error } = await supabaseClient
-            .from('appointments')
-            .select('aid, patient_id, patient_name, appointment_date, appointment_time, status, primary_condition')
-            .order('appointment_date', { ascending: false })
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+
+        const { data: patients, error } = await supabaseClient
+            .from('patients')
+            .select('patient_no, first_name, last_name, patient_registration_date, status')
+            .eq('fid', numericFacilityId)
+            .order('patient_registration_date', { ascending: false })
             .limit(10);
 
         if (error) throw error;
@@ -195,17 +189,17 @@ async function loadRecentAppointments() {
         if (tableBody) {
             tableBody.innerHTML = '';
 
-            if (appointments && appointments.length > 0) {
-                appointments.forEach(appt => {
+            if (patients && patients.length > 0) {
+                patients.forEach(patient => {
                     const row = document.createElement('tr');
-                    const statusColor = appt.status === 'Completed' ? 'success' : appt.status === 'Scheduled' ? 'info' : 'warning';
+                    const statusColor = patient.status === 'Active' ? 'success' : patient.status === 'Scheduled' ? 'info' : 'warning';
                     row.innerHTML = `
-                        <td>${appt.patient_id || 'N/A'}</td>
-                        <td>${appt.patient_name || 'N/A'}</td>
-                        <td>${new Date(appt.appointment_date).toLocaleDateString()}</td>
-                        <td>${appt.appointment_time || 'N/A'}</td>
-                        <td>${appt.primary_condition || 'N/A'}</td>
-                        <td><span class="badge bg-${statusColor}">${appt.status || 'N/A'}</span></td>
+                        <td>${patient.patient_no || 'N/A'}</td>
+                        <td>${patient.first_name} ${patient.last_name}</td>
+                        <td>${new Date(patient.patient_registration_date).toLocaleDateString()}</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td><span class="badge bg-${statusColor}">${patient.status || 'N/A'}</span></td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -218,14 +212,20 @@ async function loadRecentAppointments() {
     }
 }
 
-// Fetch HIV viral load data
+// Fetch HIV viral load data from patients table
 async function loadViralLoadData() {
     try {
-        const { data: appointments, error } = await supabaseClient
-            .from('appointments')
-            .select('patient_id, patient_name, viral_load_copies, viral_load_status, appointment_date')
-            .not('viral_load_status', 'is', null)
-            .order('appointment_date', { ascending: false })
+        const session = JSON.parse(localStorage.getItem('healthflow_session'));
+        if (!session) return;
+
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+
+        const { data: patients, error } = await supabaseClient
+            .from('patients')
+            .select('patient_no, first_name, last_name, viral_load_copies, patient_registration_date')
+            .eq('fid', numericFacilityId)
+            .not('viral_load_copies', 'is', null)
+            .order('patient_registration_date', { ascending: false })
             .limit(15);
 
         if (error) throw error;
@@ -234,16 +234,17 @@ async function loadViralLoadData() {
         if (tableBody) {
             tableBody.innerHTML = '';
 
-            if (appointments && appointments.length > 0) {
-                appointments.forEach(record => {
+            if (patients && patients.length > 0) {
+                patients.forEach(patient => {
                     const row = document.createElement('tr');
-                    const statusColor = record.viral_load_status === 'Detected' ? 'warning' : 'success';
+                    const vl = parseInt(patient.viral_load_copies);
+                    const statusColor = vl > 0 ? 'warning' : 'success';
                     row.innerHTML = `
-                        <td>${record.patient_id || 'N/A'}</td>
-                        <td>${record.patient_name || 'N/A'}</td>
-                        <td>${record.viral_load_copies || 0}</td>
-                        <td><span class="badge bg-${statusColor}">${record.viral_load_status || 'N/A'}</span></td>
-                        <td>${new Date(record.appointment_date).toLocaleDateString()}</td>
+                        <td>${patient.patient_no || 'N/A'}</td>
+                        <td>${patient.first_name} ${patient.last_name}</td>
+                        <td>${patient.viral_load_copies || 0}</td>
+                        <td><span class="badge bg-${statusColor}">${vl > 0 ? 'Detected' : 'Undetectable'}</span></td>
+                        <td>${new Date(patient.patient_registration_date).toLocaleDateString()}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -256,14 +257,20 @@ async function loadViralLoadData() {
     }
 }
 
-// Fetch chronic conditions data
+// Fetch chronic conditions data from patients table
 async function loadChronicConditionsData() {
     try {
-        const { data: appointments, error } = await supabaseClient
-            .from('appointments')
-            .select('patient_id, patient_name, primary_condition, appointment_date, status')
-            .not('primary_condition', 'is', null)
-            .order('appointment_date', { ascending: false })
+        const session = JSON.parse(localStorage.getItem('healthflow_session'));
+        if (!session) return;
+
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+
+        const { data: patients, error } = await supabaseClient
+            .from('patients')
+            .select('patient_no, first_name, last_name, condition, patient_registration_date, status')
+            .eq('fid', numericFacilityId)
+            .not('condition', 'is', null)
+            .order('patient_registration_date', { ascending: false })
             .limit(20);
 
         if (error) throw error;
@@ -272,25 +279,25 @@ async function loadChronicConditionsData() {
         if (tableBody) {
             tableBody.innerHTML = '';
 
-            if (appointments && appointments.length > 0) {
-                appointments.forEach(record => {
+            if (patients && patients.length > 0) {
+                patients.forEach(patient => {
                     const row = document.createElement('tr');
-                    const statusColor = record.status === 'Completed' ? 'success' : record.status === 'Scheduled' ? 'info' : 'warning';
+                    const statusColor = patient.status === 'Active' ? 'success' : patient.status === 'Scheduled' ? 'info' : 'warning';
                     
                     // Determine adherence based on status
                     let adherence = 'Pending';
-                    if (record.status === 'Completed') {
+                    if (patient.status === 'Active') {
                         adherence = '<span class="badge bg-success">Good</span>';
-                    } else if (record.status === 'Cancelled') {
+                    } else if (patient.status === 'Inactive') {
                         adherence = '<span class="badge bg-danger">Poor</span>';
                     }
                     
                     row.innerHTML = `
-                        <td>${record.patient_id || 'N/A'}</td>
-                        <td>${record.patient_name || 'N/A'}</td>
-                        <td><span class="badge bg-primary">${record.primary_condition || 'N/A'}</span></td>
-                        <td>${new Date(record.appointment_date).toLocaleDateString()}</td>
-                        <td><span class="badge bg-${statusColor}">${record.status || 'N/A'}</span></td>
+                        <td>${patient.patient_no || 'N/A'}</td>
+                        <td>${patient.first_name} ${patient.last_name}</td>
+                        <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
+                        <td>${new Date(patient.patient_registration_date).toLocaleDateString()}</td>
+                        <td><span class="badge bg-${statusColor}">${patient.status || 'N/A'}</span></td>
                         <td>${adherence}</td>
                     `;
                     tableBody.appendChild(row);
@@ -304,6 +311,185 @@ async function loadChronicConditionsData() {
     }
 }
 
+// Fetch and populate Patients chart with New vs Return data by month
+async function loadPatientChart() {
+    try {
+        const session = JSON.parse(localStorage.getItem('healthflow_session'));
+        if (!session) {
+            console.warn('No session found for patient chart');
+            return;
+        }
+
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+
+        // Fetch all patients with their registration dates and patient_type
+        let query = supabaseClient
+            .from('patients')
+            .select('patient_registration_date, patient_type');
+        
+        if (numericFacilityId) {
+            query = query.eq('fid', numericFacilityId);
+        }
+        
+        const { data: allPatients, error } = await query;
+
+        if (error) {
+            console.error('Error fetching patient chart data:', error);
+            throw error;
+        }
+
+        // Organize data by month
+        const monthlyData = {};
+        const monthsOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        if (allPatients) {
+            allPatients.forEach(patient => {
+                if (!patient.patient_registration_date) return;
+                
+                const date = new Date(patient.patient_registration_date);
+                const monthIndex = date.getMonth();
+                const monthName = monthsOrder[monthIndex];
+
+                if (!monthlyData[monthName]) {
+                    monthlyData[monthName] = { new: 0, return: 0 };
+                }
+
+                // Use patient_type column to categorize (New or Return)
+                const isNew = patient.patient_type === 'New';
+                
+                if (isNew) {
+                    monthlyData[monthName].new++;
+                } else {
+                    monthlyData[monthName].return++;
+                }
+            });
+        }
+
+        // Prepare data for all 12 months
+        const newPatientData = monthsOrder.map(month => monthlyData[month]?.new || 0);
+        const returnPatientData = monthsOrder.map(month => monthlyData[month]?.return || 0);
+
+
+
+        // Initialize ApexCharts for Patients chart
+        const patientChartElement = document.getElementById('patients');
+        if (patientChartElement) {
+            // Destroy any existing chart first
+            if (window.ApexCharts) {
+                // Find and destroy any existing ApexCharts instances on this element
+                const existingCharts = ApexCharts.getChartByID(patientChartElement.id);
+                if (existingCharts) {
+                    existingCharts.destroy();
+                }
+            }
+            
+            // Clear the element
+            patientChartElement.innerHTML = '';
+            
+            const options = {
+                chart: {
+                    type: 'area',
+                    height: 315,
+                    width: '100%',
+                    stacked: false,
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: true,
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
+                        }
+                    }
+                },
+                colors: ['#116aef', '#0ebb13'],
+                stroke: {
+                    curve: 'smooth',
+                    width: [4, 4]
+                },
+                plotOptions: {
+                    area: {
+                        fillTo: 'origin'
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                xaxis: {
+                    categories: monthsOrder,
+                    type: 'category'
+                },
+                yaxis: {
+                    title: {
+                        text: 'Number of Patients'
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    horizontalAlign: 'center'
+                },
+                tooltip: {
+                    theme: 'light',
+                    y: {
+                        formatter: function(value) {
+                            return value + ' patients';
+                        }
+                    }
+                },
+                grid: {
+                    padding: {
+                        bottom: 20
+                    }
+                }
+            };
+
+            const series = [
+                {
+                    name: 'New Patients',
+                    data: newPatientData
+                },
+                {
+                    name: 'Return Patients',
+                    data: returnPatientData
+                }
+            ];
+
+            // Create and render new chart
+            const chart = new ApexCharts(patientChartElement, {
+                ...options,
+                series: series
+            });
+
+            chart.render();
+            
+            // Force resize after a small delay
+            setTimeout(() => {
+                chart.windowResizeHandler();
+            }, 100);
+        }
+
+        // Update stat cards if they exist
+        const totalNewPatients = newPatientData.reduce((a, b) => a + b, 0);
+        const totalReturnPatients = returnPatientData.reduce((a, b) => a + b, 0);
+
+        const newPatientCard = document.getElementById('newPatientCount');
+        const returnPatientCard = document.getElementById('returnPatientCount');
+
+        if (newPatientCard) {
+            newPatientCard.textContent = totalNewPatients;
+        }
+        if (returnPatientCard) {
+            returnPatientCard.textContent = totalReturnPatients;
+        }
+
+    } catch (error) {
+        console.error('Error loading patient chart:', error);
+    }
+}
+
 // Load all dashboard data on page load
 function initializeDashboardData() {
     loadDashboardStats();
@@ -311,6 +497,7 @@ function initializeDashboardData() {
     loadRecentAppointments();
     loadViralLoadData();
     loadChronicConditionsData();
+    loadPatientChart();
 }
 
 // Call initialization when dashboard loads

@@ -393,3 +393,46 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+// ============================================
+// MOBILE SIDEBAR NAVIGATION
+// ============================================
+document.addEventListener("DOMContentLoaded", function () {
+  const fabButton = document.getElementById("fabButton");
+  const sidebarNav = document.getElementById("mobileSidebarNav");
+  const sidebarOverlay = document.getElementById("sidebarOverlay");
+  const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
+  const sidebarMenuItems = document.querySelectorAll(".sidebar-menu-item");
+
+  // Open sidebar
+  fabButton.addEventListener("click", function (e) {
+    e.stopPropagation();
+    sidebarNav.classList.add("show");
+    sidebarOverlay.classList.add("show");
+  });
+
+  // Close sidebar
+  function closeSidebar() {
+    sidebarNav.classList.remove("show");
+    sidebarOverlay.classList.remove("show");
+  }
+
+  // Close when clicking close button
+  sidebarCloseBtn.addEventListener("click", closeSidebar);
+
+  // Close when clicking overlay
+  sidebarOverlay.addEventListener("click", closeSidebar);
+
+  // Close when clicking a menu item
+  sidebarMenuItems.forEach((item) => {
+    item.addEventListener("click", closeSidebar);
+  });
+
+  // Close when clicking outside
+  document.addEventListener("click", function (e) {
+    const fabMenu = document.querySelector(".mobile-fab-menu");
+    if (!sidebarNav.contains(e.target) && !fabMenu.contains(e.target)) {
+      closeSidebar();
+    }
+  });
+});

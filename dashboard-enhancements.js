@@ -265,11 +265,15 @@ function updateKPIs() {
     const adherenceRate = totalScheduledAppts > 0 ? Math.round((completedAppts / totalScheduledAppts) * 100) : 0;
     document.getElementById('appointmentAdherence').textContent = adherenceRate + '%';
     
-    // New Patients This Week
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const newPatientsThisWeek = allPatients.filter(p => new Date(p.created_at) > oneWeekAgo).length;
-    document.getElementById('newPatientsCount').textContent = newPatientsThisWeek;
-    document.getElementById('newPatientsBadge').textContent = newPatientsThisWeek;
+    // New Patients This Month
+     const now = new Date();
+     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+     const newPatientsThisMonth = allPatients.filter(p => {
+         const regDate = p.patient_registration_date ? new Date(p.patient_registration_date) : null;
+         return regDate && regDate >= monthStart && regDate <= now;
+     }).length;
+     document.getElementById('newPatientsCount').textContent = newPatientsThisMonth;
+     document.getElementById('newPatientsBadge').textContent = newPatientsThisMonth;
     
     // High Risk Patients (example: based on status)
     const highRiskCount = allPatients.filter(p => p.status === 'Inactive').length;
