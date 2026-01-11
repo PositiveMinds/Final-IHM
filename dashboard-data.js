@@ -8,11 +8,11 @@ async function loadDashboardStats() {
 
         console.log('Session data:', session);
 
-        // Try multiple approaches to get the facility filter
-        let facilityUUID = session.facilityId;
+        // Get facility filter from session (use fid which is the numeric facility ID)
+        let facilityId = session.fid || session.facility_id;
         let facilityCode = session.facilityIdCode;
 
-        console.log('Facility UUID:', facilityUUID, 'Facility Code:', facilityCode);
+        console.log('Facility ID:', facilityId, 'Facility Code:', facilityCode);
 
         // Fetch total patients - try without filter first to debug
         let { count: totalPatients, error: patientError } = await supabaseClient
@@ -21,27 +21,20 @@ async function loadDashboardStats() {
 
         console.log('Total patients (no filter):', totalPatients, 'Error:', patientError);
 
-        // If we got results, try filtering by facility
-        if (totalPatients > 0) {
-            // Try filtering by facility ID (UUID)
-            const { count: facilityPatients1 } = await supabaseClient
-                .from('patients')
-                .select('*', { count: 'exact', head: true })
-                .eq('fid', facilityUUID);
+        // Filter by facility ID
+         if (facilityId) {
+             const { count: facilityPatients, error: facilityError } = await supabaseClient
+                 .from('patients')
+                 .select('*', { count: 'exact', head: true })
+                 .eq('fid', facilityId);
 
-            console.log('Patients with fid filter:', facilityPatients1);
-
-            // Try filtering by facility_id (code)
-            const { count: facilityPatients2 } = await supabaseClient
-                .from('patients')
-                .select('*', { count: 'exact', head: true })
-                .eq('facility_id', facilityCode);
-
-            console.log('Patients with facility_id filter:', facilityPatients2);
-
-            // Use the one that has results
-            totalPatients = facilityPatients1 > 0 ? facilityPatients1 : (facilityPatients2 > 0 ? facilityPatients2 : totalPatients);
-        }
+             if (!facilityError && facilityPatients > 0) {
+                 totalPatients = facilityPatients;
+                 console.log('Facility patients count:', facilityPatients);
+             } else if (facilityError) {
+                 console.warn('Error filtering by facility:', facilityError);
+             }
+         }
 
         // Fetch patients by chronic condition
         const conditions = {

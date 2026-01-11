@@ -24,7 +24,7 @@ ADD COLUMN IF NOT EXISTS hiv_status hiv_status_enum DEFAULT 'Unknown';
 
 UPDATE patients
 SET hiv_status = CASE 
-  WHEN major_condition ILIKE '%HIV%' THEN 'Positive'::hiv_status_enum
+  WHEN condition LIKE '%HIV%' THEN 'Positive'::hiv_status_enum
   ELSE 'Unknown'::hiv_status_enum
 END
 WHERE hiv_status = 'Unknown';
