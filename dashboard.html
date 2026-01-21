@@ -88,11 +88,6 @@
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="assets/css/OverlayScrollbars.min.css">
-
-    <!-- Export Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   </head>
 
   <body>
@@ -1137,9 +1132,14 @@
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/moment.min.js"></script>
 
+    <!-- Export Libraries -->
+    <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
+
     <!-- *************
-			************ Vendor Js Files *************
-		************* -->
+    ************ Vendor Js Files *************
+    ************* -->
 
     <!-- Overlay Scroll JS -->
     <script src="assets/js/jquery.overlayScrollbars.min.js"></script>
@@ -1467,7 +1467,7 @@
        }
 
       // Export patients to CSV
-       function exportPatientsToCSV() {
+       window.exportPatientsToCSV = function() {
          const { headers, rows } = getPatientExportData();
          
          let csvContent = headers.join(',') + '\n';
@@ -1484,13 +1484,24 @@
          a.click();
          document.body.removeChild(a);
          window.URL.revokeObjectURL(url);
-       }
+       };
 
       // Export patients to Excel
-       function exportPatientsToExcel() {
+       window.exportPatientsToExcel = function() {
          try {
+           if (!window.XLSX) {
+             throw new Error('XLSX library not loaded');
+           }
+           
            const { headers, rows } = getPatientExportData();
            const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+           
+           // Set column widths
+           ws['!cols'] = [
+             {wch: 12}, {wch: 15}, {wch: 15}, {wch: 8}, {wch: 10}, 
+             {wch: 20}, {wch: 15}, {wch: 12}, {wch: 15}, {wch: 20}
+           ];
+           
            const wb = XLSX.utils.book_new();
            XLSX.utils.book_append_sheet(wb, ws, 'Patients');
            XLSX.writeFile(wb, `patients_${new Date().toISOString().split('T')[0]}.xlsx`);
@@ -1498,16 +1509,20 @@
            console.error('Error exporting to Excel:', error);
            Swal.fire({
              title: 'Export Failed',
-             text: 'Failed to export patients to Excel',
+             text: `Failed to export patients to Excel: ${error.message}`,
              icon: 'error',
              confirmButtonColor: '#15696B'
            });
          }
-       }
+       };
 
       // Export patients to PDF
-        function exportPatientsToPDF() {
+        window.exportPatientsToPDF = function() {
           try {
+            if (!window.jspdf) {
+              throw new Error('jsPDF library not loaded');
+            }
+            
             const { headers, rows } = getPatientExportData();
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape' });
@@ -1551,12 +1566,12 @@
            console.error('Error exporting to PDF:', error);
            Swal.fire({
              title: 'Export Failed',
-             text: 'Failed to export patients to PDF',
+             text: `Failed to export patients to PDF: ${error.message}`,
              icon: 'error',
              confirmButtonColor: '#15696B'
            });
          }
-       }
+       };
 
       // Fetch and populate all patients in the table
       async function fetchAndPopulatePatients(session) {
