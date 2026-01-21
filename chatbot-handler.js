@@ -549,22 +549,47 @@ class FacilityChatbot {
     this.showLoading(true);
 
     try {
-      // Call Supabase Edge Function
-      const response = await supabaseClient.functions.invoke('chatbot-query', {
+      // Step 1: Use smart matching (instant, local)
+      if (typeof smartEngine !== 'undefined') {
+        const match = smartEngine.findBestMatch(query);
+        const response = smartEngine.buildResponse(match);
+
+        this.showLoading(false);
+
+        // Low confidence - ask for clarification
+        if (!response.execute) {
+          this.addMessage(response.message, 'bot');
+          return;
+        }
+
+        // Medium confidence - show what we understood
+        if (response.confidence === 'medium' || response.confidence !== 'high') {
+          if (response.context) {
+            this.addMessage(`💡 Understanding: ${response.context}`, 'bot');
+          }
+        }
+      }
+
+      // Step 2: Call Supabase Edge Function with matched handler
+      const apiResponse = await supabaseClient.functions.invoke('chatbot-query', {
         body: {
           query: query,
-          facility_id: this.facilityId
+          facility_id: this.facilityId,
+          // Pass the matched handler if available
+          handler: typeof smartEngine !== 'undefined' && smartEngine.findBestMatch(query).pattern 
+            ? smartEngine.findBestMatch(query).pattern.handler 
+            : undefined
         }
       });
 
       // Hide loading
       this.showLoading(false);
 
-      if (response.error) {
-        throw new Error(response.error.message || 'Error processing query');
+      if (apiResponse.error) {
+        throw new Error(apiResponse.error.message || 'Error processing query');
       }
 
-      const result = response.data;
+      const result = apiResponse.data;
 
       // Add bot response
       if (result.type === 'table') {
@@ -575,10 +600,24 @@ class FacilityChatbot {
     } catch (error) {
       this.showLoading(false);
       console.error('Chatbot error:', error);
-      this.addMessage(
-        'Sorry, I encountered an error processing your query. Please try again.',
-        'bot'
-      );
+      
+      // Even if error, try to be helpful with smart suggestions
+      if (typeof smartEngine !== 'undefined') {
+        const match = smartEngine.findBestMatch(document.getElementById('chatbot-input').value);
+        if (match.suggestion) {
+          this.addMessage(`⚠️ ${match.suggestion}`, 'bot');
+        } else {
+          this.addMessage(
+            'Sorry, I had trouble processing that query. Try rephrasing or ask about: appointments, patients, test results, or medications.',
+            'bot'
+          );
+        }
+      } else {
+        this.addMessage(
+          'Sorry, I encountered an error processing your query. Please try again.',
+          'bot'
+        );
+      }
     }
   }
 

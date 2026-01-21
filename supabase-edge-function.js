@@ -171,6 +171,210 @@ const QUERY_PATTERNS = {
   'due_review': {
     keywords: ['due.*review', 'clinic.*review.*due', 'follow.?up.*due'],
     handler: 'getDueForClinicReview'
+  },
+
+  // ============================================================
+  // Treatment & Regimen patterns
+  // ============================================================
+  'first_line_art': {
+    keywords: ['first.*line', 'first line art', 'initial.*regimen', 'starter.*regimen'],
+    handler: 'getFirstLineARTPatients'
+  },
+  'second_line_art': {
+    keywords: ['second.*line', 'second line art', 'switch.*regimen', 'treatment.*failure'],
+    handler: 'getSecondLineARTPatients'
+  },
+  'switch_regimen': {
+    keywords: ['switch', 'regimen.*change', 'change.*regimen', 'medication.*switch'],
+    handler: 'getPatientsNeedingRegimenSwitch'
+  },
+  'drug_interactions': {
+    keywords: ['drug.*interaction', 'interaction', 'polypharmacy'],
+    handler: 'getPatientsWithPossibleDrugInteractions'
+  },
+
+  // ============================================================
+  // Pregnancy & HIV patterns
+  // ============================================================
+  'pmtct': {
+    keywords: ['pmtct', 'prevention.*mother.*child', 'prevention of mother to child'],
+    handler: 'getPMTCTPatients'
+  },
+  'pregnant_hiv': {
+    keywords: ['pregnant.*hiv', 'hiv.*pregnant', 'pregnancy.*hiv status'],
+    handler: 'getPregnantHIVPatients'
+  },
+  'infant_prophylaxis': {
+    keywords: ['infant.*prophylaxis', 'baby.*hiv.*prevention', 'neonatal.*prophylaxis'],
+    handler: 'getInfantProphylaxisPatients'
+  },
+
+  // ============================================================
+  // Opportunistic Infections & Comorbidities
+  // ============================================================
+  'oi_patients': {
+    keywords: ['opportunistic.*infection', 'oi.*patient', 'oportunistic'],
+    handler: 'getOIPatients'
+  },
+  'tb_hiv_coinfection': {
+    keywords: ['tb.*hiv', 'hiv.*tb', 'tb/hiv', 'co.?infection'],
+    handler: 'getTBHIVCoinfection'
+  },
+  'on_tb_treatment': {
+    keywords: ['on.*tb', 'tb.*treatment', 'anti.*tb'],
+    handler: 'getOnTBTreatment'
+  },
+  'cns_infections': {
+    keywords: ['meningitis', 'cns.*infection', 'encephalitis', 'cryptococcal'],
+    handler: 'getCNSInfections'
+  },
+
+  // ============================================================
+  // Immunological Monitoring patterns
+  // ============================================================
+  'baseline_cd4': {
+    keywords: ['baseline.*cd4', 'cd4.*baseline', 'pre.?art.*cd4'],
+    handler: 'getBaselineCD4Patients'
+  },
+  'cd4_recovery': {
+    keywords: ['cd4.*recovery', 'recovering.*cd4', 'cd4.*improving'],
+    handler: 'getCD4RecoveryPatients'
+  },
+  'cd4_declining': {
+    keywords: ['cd4.*declining', 'declining.*cd4', 'cd4.*falling', 'cd4.*drop'],
+    handler: 'getCD4DecliningPatients'
+  },
+  'immune_reconstitution': {
+    keywords: ['immune.*reconstitution', 'iris', 'paradoxical response'],
+    handler: 'getImmuneReconstitutionDisease'
+  },
+
+  // ============================================================
+  // Virological Monitoring patterns
+  // ============================================================
+  'vl_suppressed': {
+    keywords: ['suppressed', 'viral.*suppressed', 'vl.*suppressed', 'undetectable'],
+    handler: 'getVLSuppressedPatients'
+  },
+  'vl_blip': {
+    keywords: ['viral.*blip', 'vl.*blip', 'transient.*vl', 'viral.*spike'],
+    handler: 'getVLBlipPatients'
+  },
+  'vl_failure': {
+    keywords: ['virological.*failure', 'vl.*failure', 'viral.*failure'],
+    handler: 'getVirologicalFailurePatients'
+  },
+  'vl_monitoring': {
+    keywords: ['vl.*monitoring', 'viral.*monitoring', 'monitoring plan'],
+    handler: 'getVLMonitoringRequired'
+  },
+
+  // ============================================================
+  // NCD Specific patterns
+  // ============================================================
+  'hypertension_uncontrolled': {
+    keywords: ['uncontrolled.*hypertension', 'hypertension.*uncontrolled', 'high.*bp'],
+    handler: 'getUncontrolledHypertension'
+  },
+  'diabetes_uncontrolled': {
+    keywords: ['uncontrolled.*diabetes', 'diabetes.*uncontrolled', 'high.*glucose', 'poor.*glycemic'],
+    handler: 'getUncontrolledDiabetes'
+  },
+  'on_insulin': {
+    keywords: ['on.*insulin', 'insulin.*therapy', 'insulin.*dependent'],
+    handler: 'getOnInsulinTherapy'
+  },
+  'copd': {
+    keywords: ['copd', 'chronic.*obstructive', 'chronic.*airway.*disease'],
+    handler: 'getCOPDPatients'
+  },
+  'stroke_history': {
+    keywords: ['stroke', 'cvd.*event', 'cerebrovascular', 'tia'],
+    handler: 'getStrokeHistoryPatients'
+  },
+
+  // ============================================================
+  // Medication & Pharmacy patterns
+  // ============================================================
+  'overdue_refill': {
+    keywords: ['refill.*due', 'due.*refill', 'overdue.*refill', 'medication.*due'],
+    handler: 'getOverdueRefillPatients'
+  },
+  'stock_out': {
+    keywords: ['stock.*out', 'out of stock', 'no stock', 'medication.*unavailable'],
+    handler: 'getPatientAffectedByStockOut'
+  },
+  'on_antiretroviral': {
+    keywords: ['antiretroviral', 'arv', 'art.*medication', 'on.*art'],
+    handler: 'getOnAntiretroviral'
+  },
+
+  // ============================================================
+  // Risk & Alert patterns
+  // ============================================================
+  'at_risk': {
+    keywords: ['at.*risk', 'risk.*patient', 'high.*risk'],
+    handler: 'getAtRiskPatients'
+  },
+  'vulnerable_population': {
+    keywords: ['vulnerable', 'vulnerable.*population', 'marginalized', 'hcw'],
+    handler: 'getVulnerablePopulation'
+  },
+  'defaulter_alert': {
+    keywords: ['defaulter.*alert', 'alert.*defaulter', 'potential.*defaulter'],
+    handler: 'getDefaulterAlerts'
+  },
+  'mortality_risk': {
+    keywords: ['mortality.*risk', 'death.*risk', 'high.*risk.*mortality'],
+    handler: 'getMortalityRiskPatients'
+  },
+
+  // ============================================================
+  // Gender & Special Population patterns
+  // ============================================================
+  'female_patients': {
+    keywords: ['female', 'women', 'ladies', 'female.*patient'],
+    handler: 'getFemalePatients'
+  },
+  'male_patients': {
+    keywords: ['male', 'men', 'male.*patient'],
+    handler: 'getMalePatients'
+  },
+  'adolescent': {
+    keywords: ['adolescent', 'youth', 'young.*person', 'teenager'],
+    handler: 'getAdolescentPatients'
+  },
+  'elderly': {
+    keywords: ['elderly', 'aged', 'senior', 'over.*60'],
+    handler: 'getElderlyPatients'
+  },
+  'key_populations': {
+    keywords: ['key.*population', 'msm', 'sex.*worker', 'pwid', 'migrant'],
+    handler: 'getKeyPopulationPatients'
+  },
+
+  // ============================================================
+  // Statistics & Summary patterns
+  // ============================================================
+  'total_patients': {
+    keywords: ['total.*patient', 'how many.*patient', 'patient.*count', 'patient.*statistics'],
+    handler: 'getTotalPatients'
+  },
+  'patient_breakdown': {
+    keywords: ['breakdown', 'distribution', 'patient.*type.*breakdown'],
+    handler: 'getPatientBreakdown'
+  },
+  'facility_summary': {
+    keywords: ['facility.*summary', 'summary', 'overview', 'facility.*overview'],
+    handler: 'getFacilitySummary'
+  },
+  'caseload': {
+    keywords: ['caseload', 'case load', 'total.*load'],
+    handler: 'getCaseloadSummary'
+  },
+  'monthly_stats': {
+    keywords: ['monthly', 'month.*stat', 'this.*month'],
+    handler: 'getMonthlyStatistics'
   }
 }
 
@@ -1252,6 +1456,418 @@ async function getDueForClinicReview(facilityId, query) {
 // ============================================================
 // UTILITIES
 // ============================================================
+
+// ============================================================
+// EXPANDED HANDLERS (Additional 40+ patterns)
+// ============================================================
+
+async function getFirstLineARTPatients(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, art_regimen, art_start_date, status')
+      .eq('fid', facilityId)
+      .eq('art_line', 'First')
+      .order('art_start_date', { ascending: false })
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No first-line ART patients found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'Regimen', 'Start Date', 'Status'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'Regimen': p.art_regimen || 'Not specified',
+        'Start Date': formatDate(p.art_start_date),
+        'Status': p.status || 'Active'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching first-line ART patients: ' + error.message }
+  }
+}
+
+async function getSecondLineARTPatients(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, art_regimen, art_line, switch_date, failure_reason')
+      .eq('fid', facilityId)
+      .eq('art_line', 'Second')
+      .order('switch_date', { ascending: false })
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No second-line ART patients found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'Current Regimen', 'Switch Date', 'Reason'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'Current Regimen': p.art_regimen || 'Not specified',
+        'Switch Date': formatDate(p.switch_date),
+        'Reason': p.failure_reason || 'Switch required'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching second-line ART patients: ' + error.message }
+  }
+}
+
+async function getTBHIVCoinfection(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, tb_status, tb_treatment_start, art_status, hiv_status')
+      .eq('fid', facilityId)
+      .eq('tb_status', 'Active')
+      .eq('hiv_status', 'Positive')
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No TB/HIV coinfection cases found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'TB Status', 'TB Start Date', 'HIV Status'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'TB Status': p.tb_status || 'Unknown',
+        'TB Start Date': formatDate(p.tb_treatment_start),
+        'HIV Status': p.hiv_status || 'Unknown'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching TB/HIV cases: ' + error.message }
+  }
+}
+
+async function getOnTBTreatment(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, tb_status, tb_treatment_start, tb_regimen, tb_duration')
+      .eq('fid', facilityId)
+      .eq('tb_status', 'Active')
+      .order('tb_treatment_start', { ascending: false })
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No patients currently on TB treatment.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'TB Regimen', 'Start Date', 'Expected End'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'TB Regimen': p.tb_regimen || 'Not specified',
+        'Start Date': formatDate(p.tb_treatment_start),
+        'Expected End': p.tb_duration ? calculateEndDate(p.tb_treatment_start, p.tb_duration) : 'N/A'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching TB patients: ' + error.message }
+  }
+}
+
+async function getUncontrolledHypertension(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, hypertension_status, last_bp_systolic, last_bp_diastolic, last_bp_date')
+      .eq('fid', facilityId)
+      .eq('hypertension_status', 'Uncontrolled')
+      .order('last_bp_date', { ascending: false })
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No uncontrolled hypertension cases found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'Last BP', 'BP Date', 'Status'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'Last BP': p.last_bp_systolic && p.last_bp_diastolic ? `${p.last_bp_systolic}/${p.last_bp_diastolic}` : 'N/A',
+        'BP Date': formatDate(p.last_bp_date),
+        'Status': 'Requires intervention'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching uncontrolled HTN patients: ' + error.message }
+  }
+}
+
+async function getUncontrolledDiabetes(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, diabetes_status, last_glucose, last_glucose_date, hba1c')
+      .eq('fid', facilityId)
+      .eq('diabetes_status', 'Uncontrolled')
+      .order('last_glucose_date', { ascending: false })
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No uncontrolled diabetes cases found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'Last Glucose', 'HbA1c', 'Date'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'Last Glucose': p.last_glucose ? p.last_glucose + ' mg/dL' : 'N/A',
+        'HbA1c': p.hba1c ? p.hba1c + '%' : 'Not tested',
+        'Date': formatDate(p.last_glucose_date)
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching uncontrolled diabetes patients: ' + error.message }
+  }
+}
+
+async function getFemalePatients(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, dob, hiv_status, pregnancy_status')
+      .eq('fid', facilityId)
+      .eq('gender', 'Female')
+      .order('patient_name', { ascending: true })
+      .limit(100)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No female patients found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'HIV Status', 'Pregnancy Status', 'Age'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'HIV Status': p.hiv_status || 'Unknown',
+        'Pregnancy Status': p.pregnancy_status || 'Not pregnant',
+        'Age': calculateAge(p.dob)
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching female patients: ' + error.message }
+  }
+}
+
+async function getMalePatients(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, dob, hiv_status, patient_type')
+      .eq('fid', facilityId)
+      .eq('gender', 'Male')
+      .order('patient_name', { ascending: true })
+      .limit(100)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No male patients found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'HIV Status', 'Patient Type', 'Age'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'HIV Status': p.hiv_status || 'Unknown',
+        'Patient Type': p.patient_type || 'General',
+        'Age': calculateAge(p.dob)
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching male patients: ' + error.message }
+  }
+}
+
+async function getAdolescentPatients(facilityId, query) {
+  try {
+    const today = new Date()
+    const ageThreshold = new Date(today.getFullYear() - 19, today.getMonth(), today.getDate())
+    
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, dob, hiv_status, patient_type')
+      .eq('fid', facilityId)
+      .lte('dob', ageThreshold.toISOString())
+      .gte('dob', new Date(today.getFullYear() - 10, today.getMonth(), today.getDate()).toISOString())
+      .order('patient_name', { ascending: true })
+      .limit(100)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No adolescent patients (10-19 years) found.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'Age', 'HIV Status', 'Patient Type'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'Age': calculateAge(p.dob) + ' years',
+        'HIV Status': p.hiv_status || 'Unknown',
+        'Patient Type': p.patient_type || 'General'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching adolescent patients: ' + error.message }
+  }
+}
+
+async function getTotalPatients(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_type, hiv_status', { count: 'exact' })
+      .eq('fid', facilityId)
+    
+    if (error) throw error
+    
+    const total = data ? data.length : 0
+    const hiv_positive = data ? data.filter(p => p.hiv_status === 'Positive').length : 0
+    const hiv_negative = data ? data.filter(p => p.hiv_status === 'Negative').length : 0
+    
+    return {
+      type: 'text',
+      message: `📊 **Facility Patient Summary**\n\n` +
+        `✓ Total Patients: **${total}**\n` +
+        `🔴 HIV Positive: **${hiv_positive}** (${total > 0 ? ((hiv_positive/total)*100).toFixed(1) : 0}%)\n` +
+        `🟢 HIV Negative: **${hiv_negative}** (${total > 0 ? ((hiv_negative/total)*100).toFixed(1) : 0}%)`
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching patient count: ' + error.message }
+  }
+}
+
+async function getPatientBreakdown(facilityId, query) {
+  try {
+    const { data, error } = await supabase
+      .from('patients')
+      .select('patient_type')
+      .eq('fid', facilityId)
+    
+    if (error) throw error
+    
+    const breakdown = {}
+    if (data) {
+      data.forEach(p => {
+        const type = p.patient_type || 'Unspecified'
+        breakdown[type] = (breakdown[type] || 0) + 1
+      })
+    }
+    
+    const total = data ? data.length : 0
+    const rows = Object.entries(breakdown).map(([type, count]) => ({
+      'Patient Type': type,
+      'Count': count,
+      'Percentage': total > 0 ? ((count/total)*100).toFixed(1) + '%' : '0%'
+    }))
+    
+    return {
+      type: 'table',
+      columns: ['Patient Type', 'Count', 'Percentage'],
+      data: rows
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching patient breakdown: ' + error.message }
+  }
+}
+
+async function getOverdueRefillPatients(facilityId, query) {
+  try {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0]
+    
+    const { data, error } = await supabase
+      .from('patients')
+      .select('pid, patient_name, last_refill_date, medication_regimen, status')
+      .eq('fid', facilityId)
+      .lt('last_refill_date', thirtyDaysAgoStr)
+      .order('last_refill_date', { ascending: true })
+      .limit(50)
+    
+    if (error) throw error
+    if (!data || data.length === 0) {
+      return { type: 'text', message: 'No patients with overdue refills.' }
+    }
+    
+    return {
+      type: 'table',
+      columns: ['Patient ID', 'Name', 'Last Refill', 'Regimen', 'Status'],
+      data: data.map(p => ({
+        'Patient ID': p.pid,
+        'Name': p.patient_name || 'N/A',
+        'Last Refill': formatDate(p.last_refill_date),
+        'Regimen': p.medication_regimen || 'Not specified',
+        'Status': p.status || 'Active'
+      }))
+    }
+  } catch (error) {
+    return { type: 'text', message: 'Error fetching overdue refill patients: ' + error.message }
+  }
+}
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+
+function calculateAge(dob) {
+  if (!dob) return 'N/A'
+  try {
+    const birth = new Date(dob)
+    const today = new Date()
+    let age = today.getFullYear() - birth.getFullYear()
+    const monthDiff = today.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age
+  } catch {
+    return 'N/A'
+  }
+}
+
+function calculateEndDate(startDate, durationMonths) {
+  if (!startDate || !durationMonths) return 'N/A'
+  try {
+    const end = new Date(startDate)
+    end.setMonth(end.getMonth() + parseInt(durationMonths))
+    return formatDate(end.toISOString().split('T')[0])
+  } catch {
+    return 'N/A'
+  }
+}
 
 function formatDate(dateStr) {
   if (!dateStr) return 'N/A'
