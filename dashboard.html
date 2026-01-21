@@ -31,7 +31,54 @@
       }
       
       .app-header {
-        background-color: white !important;
+         background-color: white !important;
+       }
+      
+      /* Export Icons Styling */
+      .export-icons-container {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        height: 38px;
+      }
+      
+      .export-icon-btn {
+        background: none;
+        border: 1px solid #ccc;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.3em;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+      }
+      
+      .export-excel-btn i {
+        color: #00a651;
+      }
+      
+      .export-pdf-btn i {
+        color: #d32f2f;
+      }
+      
+      .export-icon-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      .export-excel-btn:hover {
+        border-color: #00a651;
+        background-color: rgba(0, 166, 81, 0.05);
+      }
+      
+      .export-pdf-btn:hover {
+        border-color: #d32f2f;
+        background-color: rgba(211, 47, 47, 0.05);
       }
     </style>
 
@@ -41,6 +88,11 @@
 
     <!-- Scrollbar CSS -->
     <link rel="stylesheet" href="assets/css/OverlayScrollbars.min.css">
+
+    <!-- Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   </head>
 
   <body>
@@ -432,32 +484,7 @@
               </li>
               
             
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-stethoscope-line"></i>
-                  <span class="menu-text">Doctors</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">Doctors Dashboard</a>
-                  </li>
-                  <li>
-                    <a href="#">Doctors List</a>
-                  </li>
-                  <li>
-                    <a href="#">Doctors Cards</a>
-                  </li>
-                  <li>
-                    <a href="#">Doctors Profile</a>
-                  </li>
-                  <li>
-                    <a href="#">Add Doctor</a>
-                  </li>
-                  <li>
-                    <a href="#">Edit Doctor</a>
-                  </li>
-                </ul>
-              </li>
+
               <li class="treeview">
                 <a href="#!">
                   <i class="ri-heart-pulse-line"></i>
@@ -515,23 +542,7 @@
                   </li>
                 </ul>
               </li>
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-building-2-line"></i>
-                  <span class="menu-text">Departments</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">Departments List</a>
-                  </li>
-                  <li>
-                    <a href="#">Add Department</a>
-                  </li>
-                  <li>
-                    <a href="#">Edit Department</a>
-                  </li>
-                </ul>
-              </li>
+
               <li class="treeview">
                 <a href="#!">
                   <i class="ri-secure-payment-line"></i>
@@ -547,90 +558,14 @@
                   
                 </ul>
               </li>
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-group-2-line"></i>
-                  <span class="menu-text">Human Resources</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">HR Approvals</a>
-                  </li>
-                  <li>
-                    <a href="#">Attendance</a>
-                  </li>
-                  
-                </ul>
-              </li>
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-money-dollar-circle-line"></i>
-                  <span class="menu-text">Salaries</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">Salary List</a>
-                  </li>
-                 
-                </ul>
-              </li>
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-hotel-bed-line"></i>
-                  <span class="menu-text">Rooms</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">Statistics</a>
-                  </li>
-                  <li>
-                    <a href="#">Rooms Allotted</a>
-                  </li>
-                
-                </ul>
-              </li>
+
+
+
              
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-terminal-window-line"></i>
-                  <span class="menu-text">Forms</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">Form Inputs</a>
-                  </li>
-                  <li>
-                    <a href="#">Checkbox &amp; Radio</a>
-                  </li>
-                 
-                </ul>
-              </li>
-              <li>
-                <a href="#">
-                  <i class="ri-table-line"></i>
-                  <span class="menu-text">Tables</span>
-                </a>
-              </li>
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-bar-chart-line"></i>
-                  <span class="menu-text">Graphs</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#">Apex Graphs</a>
-                  </li>
-                  <li>
-                    <a href="#">MorrisGraphs</a>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <a href="#">
-                  <i class="ri-road-map-line"></i>
-                  <span class="menu-text">Vector Maps</span>
-                </a>
-              </li>
+
+
+
+
               <li class="treeview">
                 <a href="#!">
                   <i class="ri-login-circle-line"></i>
@@ -657,76 +592,9 @@
                   <span class="menu-text">Page Not Found</span>
                 </a>
               </li>
-              <li>
-                <a href="#">
-                  <i class="ri-auction-line"></i>
-                  <span class="menu-text">Maintenance</span>
-                </a>
-              </li>
-              <li class="treeview">
-                <a href="#!">
-                  <i class="ri-dropdown-list"></i>
-                  <span class="menu-text">Menu Level</span>
-                </a>
-                <ul class="treeview-menu">
-                  <li>
-                    <a href="#!">Level One Link</a>
-                  </li>
-                  <li>
-                    <a href="#!">
-                      Level One Menu
-                      <i class="ri-arrow-right-s-line"></i>
-                    </a>
-                    <ul class="treeview-menu">
-                      <li>
-                        <a href="#!">Level Two Link</a>
-                      </li>
-                      <li>
-                        <a href="#!">Level Two Menu
-                          <i class="ri-arrow-right-s-line"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                          <li>
-                            <a href="#!">Level Three Link</a>
-                          </li>
-                          <li>
-                            <a href="#!">Level Three Link</a>
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    <a href="#!">Level One Link</a>
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <a href="#">
-                  <i class="ri-send-plane-line"></i>
-                  <span class="menu-text">External Link</span>
-                </a>
-              </li>
-              <li>
-                <a href="#!">
-                  <i class="ri-exchange-line"></i>
-                  <span class="menu-text">Chip</span>
-                  <span class="badge bg-primary ms-auto">6</span>
-                </a>
-              </li>
-              <li>
-                <a href="#!">
-                  <i class="ri-ticket-line"></i>
-                  <span class="menu-text">Badge</span>
-                  <span class="badge border border-primary text-primary ms-auto">Chip</span>
-                </a>
-              </li>
-              <li>
-                <a href="#!" class="disabled">
-                  <i class="ri-magic-line"></i>
-                  <span class="menu-text">Disabled Link</span>
-                </a>
-              </li>
+
+
+
             </ul>
           </div>
           <!-- Sidebar menu ends -->
@@ -935,33 +803,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-xl-3 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex align-items-center">
-                      <div class="p-2 border border-warning rounded-circle me-3">
-                        <div class="icon-box md bg-warning-subtle rounded-5">
-                          <i class="ri-money-dollar-circle-line fs-4 text-warning"></i>
-                        </div>
-                      </div>
-                      <div class="d-flex flex-column">
-                        <h2 class="lh-1">$98000</h2>
-                        <p class="m-0">Total Earnings</p>
-                      </div>
-                    </div>
-                    <div class="d-flex align-items-end justify-content-between mt-1">
-                      <a class="text-warning" href="javascript:void(0);">
-                        <span>View All</span>
-                        <i class="ri-arrow-right-line ms-1"></i>
-                      </a>
-                      <div class="text-end">
-                        <p class="mb-0 text-warning">+20%</p>
-                        <span class="badge bg-warning-subtle text-warning small">this month</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
             </div>
             <!-- Row ends -->
 
@@ -1053,10 +895,168 @@
               <div class="col-xxl-12 col-sm-12">
                 <div class="card mb-3">
                   <div class="card-header">
-                    <h5 class="card-title">Available Beds</h5>
+                    <h5 class="card-title">All Patients</h5>
                   </div>
                   <div class="card-body">
-                    <div id="availableBeds"></div>
+                    <!-- Search, Filter, Export Controls -->
+                    <div class="row mb-3 g-2">
+                      <div class="col-12 col-sm-6 col-md-4">
+                        <input type="text" class="form-control form-control-sm" id="patientSearchInput" placeholder="Search patients...">
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-3">
+                        <select class="form-select form-select-sm" id="patientConditionFilter">
+                          <option value="">All Conditions</option>
+                          <option value="HIV">HIV</option>
+                          <option value="Diabetes">Diabetes</option>
+                          <option value="Hypertension">Hypertension</option>
+                          <option value="TB">TB</option>
+                        </select>
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-3">
+                        <select class="form-select form-select-sm" id="patientStatusFilter">
+                          <option value="">All Status</option>
+                          <option value="Active">Active</option>
+                          <option value="Inactive">Inactive</option>
+                          <option value="Critical">Critical</option>
+                          <option value="Alert">Alert</option>
+                        </select>
+                      </div>
+                      <div class="col-12 col-sm-6 col-md-2">
+                       <div class="export-icons-container">
+                         <button class="export-icon-btn export-excel-btn" title="Export to Excel" onclick="exportPatientsToExcel()">
+                           <i class="ri-file-excel-2-line"></i>
+                         </button>
+                         <button class="export-icon-btn export-pdf-btn" title="Export to PDF" onclick="exportPatientsToPDF()">
+                           <i class="ri-file-pdf-fill"></i>
+                         </button>
+                       </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Responsive Table with Horizontal Scroll on Mobile -->
+                    <div class="table-responsive">
+                      <table class="table table-hover table-sm patients-table">
+                        <thead>
+                           <tr>
+                             <th>Patient ID</th>
+                             <th>Name</th>
+                             <th>Age</th>
+                             <th>Gender</th>
+                             <th>Phone</th>
+                             <th>Address</th>
+                             <th>Condition</th>
+                             <th>Status</th>
+                             <th>HIV Status</th>
+                             <th>Notes</th>
+                           </tr>
+                         </thead>
+                        <tbody id="patientsTableBody">
+                          <tr>
+                            <td colspan="8" class="text-center">Loading patients...</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <nav aria-label="Patient table pagination" class="mt-3">
+                      <ul class="pagination pagination-sm justify-content-center" id="patientsPagination">
+                        <li class="page-item">
+                          <button class="page-link" id="prevPageBtn" onclick="previousPatientPage()">
+                            <i class="ri-arrow-left-s-line"></i> <span class="d-none d-sm-inline">Prev</span>
+                          </button>
+                        </li>
+                        <li class="page-item active" id="pageInfoLi">
+                          <span class="page-link" id="pageInfo">Page 1</span>
+                        </li>
+                        <li class="page-item">
+                          <button class="page-link" id="nextPageBtn" onclick="nextPatientPage()">
+                            <span class="d-none d-sm-inline">Next</span> <i class="ri-arrow-right-s-line"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </nav>
+                    <div class="text-center">
+                      <small class="text-muted" id="patientCountInfo">Showing 0 of 0 patients</small>
+                    </div>
+
+                    <!-- Responsive Table CSS -->
+                    <style>
+                      /* Horizontal scroll on mobile devices */
+                      @media (max-width: 767.98px) {
+                        .table-responsive {
+                          overflow-x: auto;
+                          -webkit-overflow-scrolling: touch;
+                          overflow-y: hidden;
+                        }
+                        
+                        .patients-table {
+                          min-width: 800px;
+                          font-size: 0.85rem;
+                          margin-bottom: 0;
+                        }
+                        
+                        .patients-table thead {
+                          position: sticky;
+                          top: 0;
+                          background-color: #f8f9fa;
+                          z-index: 10;
+                        }
+                        
+                        .patients-table th {
+                          padding: 0.75rem 0.5rem !important;
+                          white-space: nowrap;
+                          font-weight: 600;
+                          border-bottom: 2px solid #dee2e6;
+                        }
+                        
+                        .patients-table td {
+                          padding: 0.5rem !important;
+                          white-space: nowrap;
+                        }
+                        
+                        .badge {
+                          font-size: 0.7rem;
+                          padding: 0.35rem 0.5rem;
+                        }
+                      }
+
+                      /* Table adjustments for tablets and above */
+                      @media (min-width: 768px) {
+                        .patients-table {
+                          font-size: 0.95rem;
+                        }
+                        
+                        .patients-table th,
+                        .patients-table td {
+                          padding: 0.75rem !important;
+                        }
+                      }
+
+                      /* Standard scrollbar styling for mobile scroll */
+                      .table-responsive {
+                        scrollbar-width: thin;
+                        scrollbar-color: #15696B #f0f0f0;
+                      }
+
+                      .table-responsive::-webkit-scrollbar {
+                        height: 6px;
+                      }
+
+                      .table-responsive::-webkit-scrollbar-track {
+                        background: #f0f0f0;
+                        border-radius: 10px;
+                      }
+
+                      .table-responsive::-webkit-scrollbar-thumb {
+                        background: #15696B;
+                        border-radius: 10px;
+                      }
+
+                      .table-responsive::-webkit-scrollbar-thumb:hover {
+                        background: #0F4449;
+                      }
+                    </style>
                   </div>
                 </div>
               </div>
@@ -1066,7 +1066,7 @@
                     <h5 class="card-title">Patients</h5>
                   </div>
                   <div class="card-body">
-                    <div id="patients"></div>
+                    <!-- Chart removed - card only -->
                   </div>
                 </div>
               </div>
@@ -1086,86 +1086,16 @@
                     <h5 class="card-title">Hospital Earnings</h5>
                   </div>
                   <div class="card-body">
-
-                    <!-- Row start -->
-                    <div class="row g-3">
-                      <div class="col-sm-6 col-12">
-                        <div class="border rounded-2 d-flex align-items-center flex-row p-2">
-                          <div class="me-2">
-                            <div id="sparkline1"></div>
-                          </div>
-                          <div class="m-0">
-                            <div class="d-flex align-items-center">
-                              <h4 class="m-0 fw-bold">$4900</h4>
-                              <div class="ms-2 text-primary d-flex">
-                                <small>20%</small> <i class="ri-arrow-right-up-line ms-1 fw-bold"></i>
-                              </div>
-                            </div>
-                            <small>Online Consultation</small>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm-6 col-12">
-                        <div class="border rounded-2 d-flex align-items-center flex-row p-2">
-                          <div class="me-2">
-                            <div id="sparkline2"></div>
-                          </div>
-                          <div class="m-0">
-                            <div class="d-flex align-items-center">
-                              <div class="fs-4 fw-bold">$750</div>
-                              <div class="ms-2 text-danger d-flex">
-                                <small>26%</small> <i class="ri-arrow-right-down-line ms-1 fw-bold"></i>
-                              </div>
-                            </div>
-                            <small class="text-dark">Overall Purchases</small>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm-6 col-12">
-                        <div class="border rounded-2 d-flex align-items-center flex-row p-2">
-                          <div class="me-2">
-                            <div id="sparkline3"></div>
-                          </div>
-                          <div class="m-0">
-                            <div class="d-flex align-items-center">
-                              <div class="fs-4 fw-bold">$560</div>
-                              <div class="ms-2 text-primary d-flex">
-                                <small>28%</small> <i class="ri-arrow-right-up-line ms-1 fw-bold"></i>
-                              </div>
-                            </div>
-                            <small class="text-dark">Pending Invoices</small>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm-6 col-12">
-                        <div class="border rounded-2 d-flex align-items-center flex-row p-2">
-                          <div class="me-2">
-                            <div id="sparkline4"></div>
-                          </div>
-                          <div class="m-0">
-                            <div class="d-flex align-items-center">
-                              <div class="fs-4 fw-bold">$390</div>
-                              <div class="ms-2 text-primary d-flex">
-                                <small>30%</small> <i class="ri-arrow-right-up-line ms-1 fw-bold"></i>
-                              </div>
-                            </div>
-                            <small class="text-dark">Monthly Billing</small>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Row ends -->
-
                   </div>
                 </div>
               </div>
+
               <div class="col-xxl-3 col-sm-6">
                 <div class="card mb-3">
                   <div class="card-header">
                     <h5 class="card-title">Insurance Claims</h5>
                   </div>
                   <div class="card-body">
-                    <div id="claims"></div>
                   </div>
                 </div>
               </div>
@@ -1175,9 +1105,6 @@
                     <h5 class="card-title">Patients by Gender</h5>
                   </div>
                   <div class="card-body">
-                    <div class="auto-align-graph">
-                      <div id="genderAge"></div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1322,6 +1249,9 @@
 
         // Fetch and update real stats from database
         fetchDashboardStats(session);
+        
+        // Fetch and populate patients table
+        fetchAndPopulatePatients(session);
       }
 
       // Fetch dashboard statistics from Supabase
@@ -1398,6 +1328,320 @@
         } catch (error) {
           console.error('Error fetching dashboard stats:', error);
         }
+      }
+
+      // Global variables for pagination and filtering
+      let allPatients = [];
+      let filteredPatients = [];
+      let currentPatientPage = 1;
+      const PATIENTS_PER_PAGE = 5;
+
+      // Setup search and filter controls
+       function setupPatientTableControls() {
+         const searchInput = document.getElementById('patientSearchInput');
+         const conditionFilter = document.getElementById('patientConditionFilter');
+         const statusFilter = document.getElementById('patientStatusFilter');
+
+         if (searchInput) searchInput.addEventListener('input', filterAndDisplayPatients);
+         if (conditionFilter) conditionFilter.addEventListener('change', filterAndDisplayPatients);
+         if (statusFilter) statusFilter.addEventListener('change', filterAndDisplayPatients);
+       }
+
+      // Filter and display patients based on search and filter inputs
+      function filterAndDisplayPatients() {
+        const searchTerm = document.getElementById('patientSearchInput').value.toLowerCase();
+        const conditionFilter = document.getElementById('patientConditionFilter').value;
+        const statusFilter = document.getElementById('patientStatusFilter').value;
+
+        filteredPatients = allPatients.filter(patient => {
+          const matchesSearch = !searchTerm || 
+            (patient.patient_no && patient.patient_no.toLowerCase().includes(searchTerm)) ||
+            (patient.first_name && patient.first_name.toLowerCase().includes(searchTerm)) ||
+            (patient.last_name && patient.last_name.toLowerCase().includes(searchTerm));
+
+          const matchesCondition = !conditionFilter || patient.condition === conditionFilter;
+          const matchesStatus = !statusFilter || patient.status === statusFilter;
+
+          return matchesSearch && matchesCondition && matchesStatus;
+        });
+
+        currentPatientPage = 1;
+        displayPatientPage();
+        updatePatientPaginationInfo();
+      }
+
+      // Display current page of patients
+      function displayPatientPage() {
+        const startIndex = (currentPatientPage - 1) * PATIENTS_PER_PAGE;
+        const endIndex = startIndex + PATIENTS_PER_PAGE;
+        const pagePatients = filteredPatients.slice(startIndex, endIndex);
+
+        const tableBody = document.getElementById('patientsTableBody');
+
+        if (pagePatients.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No patients found</td></tr>';
+          return;
+        }
+
+        // Table view (responsive with horizontal scroll on mobile)
+         tableBody.innerHTML = pagePatients.map(patient => `
+           <tr>
+             <td>${patient.patient_no || '-'}</td>
+             <td>${patient.first_name || '-'} ${patient.last_name || '-'}</td>
+             <td>${patient.age || '-'}</td>
+             <td>${patient.gender || '-'}</td>
+             <td>${patient.phone_number || '-'}</td>
+             <td>${patient.address || '-'}</td>
+             <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
+             <td>
+               <span class="badge ${getStatusBadgeClass(patient.status)}">
+                 ${patient.status || 'Unknown'}
+               </span>
+             </td>
+             <td>
+               <span class="badge ${getHIVStatusBadgeClass(patient.hiv_status)}">
+                 ${patient.hiv_status || 'Unknown'}
+               </span>
+             </td>
+             <td>${patient.notes || '-'}</td>
+           </tr>
+         `).join('');
+      }
+
+      // Update pagination info and button states
+      function updatePatientPaginationInfo() {
+        const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
+        const pageInfo = document.getElementById('pageInfo');
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        const countInfo = document.getElementById('patientCountInfo');
+
+        if (pageInfo) pageInfo.textContent = `Page ${currentPatientPage} of ${totalPages}`;
+        if (countInfo) {
+          const startCount = Math.max(1, (currentPatientPage - 1) * PATIENTS_PER_PAGE + 1);
+          const endCount = Math.min(filteredPatients.length, currentPatientPage * PATIENTS_PER_PAGE);
+          countInfo.textContent = `Showing ${startCount} to ${endCount} of ${filteredPatients.length} patients`;
+        }
+
+        if (prevBtn) prevBtn.disabled = currentPatientPage === 1;
+        if (nextBtn) nextBtn.disabled = currentPatientPage >= totalPages;
+      }
+
+      // Go to previous page
+      window.previousPatientPage = function() {
+        if (currentPatientPage > 1) {
+          currentPatientPage--;
+          displayPatientPage();
+          updatePatientPaginationInfo();
+        }
+      };
+
+      // Go to next page
+      window.nextPatientPage = function() {
+        const totalPages = Math.ceil(filteredPatients.length / PATIENTS_PER_PAGE);
+        if (currentPatientPage < totalPages) {
+          currentPatientPage++;
+          displayPatientPage();
+          updatePatientPaginationInfo();
+        }
+      };
+
+      // Get patient data for export
+       function getPatientExportData() {
+         return {
+           headers: ['Patient ID', 'First Name', 'Last Name', 'Age', 'Gender', 'Phone', 'Address', 'Condition', 'Status', 'HIV Status', 'Notes'],
+           rows: filteredPatients.map(patient => [
+             patient.patient_no || '',
+             patient.first_name || '',
+             patient.last_name || '',
+             patient.age || '',
+             patient.gender || '',
+             patient.phone_number || '',
+             patient.address || '',
+             patient.condition || '',
+             patient.status || '',
+             patient.hiv_status || '',
+             patient.notes || ''
+           ])
+         };
+       }
+
+      // Export patients to CSV
+       function exportPatientsToCSV() {
+         const { headers, rows } = getPatientExportData();
+         
+         let csvContent = headers.join(',') + '\n';
+         rows.forEach(row => {
+           csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+         });
+
+         const blob = new Blob([csvContent], { type: 'text/csv' });
+         const url = window.URL.createObjectURL(blob);
+         const a = document.createElement('a');
+         a.href = url;
+         a.download = `patients_${new Date().toISOString().split('T')[0]}.csv`;
+         document.body.appendChild(a);
+         a.click();
+         document.body.removeChild(a);
+         window.URL.revokeObjectURL(url);
+       }
+
+      // Export patients to Excel
+       function exportPatientsToExcel() {
+         try {
+           const { headers, rows } = getPatientExportData();
+           const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+           const wb = XLSX.utils.book_new();
+           XLSX.utils.book_append_sheet(wb, ws, 'Patients');
+           XLSX.writeFile(wb, `patients_${new Date().toISOString().split('T')[0]}.xlsx`);
+         } catch (error) {
+           console.error('Error exporting to Excel:', error);
+           Swal.fire({
+             title: 'Export Failed',
+             text: 'Failed to export patients to Excel',
+             icon: 'error',
+             confirmButtonColor: '#15696B'
+           });
+         }
+       }
+
+      // Export patients to PDF
+        function exportPatientsToPDF() {
+          try {
+            const { headers, rows } = getPatientExportData();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+           
+           doc.setFontSize(16);
+           doc.text('Patients Report', 14, 15);
+           
+           doc.setFontSize(10);
+           doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 25);
+           
+           doc.autoTable({
+             head: [headers],
+             body: rows,
+             startY: 35,
+             theme: 'grid',
+             headStyles: {
+               fillColor: [21, 105, 107],
+               textColor: [255, 255, 255],
+               fontStyle: 'bold',
+               halign: 'center'
+             },
+             bodyStyles: {
+               textColor: [0, 0, 0]
+             },
+             alternateRowStyles: {
+               fillColor: [240, 240, 240]
+             },
+             margin: 10,
+             didDrawPage: function(data) {
+               // Add page number
+               const pageSize = doc.internal.pageSize;
+               const pageHeight = pageSize.getHeight();
+               const pageWidth = pageSize.getWidth();
+               doc.setFontSize(8);
+               doc.text(`Page ${doc.internal.pages.length - 1}`, pageWidth - 20, pageHeight - 10);
+             }
+           });
+           
+           doc.save(`patients_${new Date().toISOString().split('T')[0]}.pdf`);
+         } catch (error) {
+           console.error('Error exporting to PDF:', error);
+           Swal.fire({
+             title: 'Export Failed',
+             text: 'Failed to export patients to PDF',
+             icon: 'error',
+             confirmButtonColor: '#15696B'
+           });
+         }
+       }
+
+      // Fetch and populate all patients in the table
+      async function fetchAndPopulatePatients(session) {
+        try {
+          console.log('fetchAndPopulatePatients called with session:', session);
+          
+          // Check if supabaseClient is available
+          if (!supabaseClient) {
+            console.error('Supabase client not initialized');
+            document.getElementById('patientsTableBody').innerHTML = 
+              '<tr><td colspan="10" class="text-center text-danger">Supabase not initialized</td></tr>';
+            return;
+          }
+
+          const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+          console.log('Fetching patients for facility ID:', numericFacilityId);
+          
+          // Fetch all patients for the facility with relevant fields
+           const { data: patients, error: patientError } = await supabaseClient
+             .from('patients')
+             .select('patient_no, first_name, last_name, age, gender, phone_number, address, condition, status, hiv_status, notes')
+             .eq('fid', numericFacilityId);
+
+          console.log('Patients fetch result:', { patients, error: patientError });
+
+          if (patientError) {
+            console.error('Error fetching patients:', patientError);
+            document.getElementById('patientsTableBody').innerHTML = 
+              `<tr><td colspan="10" class="text-center text-danger">Error: ${patientError.message}</td></tr>`;
+            return;
+          }
+
+          if (!patients || patients.length === 0) {
+            document.getElementById('patientsTableBody').innerHTML = '<tr><td colspan="10" class="text-center">No patients found</td></tr>';
+            return;
+          }
+
+          console.log('Fetched', patients.length, 'patients');
+
+          // Store all patients for filtering
+          allPatients = patients;
+          filteredPatients = patients;
+          currentPatientPage = 1;
+
+          // Setup event listeners for search and filters
+          setupPatientTableControls();
+
+          // Display first page
+          displayPatientPage();
+          updatePatientPaginationInfo();
+        } catch (error) {
+           console.error('Error fetching and populating patients:', error);
+           document.getElementById('patientsTableBody').innerHTML = 
+             `<tr><td colspan="10" class="text-center text-danger">Error: ${error.message}</td></tr>`;
+         }
+      }
+
+      // Helper function to get status badge class
+      function getStatusBadgeClass(status) {
+        switch(status) {
+          case 'Active':
+            return 'bg-success-subtle text-success';
+          case 'Inactive':
+            return 'bg-danger-subtle text-danger';
+          case 'Critical':
+            return 'bg-warning-subtle text-warning';
+          case 'Alert':
+            return 'bg-info-subtle text-info';
+          default:
+            return 'bg-secondary-subtle text-secondary';
+        }
+      }
+
+      // Helper function to get HIV status badge class
+      function getHIVStatusBadgeClass(hivStatus) {
+        if (!hivStatus) return 'bg-secondary-subtle text-secondary';
+        const status = hivStatus.toLowerCase();
+        if (status.includes('positive')) {
+          return 'bg-danger-subtle text-danger';
+        } else if (status.includes('negative')) {
+          return 'bg-success-subtle text-success';
+        } else if (status.includes('unknown')) {
+          return 'bg-warning-subtle text-warning';
+        }
+        return 'bg-secondary-subtle text-secondary';
       }
 
       // Setup logout button functionality
