@@ -664,6 +664,7 @@
               <div class="px-3 py-2">
                 <span class="small" id="userRole">User</span>
                 <h6 class="m-0" id="userName">Loading...</h6>
+                <p class="m-0 small text-muted" id="facilityName" style="font-size: 12px; margin-top: 4px;">Facility</p>
               </div>
               <div class="mx-3 my-2 d-grid">
                 <button id="logoutBtn" class="btn btn-danger">Logout</button>
@@ -1449,6 +1450,12 @@
         document.getElementById('userInitials').textContent = initials;
         document.getElementById('userName').textContent = fullname;
         document.getElementById('userRole').textContent = userRole;
+        
+        // Update facility name in dropdown
+        const facilityNameEl = document.getElementById('facilityName');
+        if (facilityNameEl) {
+          facilityNameEl.textContent = session.facilityName || 'Facility';
+        }
 
         // Update sidebar profile UI
         document.getElementById('sidebarUserName').textContent = fullname;
