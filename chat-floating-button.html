@@ -1,0 +1,141 @@
+<!-- Floating Chat Button -->
+<!-- Add this before the closing </body> tag in dashboard.html -->
+
+<style>
+  /* Floating Chat Button */
+  .chat-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #15696B;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(21, 105, 107, 0.4);
+    transition: all 0.3s ease;
+    z-index: 998;
+  }
+
+  .chat-fab:hover {
+    background: #0F4449;
+    transform: scale(1.1) translateY(-5px);
+    box-shadow: 0 6px 16px rgba(21, 105, 107, 0.6);
+  }
+
+  .chat-fab:active {
+    transform: scale(0.95);
+  }
+
+  /* Badge for unread messages */
+  .chat-fab-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #d32f2f;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid white;
+  }
+
+  /* Pulse animation for new messages */
+  @keyframes pulse-fab {
+    0% {
+      box-shadow: 0 0 0 0 rgba(21, 105, 107, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 15px rgba(21, 105, 107, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(21, 105, 107, 0);
+    }
+  }
+
+  .chat-fab.has-unread {
+    animation: pulse-fab 2s infinite;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .chat-fab {
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.3rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .chat-fab {
+      bottom: 15px;
+      right: 15px;
+      width: 52px;
+      height: 52px;
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<!-- Floating Chat Button HTML -->
+<button 
+  class="chat-fab" 
+  id="chatFabBtn"
+  onclick="chatSystem.openChat()" 
+  title="Open Chat"
+  aria-label="Open Chat">
+  <i class="ri-chat-3-line"></i>
+  <div class="chat-fab-badge" id="chatFabBadge" style="display: none;">0</div>
+</button>
+
+<script>
+  // Initialize floating button
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatFabBtn = document.getElementById('chatFabBtn');
+    
+    if (chatFabBtn) {
+      // Click handler for opening chat
+      chatFabBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (chatSystem) {
+          chatSystem.openChat();
+        }
+      });
+
+      // Update unread badge
+      function updateUnreadBadge() {
+        if (!chatSystem || !chatSystem.chats) return;
+        
+        // Count unread messages (optional - implement based on your needs)
+        const unreadCount = 0; // Replace with actual unread count logic
+        const badge = document.getElementById('chatFabBadge');
+        
+        if (unreadCount > 0) {
+          badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+          badge.style.display = 'flex';
+          chatFabBtn.classList.add('has-unread');
+        } else {
+          badge.style.display = 'none';
+          chatFabBtn.classList.remove('has-unread');
+        }
+      }
+
+      // Update badge periodically
+      setInterval(updateUnreadBadge, 5000);
+      updateUnreadBadge();
+    }
+  });
+</script>

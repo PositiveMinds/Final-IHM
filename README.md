@@ -32,6 +32,28 @@ IHM2 is a web-based healthcare information system that integrates patient manage
 - NCD (diabetes, hypertension, etc.) queries
 - Quick reference database
 - Natural language processing via Gemini API
+- **Intelligent Appointment Querying**
+  - Flexible date range filtering (natural language, slash format, ISO format)
+  - Missed appointment detection
+  - Multi-format date parsing (Jan 1, 01/01/2024, 2024-01-01, etc.)
+  - Predefined time ranges (this week, next month, next 30 days, etc.)
+- **Advanced Export Functionality**
+  - Export appointments to Excel with color-coded formatting
+  - Export appointments to PDF with statistics
+  - Combined filtering with patient attributes (status, condition, HIV status, etc.)
+  - Statistical analysis: completion rates, missed appointment rates, status breakdown
+- **Appointment Reminders**
+  - Set email or notification reminders (1 hour or 24 hours before)
+  - Bulk reminder scheduling for multiple appointments
+  - Automatic reminder triggering and tracking
+- **Appointment Status Management**
+  - Update individual or bulk appointment statuses
+  - Statuses: Completed, Scheduled, Missed, Cancelled
+  - Real-time database synchronization
+- **Bulk Operations**
+  - Mark multiple appointments as Completed, Missed, or Cancelled
+  - Set reminders for all retrieved appointments
+  - Confirmation dialogs to prevent accidental updates
 
 ### 5. **Admin Dashboard**
 - Real-time statistics
@@ -148,6 +170,8 @@ IHM2/
 - Integration via N8N workflow
 - Gemini API for NLP processing
 - Real-time response handling
+- Appointment data export
+- Advanced date range filtering
 
 ## Documentation
 
@@ -157,6 +181,7 @@ Comprehensive guides are included:
 - **CORS_FIX_GUIDE.md** - CORS configuration troubleshooting
 - **N8N_SUPABASE_QUICK_START.md** - Workflow automation setup
 - **DASHBOARD_ENHANCEMENTS_GUIDE.md** - UI customization
+- **APPOINTMENT_EXPORT_IMPLEMENTATION.md** - Appointment filtering and export features
 
 ## Security Considerations
 
@@ -169,6 +194,63 @@ Comprehensive guides are included:
 - Enable HTTPS in production
 - Regularly audit database access logs
 
+## Chatbot Query Examples
+
+### Appointment Queries with Date Filtering
+
+**Predefined Date Ranges:**
+```
+"Show me appointments next week"
+"What appointments have been missed?"
+"List all appointments for this month"
+"Appointments in the next 30 days"
+```
+
+**Custom Date Ranges:**
+```
+"Show appointments from Jan 1 to Jan 15"
+"Appointments between 2024-01-01 and 2024-01-31"
+"List appointments from 01/15/2024 to 01/30/2024"
+"Show appointments from January 1 to January 31 2024"
+```
+
+**With Patient Filters:**
+```
+"Show active patients' appointments next week"
+"List HIV positive patients with appointments in February"
+"Missed appointments for critical patients"
+```
+
+### Exporting Results
+```
+"Show appointments next week" → Click "Export to Excel" or "Export to PDF"
+"Missed appointments for January" → Download as CSV or print as PDF
+```
+
+## Appointment Date Filtering Reference
+
+### Supported Date Formats
+
+**Natural Language:**
+- "Jan 1", "January 1", "1 Jan", "1 January"
+- "Jan 1 2024", "January 1 2024", "1 Jan 2024"
+
+**Slash Format:**
+- "01/01/2024", "1/1/2024"
+- "01/15/2024 to 01/30/2024"
+
+**ISO Format:**
+- "2024-01-01", "2024-01-31"
+- "2024-01-01 to 2024-01-31"
+
+**Time Ranges:**
+- "this week", "next week", "this month", "next month"
+- "next 7 days", "next 30 days", "last 30 days"
+- "missed appointments", "overdue appointments"
+
+### Month Name Support
+Full names and abbreviations: January (Jan), February (Feb), March (Mar), April (Apr), May, June (Jun), July (Jul), August (Aug), September (Sep/Sept), October (Oct), November (Nov), December (Dec)
+
 ## Features in Development
 
 - [ ] Mobile app version
@@ -178,6 +260,9 @@ Comprehensive guides are included:
 - [ ] Multi-language support
 - [ ] SMS/WhatsApp notifications
 - [ ] Video consultation module
+- [ ] Appointment filtering by provider/staff
+- [ ] Recurring appointment patterns
+- [ ] Relative date expressions ("last week", "2 weeks ago")
 
 ## Contributing
 

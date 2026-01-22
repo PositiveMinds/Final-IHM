@@ -50,7 +50,11 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
     // Verify password using Supabase Auth (simulated comparison)
     // Note: In production, use bcryptjs to compare hashed passwords
-    if (await comparePassword(password, users.password)) {
+    const passwordMatch = await comparePassword(password, users.password);
+    console.log("Password match result:", passwordMatch);
+    console.log("User data:", { email: users.email, has_password: !!users.password, is_active: users.is_active });
+
+    if (passwordMatch) {
       // Check if user is active
       if (!users.is_active) {
         Swal.fire({
@@ -73,60 +77,63 @@ document.getElementById("loginForm").addEventListener("submit", async function (
            .eq('fid', users.fid)
            .single();
         
-        console.log("Facility lookup result:", { facility, facilityError });
+         console.log("Facility lookup result:", { facility, facilityError });
         
-        if (facility && !facilityError) {
-          facilityId = facility.fid;
-          facilityRegion = facility.region;
-          facilityName = facility.facility_name || facilityName;
-        } else if (facilityError) {
-          console.warn('Facility not found:', facilityError);
-          facilityId = users.fid;
-        }
-        } catch (e) {
-        console.warn('Could not fetch facility:', e);
-        facilityId = users.fid;
-        }
+         if (facility && !facilityError) {
+           facilityId = facility.fid;
+           facilityRegion = facility.region;
+           facilityName = facility.facility_name || facilityName;
+         } else if (facilityError) {
+           console.warn('Facility not found:', facilityError);
+           facilityId = users.fid;
+         }
+         } catch (e) {
+         console.warn('Could not fetch facility:', e);
+         facilityId = users.fid;
+         }
 
-        // Store session data
-         const sessionData = {
-           id: users.uid,
-           email: users.email,
-           fullname: users.fullname || facilityName,
-           username: users.username,
-           facilityName: facilityName,
-           facility_id: facilityId || users.fid,
-           fid: users.fid,
-           facilityIdCode: users.facility_id,
-           facilityRegion: facilityRegion,
-           userRole: users.user_role,
-           isActive: users.is_active,
-           loginTime: new Date().toISOString(),
-         };
+         // Store session data
+          const sessionData = {
+            id: users.uid,
+            email: users.email,
+            fullname: users.fullname || facilityName,
+            username: users.username,
+            facilityName: facilityName,
+            facility_id: facilityId || users.fid,
+            fid: users.fid,
+            facilityIdCode: users.facility_id,
+            facilityRegion: facilityRegion,
+            userRole: users.user_role,
+            isActive: users.is_active,
+            loginTime: new Date().toISOString(),
+          };
 
-        localStorage.setItem("userSession", JSON.stringify(sessionData));
+         console.log("Session data stored:", sessionData);
+         localStorage.setItem("userSession", JSON.stringify(sessionData));
 
-      if (rememberMe) {
-        localStorage.setItem("healthflow_email", email);
-      }
+       if (rememberMe) {
+         localStorage.setItem("healthflow_email", email);
+       }
 
-      // Success message
-      const displayName = users.fullname || users.facility_name || 'User';
-      Swal.fire({
-        icon: "success",
-        title: "Welcome!",
-        text: `Welcome back, ${displayName}!`,
-        confirmButtonColor: "#28a745",
-        confirmButtonText: "Continue",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Add delay to ensure localStorage is written, then redirect
-          setTimeout(() => {
-            window.location.href = "dashboard.html";
-          }, 1000);
-        }
-      });
+       // Success message
+       const displayName = users.fullname || users.facility_name || 'User';
+       Swal.fire({
+         icon: "success",
+         title: "Welcome!",
+         text: `Welcome back, ${displayName}!`,
+         confirmButtonColor: "#28a745",
+         confirmButtonText: "Continue",
+       }).then((result) => {
+         if (result.isConfirmed) {
+           console.log("Redirecting to dashboard...");
+           // Add delay to ensure localStorage is written, then redirect
+           setTimeout(() => {
+             window.location.href = "dashboard.html";
+           }, 500);
+         }
+       });
     } else {
+      console.log("Password mismatch or no password on record");
       Swal.fire({
         icon: "error",
         title: "Login Failed",

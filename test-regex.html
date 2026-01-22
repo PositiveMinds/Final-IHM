@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Regex for Date Range</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .query { color: blue; }
+        .result { color: green; margin-top: 5px; }
+        .bad { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Regex Pattern Test</h1>
+    
+    <script>
+        const queries = [
+            "Show appointments from January 15 to January 31",
+            "show appointments from january 15 to january 31",
+            "from january 15 to january 31",
+            "appointments from january 15 to january 31",
+        ];
+
+        // Current pattern
+        const pattern1 = /from\s+(.+)\s+to\s+(.+?)(?:\s+appointments)?(?:\s|$)/i;
+        
+        // Better pattern - more specific
+        const pattern2 = /from\s+([a-z]+\s+\d+)\s+to\s+([a-z]+\s+\d+)/i;
+        
+        // Alternative pattern with word boundary
+        const pattern3 = /from\s+(.+?)\s+to\s+(.+?)(?:\s|$)/i;
+
+        console.log("Testing patterns...\n");
+
+        queries.forEach(query => {
+            console.log("Query: " + query);
+            const lower = query.toLowerCase();
+            
+            const match1 = lower.match(pattern1);
+            const match2 = lower.match(pattern2);
+            const match3 = lower.match(pattern3);
+            
+            console.log("  Pattern 1 (current):", match1 ? [match1[1], match1[2]] : "NO MATCH");
+            console.log("  Pattern 2 (specific):", match2 ? [match2[1], match2[2]] : "NO MATCH");
+            console.log("  Pattern 3 (alt):", match3 ? [match3[1], match3[2]] : "NO MATCH");
+            console.log("");
+        });
+    </script>
+</body>
+</html>

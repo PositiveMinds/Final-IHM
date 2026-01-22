@@ -29,6 +29,8 @@
     <!-- Chatbot CSS -->
     <link rel="stylesheet" href="assets/css/chatbot.css">
 
+    <!-- Chat System CSS -->
+    <link rel="stylesheet" href="chat-system.css">
     
     <!-- Theme Color Override -->
     <style>
@@ -1761,6 +1763,8 @@
     <script src="https://unpkg.com/exceljs@4.3.0/dist/exceljs.min.js"></script>
     <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
+    <!-- Email.js for Gmail/SMTP support -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <!-- *************
     ************ Vendor Js Files *************
@@ -1790,12 +1794,6 @@
     <!-- Dashboard Data Script -->
     <script src="dashboard-data.js"></script>
 
-    <!-- Chatbot Handler Script -->
-    <script src="chatbot-handler.js"></script>
-
-    <!-- Smart Chatbot Matching Engine -->
-    <script src="CHATBOT_SMART_MATCHING.js"></script>
-
     <!-- Authentication Check & Session Management -->
     <script>
       const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -1803,7 +1801,7 @@
 
       // Initialize dashboard on page load
       document.addEventListener('DOMContentLoaded', function() {
-        const sessionData = localStorage.getItem('healthflow_session');
+        const sessionData = localStorage.getItem('userSession');
         
         if (!sessionData) {
           // User is not logged in, redirect to login page
@@ -3516,7 +3514,7 @@
       // Logout function
       function logout() {
         // Clear session data
-        localStorage.removeItem('healthflow_session');
+        localStorage.removeItem('userSession');
         localStorage.removeItem('healthflow_email');
 
         // Clear inactivity timer
@@ -3543,7 +3541,7 @@
         // Set new timeout
         inactivityTimeout = setTimeout(function() {
           // Session expired due to inactivity
-          const sessionData = localStorage.getItem('healthflow_session');
+          const sessionData = localStorage.getItem('userSession');
           if (sessionData) {
             // Show warning before logout
             Swal.fire({
@@ -3567,7 +3565,7 @@
       document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
           // Page is now visible, check session validity
-          const sessionData = localStorage.getItem('healthflow_session');
+          const sessionData = localStorage.getItem('userSession');
           if (!sessionData) {
             window.location.href = 'login.html';
           }
@@ -3674,7 +3672,7 @@
             return;
           }
           
-          const session = window.currentSession || JSON.parse(localStorage.getItem('healthflow_session'));
+          const session = window.currentSession || JSON.parse(localStorage.getItem('userSession'));
           const facilityId = session.fid || session.facility_id;
 
           console.log('Fetching patient details for patientId:', patientId, 'facilityId:', facilityId);
@@ -3889,7 +3887,7 @@
             return;
           }
           
-          const session = window.currentSession || JSON.parse(localStorage.getItem('healthflow_session'));
+          const session = window.currentSession || JSON.parse(localStorage.getItem('userSession'));
           const facilityId = session.fid || session.facility_id;
 
           // Fetch patient appointment details
@@ -4439,7 +4437,7 @@
         contentDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         
         // Fetch and display data
-        const sessionData = localStorage.getItem('healthflow_session');
+        const sessionData = localStorage.getItem('userSession');
         const session = JSON.parse(sessionData);
         const numericFacilityId = session.fid || session.facility_id || session.facilityId;
         
@@ -4658,7 +4656,7 @@
           usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4"><i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Loading users...</td></tr>';
 
           // Get facility ID from session
-          const session = JSON.parse(localStorage.getItem('healthflow_session'));
+          const session = JSON.parse(localStorage.getItem('userSession'));
           const facilityId = session?.fid || null;
 
           if (!facilityId) {
@@ -4817,7 +4815,7 @@
             return;
           }
 
-          const session = JSON.parse(localStorage.getItem('healthflow_session'));
+          const session = JSON.parse(localStorage.getItem('userSession'));
           const facilityId = session?.fid || null;
 
           const { error: insertError } = await supabaseClient
@@ -5210,8 +5208,108 @@
     <script src="supabase-config.js"></script>
     
     <!-- Chatbot -->
+    <script src="assets/js/chatbot-advanced-features.js"></script>
     <script src="assets/js/chatbot-ai.js"></script>
     <script src="assets/js/chatbot-ui.js"></script>
+
+    <!-- Chat System -->
+    <script src="chat-system.js"></script>
+
+    <!-- Floating Chat Button -->
+    <style>
+      .chat-fab {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #15696B;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(21, 105, 107, 0.4);
+        transition: all 0.3s ease;
+        z-index: 998;
+      }
+
+      .chat-fab:hover {
+        background: #0F4449;
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 6px 16px rgba(21, 105, 107, 0.6);
+      }
+
+      .chat-fab:active {
+        transform: scale(0.95);
+      }
+
+      .chat-fab-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #d32f2f;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 2px solid white;
+      }
+
+      @keyframes pulse-fab {
+        0% {
+          box-shadow: 0 0 0 0 rgba(21, 105, 107, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 15px rgba(21, 105, 107, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(21, 105, 107, 0);
+        }
+      }
+
+      .chat-fab.has-unread {
+        animation: pulse-fab 2s infinite;
+      }
+
+      @media (max-width: 768px) {
+        .chat-fab {
+          bottom: 20px;
+          right: 20px;
+          width: 56px;
+          height: 56px;
+          font-size: 1.3rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .chat-fab {
+          bottom: 15px;
+          right: 15px;
+          width: 52px;
+          height: 52px;
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+
+    <button 
+      class="chat-fab" 
+      id="chatFabBtn"
+      onclick="chatSystem.openChat()" 
+      title="Open Chat"
+      aria-label="Open Chat">
+      <i class="ri-chat-3-line"></i>
+      <div class="chat-fab-badge" id="chatFabBadge" style="display: none;">0</div>
+    </button>
   </body>
 
 </html>

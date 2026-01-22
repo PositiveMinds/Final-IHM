@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Date Range Filter Test</title>
+</head>
+<body>
+    <h1>Date Range Filter Logic Test</h1>
+    <pre id="output"></pre>
+    
+    <script>
+        function testDateRange() {
+            const output = [];
+            
+            // Test 1: January 15 to January 31
+            output.push("Test 1: January 15 to January 31");
+            const startDate = new Date(2026, 0, 15);
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(2026, 0, 31);
+            endDate.setHours(0, 0, 0, 0);
+            
+            output.push(`Start Date: ${startDate.toISOString()}`);
+            output.push(`End Date: ${endDate.toISOString()}`);
+            
+            // Calculate buffer
+            const endDateWithBuffer = new Date(endDate);
+            output.push(`Before setDate: ${endDateWithBuffer.toISOString()}`);
+            endDateWithBuffer.setDate(endDateWithBuffer.getDate() + 1);
+            output.push(`After setDate(+1): ${endDateWithBuffer.toISOString()}`);
+            endDateWithBuffer.setHours(0, 0, 0, 0);
+            output.push(`After setHours: ${endDateWithBuffer.toISOString()}`);
+            
+            // Test various appointment dates
+            const testDates = [
+                new Date(2026, 0, 14), // Jan 14
+                new Date(2026, 0, 15), // Jan 15
+                new Date(2026, 0, 20), // Jan 20
+                new Date(2026, 0, 31), // Jan 31
+                new Date(2026, 1, 1),  // Feb 1
+                new Date(2026, 1, 2),  // Feb 2
+            ];
+            
+            output.push("\nAppointment Date Tests:");
+            testDates.forEach(apptDate => {
+                apptDate.setHours(0, 0, 0, 0);
+                const included = apptDate >= startDate && apptDate < endDateWithBuffer;
+                output.push(`  ${apptDate.toISOString().split('T')[0]} (${apptDate.getDate()} ${['Jan','Feb'][apptDate.getMonth()]}): ${included ? 'INCLUDED' : 'EXCLUDED'}`);
+            });
+            
+            document.getElementById('output').textContent = output.join('\n');
+        }
+        
+        testDateRange();
+    </script>
+</body>
+</html>
