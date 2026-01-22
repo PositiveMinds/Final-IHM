@@ -26,6 +26,8 @@
     <!-- Air Datepicker CSS -->
     <link href="https://cdn.jsdelivr.net/npm/air-datepicker@3.4.0/air-datepicker.css" rel="stylesheet" />
     
+
+    
     <!-- Theme Color Override -->
     <style>
       :root {
@@ -191,6 +193,15 @@
       
       .swal2-html-container select.form-control {
         margin-bottom: 0;
+      }
+      
+      /* Air Datepicker styling */
+      .air-datepicker {
+        z-index: 10000 !important;
+      }
+      
+      .air-datepicker-input {
+        width: 100%;
       }
     </style>
 
@@ -2692,6 +2703,21 @@
     <!-- Air Datepicker JS -->
     <script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.4.0/air-datepicker.js"></script>
     
+    <!-- Set English as default language for Air Datepicker -->
+    <script>
+      window.AirDatepickerLocaleOverride = {
+        en: {
+          days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+          daysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+          daysMin: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+          months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+          monthsShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          today: 'Today',
+          clear: 'Clear'
+        }
+      };
+    </script>
+    
     <!-- Initialize Select2 and Air Datepicker -->
     <script>
       function initializeSelect2AndDatePicker() {
@@ -2719,15 +2745,32 @@
           dateElements.forEach(function(dateEl) {
             if (!dateEl.hasAttribute('data-datepicker-initialized')) {
               try {
-                new AirDatepicker(dateEl, {
-                  isMobile: true,
+                // Change input type to text for Air Datepicker
+                const textInput = document.createElement('input');
+                textInput.type = 'text';
+                textInput.className = dateEl.className;
+                textInput.id = dateEl.id;
+                textInput.value = dateEl.value;
+                dateEl.parentNode.replaceChild(textInput, dateEl);
+                
+                new AirDatepicker(textInput, {
+                  isMobile: false,
                   autoClose: true,
                   position: 'bottom left',
-                  dateFormat: 'yyyy-MM-dd'
+                  dateFormat: 'yyyy-MM-dd',
+                  locale: window.AirDatepickerLocaleOverride.en,
+                  onSelect: function({date}) {
+                    if (date) {
+                      const year = date.getFullYear();
+                      const month = String(date.getMonth() + 1).padStart(2, '0');
+                      const day = String(date.getDate()).padStart(2, '0');
+                      textInput.value = `${year}-${month}-${day}`;
+                    }
+                  }
                 });
-                dateEl.setAttribute('data-datepicker-initialized', 'true');
+                textInput.setAttribute('data-datepicker-initialized', 'true');
               } catch(e) {
-                console.log('AirDatepicker init info:', e.message);
+                console.log('AirDatepicker init error:', e.message);
               }
             }
           });
