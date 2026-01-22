@@ -203,7 +203,107 @@
       .air-datepicker-input {
         width: 100%;
       }
-    </style>
+      
+      /* Wizard Form Button Styling */
+      .wizard-btn {
+        padding: 10px 24px;
+        font-weight: 500;
+        font-size: 14px;
+        border-radius: 0.35rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-width: 100px;
+      }
+      
+      .wizard-btn-primary {
+        background-color: #15696B;
+        color: white;
+        border: 1px solid #15696B;
+      }
+      
+      .wizard-btn-primary:hover {
+        background-color: #0F4449;
+        border-color: #0F4449;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(21, 105, 107, 0.3);
+      }
+      
+      .wizard-btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(21, 105, 107, 0.2);
+      }
+      
+      .wizard-btn-success {
+        background-color: #28a745;
+        color: white;
+        border: 1px solid #28a745;
+      }
+      
+      .wizard-btn-success:hover {
+        background-color: #218838;
+        border-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+      }
+      
+      .wizard-btn-success:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(40, 167, 69, 0.2);
+      }
+      
+      .wizard-btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: 1px solid #6c757d;
+      }
+      
+      .wizard-btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+      }
+      
+      .wizard-btn-secondary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(108, 117, 125, 0.2);
+      }
+      
+      .wizard-btn-outline {
+        background-color: transparent;
+        color: #15696B;
+        border: 1.5px solid #15696B;
+      }
+      
+      .wizard-btn-outline:hover {
+        background-color: #f0f5f5;
+        border-color: #0F4449;
+        color: #0F4449;
+        transform: translateY(-2px);
+      }
+      
+      .wizard-btn-outline:active {
+        transform: translateY(0);
+      }
+      
+      .wizard-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      .wizard-btn:disabled:hover {
+        background-color: inherit;
+        border-color: inherit;
+        transform: none;
+        box-shadow: none;
+      }
+      </style>
 
     <!-- *************
 		************ Vendor Css Files *************
@@ -1583,6 +1683,33 @@
         }
       };
 
+      // Function to generate unique Patient ID
+      window.generatePatientID = async function() {
+        try {
+          // Get the highest patient number from the database
+          const { data: patients, error } = await supabaseClient
+            .from('patients')
+            .select('patient_no')
+            .order('patient_no', { ascending: false })
+            .limit(1);
+          
+          if (error) throw error;
+          
+          let nextNumber = 1001;
+          if (patients && patients.length > 0) {
+            const lastPatientNo = patients[0].patient_no;
+            const lastNumber = parseInt(lastPatientNo.replace('PAT', '')) || 1000;
+            nextNumber = lastNumber + 1;
+          }
+          
+          return 'PAT' + nextNumber;
+        } catch (error) {
+          console.error('Error generating Patient ID:', error);
+          // Fallback: generate with timestamp
+          return 'PAT' + (1000 + Math.floor(Math.random() * 9000));
+        }
+      };
+
       // Edit patient - Wizard Form
       window.editPatient = function(patientNo) {
         const patient = allPatients.find(p => p.patient_no === patientNo);
@@ -1660,9 +1787,9 @@
                   <input type="email" class="form-control" id="edit_email" value="${patient.email || ''}">
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Phone Number</label>
-                  <input type="tel" class="form-control" id="edit_phone" value="${patient.phone_number || ''}">
-                </div>
+                   <label class="form-label">Phone Number</label>
+                   <input type="tel" class="form-control" id="edit_phone" placeholder="(+256) XXX XXX XXX" value="${patient.phone_number || ''}">
+                 </div>
                 <div class="row">
                   <div class="col-md-6">
                     <div class="mb-3">
@@ -1863,6 +1990,88 @@
             // Initialize Select2 and Air Datepicker
             setTimeout(() => {
               initializeSelect2AndDatePicker();
+              
+              // Add phone number formatter
+              const phoneInput = document.getElementById('edit_phone');
+              if (phoneInput) {
+                console.log('Phone input found:', phoneInput);
+                
+                // Set initial format if value exists
+                if (phoneInput.value && phoneInput.value.length > 0) {
+                  let initialValue = phoneInput.value.replace(/\D/g, '');
+                  if (initialValue.startsWith('256')) {
+                    initialValue = initialValue.slice(3);
+                  }
+                  if (initialValue.length > 0) {
+                    let formatted = '(+256)';
+                    if (initialValue.length > 0) {
+                      formatted += ' ' + initialValue.slice(0, 3);
+                    }
+                    if (initialValue.length > 3) {
+                      formatted += ' ' + initialValue.slice(3, 6);
+                    }
+                    if (initialValue.length > 6) {
+                      formatted += ' ' + initialValue.slice(6, 9);
+                    }
+                    phoneInput.value = formatted;
+                  }
+                }
+                
+                // Use both input and keyup events
+                function formatPhone(e) {
+                  let value = e.target.value.replace(/\D/g, '');
+                  console.log('Phone value:', value);
+                  
+                  // Remove leading 256 if present (user might paste it)
+                  if (value.startsWith('256')) {
+                    value = value.slice(3);
+                  }
+                  
+                  // Limit to 9 digits (after country code)
+                  if (value.length > 9) {
+                    value = value.slice(0, 9);
+                  }
+                  
+                  // Format as (+256) XXX XXX XXX
+                  let formatted = '(+256)';
+                  if (value.length > 0) {
+                    formatted += ' ' + value.slice(0, 3);
+                  }
+                  if (value.length > 3) {
+                    formatted += ' ' + value.slice(3, 6);
+                  }
+                  if (value.length > 6) {
+                    formatted += ' ' + value.slice(6, 9);
+                  }
+                  
+                  e.target.value = formatted;
+                }
+                
+                phoneInput.addEventListener('input', formatPhone);
+                phoneInput.addEventListener('keyup', formatPhone);
+              } else {
+                console.log('Phone input not found');
+              }
+              
+              // Add name capitalization on blur
+              const firstNameInput = document.getElementById('edit_first_name');
+              const lastNameInput = document.getElementById('edit_last_name');
+              
+              if (firstNameInput) {
+                firstNameInput.addEventListener('blur', function() {
+                  if (this.value) {
+                    this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1).toLowerCase();
+                  }
+                });
+              }
+              
+              if (lastNameInput) {
+                lastNameInput.addEventListener('blur', function() {
+                  if (this.value) {
+                    this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1).toLowerCase();
+                  }
+                });
+              }
             }, 100);
           },
           showCancelButton: true,
@@ -1880,11 +2089,24 @@
           const footer = document.querySelector('.swal2-actions');
           if (footer) {
             footer.innerHTML = `
-              <button id="edit-wizard-prev-btn" class="btn btn-secondary" style="display: none; margin-right: 10px;">Previous</button>
-              <button id="edit-wizard-next-btn" class="btn btn-primary" style="background-color: #15696B; border-color: #15696B;">Next</button>
-              <button id="edit-wizard-submit-btn" class="btn btn-success" style="display: none;">Update Patient</button>
-              <button class="btn btn-outline-secondary" onclick="Swal.close()">Cancel</button>
+              <button id="edit-wizard-prev-btn" class="wizard-btn wizard-btn-secondary" style="display: none; margin-right: auto;">
+                <i class="ri-arrow-left-line"></i> Previous
+              </button>
+              <div style="display: flex; gap: 12px; margin-left: auto;">
+                <button id="edit-wizard-next-btn" class="wizard-btn wizard-btn-primary">
+                  Next <i class="ri-arrow-right-line"></i>
+                </button>
+                <button id="edit-wizard-submit-btn" class="wizard-btn wizard-btn-success" style="display: none;">
+                  <i class="ri-check-line"></i> Update Patient
+                </button>
+                <button class="wizard-btn wizard-btn-outline" onclick="Swal.close()">
+                  <i class="ri-close-line"></i> Cancel
+                </button>
+              </div>
             `;
+            footer.style.display = 'flex';
+            footer.style.alignItems = 'center';
+            footer.style.gap = '0';
 
             document.getElementById('edit-wizard-prev-btn').addEventListener('click', () => {
               if (currentStep > 1) {
@@ -1901,6 +2123,112 @@
             });
 
             document.getElementById('edit-wizard-submit-btn').addEventListener('click', async () => {
+              // Validation function
+              function validatePatientForm() {
+                const errors = [];
+                
+                // Step 1: Personal Information
+                const firstName = document.getElementById('edit_first_name').value.trim();
+                const lastName = document.getElementById('edit_last_name').value.trim();
+                const email = document.getElementById('edit_email').value.trim();
+                const phone = document.getElementById('edit_phone').value.trim();
+                const age = document.getElementById('edit_age').value.trim();
+                const gender = document.getElementById('edit_gender').value;
+                
+                if (!firstName) {
+                  errors.push('First Name is required');
+                }
+                if (!lastName) {
+                  errors.push('Last Name is required');
+                }
+                if (firstName && firstName.length < 2) {
+                  errors.push('First Name must be at least 2 characters');
+                }
+                if (firstName && !/^[A-Z]/.test(firstName)) {
+                  errors.push('First Name must start with a capital letter');
+                }
+                if (lastName && lastName.length < 2) {
+                  errors.push('Last Name must be at least 2 characters');
+                }
+                if (lastName && !/^[A-Z]/.test(lastName)) {
+                  errors.push('Last Name must start with a capital letter');
+                }
+                if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                  errors.push('Please enter a valid email address');
+                }
+                if (phone && !/^\(\+\d{3}\)\s\d{3}\s\d{3}\s\d{3}$/.test(phone)) {
+                  errors.push('Phone number must be in format: (+256) XXX XXX XXX');
+                }
+                if (age && (isNaN(age) || age < 0 || age > 100)) {
+                  errors.push('Age must be a valid number between 0 and 100');
+                }
+                if (!gender) {
+                  errors.push('Gender is required');
+                }
+                
+                // Step 2: Clinical Status
+                const status = document.getElementById('edit_status').value;
+                const hivStatus = document.getElementById('edit_hiv_status').value;
+                
+                if (!status) {
+                  errors.push('Patient Status is required');
+                }
+                if (!hivStatus) {
+                  errors.push('HIV Status is required');
+                }
+                
+                // Step 3: Viral Load
+                const viralLoadCopies = document.getElementById('edit_viral_load_copies').value.trim();
+                if (viralLoadCopies && (isNaN(viralLoadCopies) || parseInt(viralLoadCopies) < 0)) {
+                  errors.push('Viral Load Copies must be a positive number');
+                }
+                
+                // Step 4: Blood Pressure
+                const systolic = document.getElementById('edit_systolic').value.trim();
+                const diastolic = document.getElementById('edit_diastolic').value.trim();
+                if (systolic && (isNaN(systolic) || parseInt(systolic) < 0 || parseInt(systolic) > 300)) {
+                  errors.push('Systolic BP must be between 0 and 300');
+                }
+                if (diastolic && (isNaN(diastolic) || parseInt(diastolic) < 0 || parseInt(diastolic) > 200)) {
+                  errors.push('Diastolic BP must be between 0 and 200');
+                }
+                
+                // Step 5: Glucose Level
+                const glucose = document.getElementById('edit_glucose_level').value.trim();
+                if (glucose && (isNaN(glucose) || parseFloat(glucose) < 0 || parseFloat(glucose) > 1000)) {
+                  errors.push('Glucose Level must be between 0 and 1000');
+                }
+                
+                // Step 6: Dates
+                const patientRegDate = document.getElementById('edit_patient_registration_date').value.trim();
+                const artStartDate = document.getElementById('edit_art_start_date').value.trim();
+                const today = new Date().toISOString().split('T')[0];
+                
+                if (patientRegDate && patientRegDate < today) {
+                  errors.push('Patient Registration Date must be in the future (today or later)');
+                }
+                
+                if (artStartDate && patientRegDate && artStartDate < patientRegDate) {
+                  errors.push('ART Start Date cannot be before Patient Registration Date');
+                }
+                
+                return errors;
+              }
+              
+              // Validate form
+              const validationErrors = validatePatientForm();
+              if (validationErrors.length > 0) {
+                Swal.fire({
+                  title: 'Validation Error',
+                  html: '<ul style="text-align: left; font-size: 14px;">' + 
+                        validationErrors.map(error => `<li style="margin: 5px 0;">${error}</li>`).join('') + 
+                        '</ul>',
+                  icon: 'error',
+                  confirmButtonColor: '#15696B'
+                });
+                return;
+              }
+
               const updatedData = {
                 first_name: document.getElementById('edit_first_name').value,
                 last_name: document.getElementById('edit_last_name').value,
@@ -2005,7 +2333,10 @@
       };
 
       // Add new patient - Wizard Form
-      window.addNewPatient = function() {
+      window.addNewPatient = async function() {
+        // Generate new Patient ID
+        const newPatientID = await generatePatientID();
+        
         let currentStep = 1;
         const totalSteps = 7;
 
@@ -2061,9 +2392,9 @@
               <div id="wizard-step-1" style="display: block;">
                 <h5 style="color: #15696B; margin-bottom: 15px;">Personal Information</h5>
                 <div class="mb-3">
-                  <label class="form-label">Patient ID *</label>
-                  <input type="text" class="form-control" id="add_patient_no" placeholder="e.g., PAT0001" required>
-                </div>
+                   <label class="form-label">Patient ID *</label>
+                   <input type="text" class="form-control" id="add_patient_no" placeholder="Auto-generated" value="${newPatientID}" disabled readonly>
+                 </div>
                 <div class="mb-3">
                   <label class="form-label">First Name *</label>
                   <input type="text" class="form-control" id="add_first_name" placeholder="Enter first name" required>
