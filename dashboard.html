@@ -20,6 +20,12 @@
     <link rel="stylesheet" href="assets/css/remixicon.css">
     <link rel="stylesheet" href="assets/css/main.min.css">
     
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    <!-- Air Datepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/air-datepicker@3.4.0/air-datepicker.css" rel="stylesheet" />
+    
     <!-- Theme Color Override -->
     <style>
       :root {
@@ -79,6 +85,112 @@
       .export-pdf-btn:hover {
         border-color: #d32f2f;
         background-color: rgba(211, 47, 47, 0.05);
+      }
+      
+      /* Select2 Custom Styling */
+      .select2-container--default .select2-dropdown {
+        border-color: #ced4da;
+        border-radius: 0.25rem;
+      }
+      
+      .select2-container--default .select2-results > .select2-results__options {
+        max-height: 250px;
+      }
+      
+      .select2-container--default .select2-results__option {
+        padding: 10px;
+        text-align: left !important;
+      }
+      
+      .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #15696B;
+      }
+      
+      .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #15696B;
+      }
+      
+      .select2-container--default .select2-selection--single {
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        height: 38px;
+        padding: 0 !important;
+      }
+      
+      .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057;
+        line-height: 36px;
+        text-align: left !important;
+        padding-left: 12px !important;
+      }
+      
+      .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+        right: 0 !important;
+        width: 32px;
+      }
+      
+      .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        margin-top: -6px !important;
+      }
+      
+      /* Wrapper alignment */
+      .select2-container {
+        width: 100% !important;
+      }
+      
+      .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #15696B;
+        box-shadow: 0 0 0 0.2rem rgba(21, 105, 107, 0.25);
+      }
+      
+      /* SweetAlert2 modal adjustments for Select2 */
+      .swal2-html-container {
+        overflow: visible !important;
+      }
+      
+      .swal2-popup {
+        overflow: visible !important;
+        z-index: 1055 !important;
+      }
+      
+      .swal2-container {
+        z-index: 1050 !important;
+      }
+      
+      /* Ensure action buttons appear below dropdown */
+      .swal2-actions {
+        z-index: auto !important;
+        position: relative;
+      }
+      
+      /* Select2 dropdown styling */
+      .select2-dropdown {
+        z-index: 10000 !important;
+        margin-top: 5px;
+        position: absolute !important;
+      }
+      
+      .select2-dropdown--above {
+        margin-top: 0;
+        margin-bottom: 5px;
+      }
+      
+      .select2-dropdown--below {
+        margin-top: 5px;
+      }
+      
+      .select2-results {
+        max-height: 250px !important;
+        overflow-y: auto !important;
+      }
+      
+      .select2-container--open {
+        z-index: 999999 !important;
+      }
+      
+      .swal2-html-container select.form-control {
+        margin-bottom: 0;
       }
     </style>
 
@@ -918,6 +1030,9 @@
                       </div>
                       <div class="col-12 col-sm-6 col-md-2">
                        <div class="export-icons-container">
+                         <button class="export-icon-btn" style="border-color: #15696B; background-color: rgba(21, 105, 107, 0.05);" title="Add Patient" onclick="addNewPatient()">
+                           <i class="ri-add-line" style="color: #15696B;"></i>
+                         </button>
                          <button class="export-icon-btn export-excel-btn" title="Export to Excel" onclick="exportPatientsToExcel()">
                            <i class="ri-file-excel-2-line"></i>
                          </button>
@@ -943,6 +1058,7 @@
                              <th>Status</th>
                              <th>HIV Status</th>
                              <th>Notes</th>
+                             <th>Actions</th>
                            </tr>
                          </thead>
                         <tbody id="patientsTableBody">
@@ -1379,33 +1495,43 @@
         const tableBody = document.getElementById('patientsTableBody');
 
         if (pagePatients.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="10" class="text-center">No patients found</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="11" class="text-center">No patients found</td></tr>';
           return;
         }
 
         // Table view (responsive with horizontal scroll on mobile)
-         tableBody.innerHTML = pagePatients.map(patient => `
-           <tr>
-             <td>${patient.patient_no || '-'}</td>
-             <td>${patient.first_name || '-'} ${patient.last_name || '-'}</td>
-             <td>${patient.age || '-'}</td>
-             <td>${patient.gender || '-'}</td>
-             <td>${patient.phone_number || '-'}</td>
-             <td>${patient.address || '-'}</td>
-             <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
-             <td>
-               <span class="badge ${getStatusBadgeClass(patient.status)}">
-                 ${patient.status || 'Unknown'}
-               </span>
-             </td>
-             <td>
-               <span class="badge ${getHIVStatusBadgeClass(patient.hiv_status)}">
-                 ${patient.hiv_status || 'Unknown'}
-               </span>
-             </td>
-             <td>${patient.notes || '-'}</td>
-           </tr>
-         `).join('');
+        tableBody.innerHTML = pagePatients.map(patient => `
+          <tr>
+            <td>${patient.patient_no || '-'}</td>
+            <td>${patient.first_name || '-'} ${patient.last_name || '-'}</td>
+            <td>${patient.age || '-'}</td>
+            <td>${patient.gender || '-'}</td>
+            <td>${patient.phone_number || '-'}</td>
+            <td>${patient.address || '-'}</td>
+            <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
+            <td>
+              <span class="badge ${getStatusBadgeClass(patient.status)}">
+                ${patient.status || 'Unknown'}
+              </span>
+            </td>
+            <td>
+              <span class="badge ${getHIVStatusBadgeClass(patient.hiv_status)}">
+                ${patient.hiv_status || 'Unknown'}
+              </span>
+            </td>
+            <td>${patient.notes || '-'}</td>
+            <td>
+              <div class="btn-group btn-group-sm" role="group">
+                <button type="button" class="btn btn-sm btn-primary" title="Edit" onclick="editPatient('${patient.patient_no}')">
+                  <i class="ri-pencil-line"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deletePatient('${patient.patient_no}')">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
       }
 
       // Update pagination info and button states
@@ -1444,6 +1570,834 @@
           displayPatientPage();
           updatePatientPaginationInfo();
         }
+      };
+
+      // Edit patient - Wizard Form
+      window.editPatient = function(patientNo) {
+        const patient = allPatients.find(p => p.patient_no === patientNo);
+        if (!patient) {
+          Swal.fire({
+            title: 'Error',
+            text: 'Patient not found',
+            icon: 'error',
+            confirmButtonColor: '#15696B'
+          });
+          return;
+        }
+
+        let currentStep = 1;
+        const totalSteps = 7;
+
+        function showStep(step) {
+          for (let i = 1; i <= totalSteps; i++) {
+            const stepEl = document.getElementById(`edit-wizard-step-${i}`);
+            if (stepEl) stepEl.style.display = 'none';
+          }
+          
+          const currentStepEl = document.getElementById(`edit-wizard-step-${step}`);
+          if (currentStepEl) currentStepEl.style.display = 'block';
+
+          const progressBar = document.getElementById('edit-wizard-progress-bar');
+          if (progressBar) {
+            const progress = (step / totalSteps) * 100;
+            progressBar.style.width = progress + '%';
+          }
+
+          const stepIndicator = document.getElementById('edit-wizard-step-indicator');
+          if (stepIndicator) {
+            stepIndicator.textContent = `Step ${step} of ${totalSteps}`;
+          }
+
+          const prevBtn = document.getElementById('edit-wizard-prev-btn');
+          const nextBtn = document.getElementById('edit-wizard-next-btn');
+          const submitBtn = document.getElementById('edit-wizard-submit-btn');
+          
+          if (prevBtn) prevBtn.style.display = step > 1 ? 'block' : 'none';
+          if (nextBtn) nextBtn.style.display = step < totalSteps ? 'block' : 'none';
+          if (submitBtn) submitBtn.style.display = step === totalSteps ? 'block' : 'none';
+        }
+
+        const wizardHTML = `
+          <div style="text-align: left;">
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span id="edit-wizard-step-indicator" style="font-weight: bold; color: #15696B;">Step 1 of ${totalSteps}</span>
+                <span style="font-size: 12px; color: #666;">Edit Patient - Wizard</span>
+              </div>
+              <div style="width: 100%; height: 6px; background-color: #e0e0e0; border-radius: 3px; overflow: hidden;">
+                <div id="edit-wizard-progress-bar" style="height: 100%; background-color: #15696B; width: 14.28%; transition: width 0.3s ease;"></div>
+              </div>
+            </div>
+
+            <form id="editPatientWizardForm">
+              <div id="edit-wizard-step-1" style="display: block;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Personal Information</h5>
+                <div class="mb-3">
+                  <label class="form-label">Patient ID</label>
+                  <input type="text" class="form-control" value="${patient.patient_no || ''}" disabled>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">First Name</label>
+                  <input type="text" class="form-control" id="edit_first_name" value="${patient.first_name || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" class="form-control" id="edit_last_name" value="${patient.last_name || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="edit_email" value="${patient.email || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Phone Number</label>
+                  <input type="tel" class="form-control" id="edit_phone" value="${patient.phone_number || ''}">
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Age</label>
+                      <input type="number" class="form-control" id="edit_age" value="${patient.age || ''}">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Gender</label>
+                      <select class="form-control" id="edit_gender">
+                        <option value="Male" ${patient.gender === 'Male' ? 'selected' : ''}>Male</option>
+                        <option value="Female" ${patient.gender === 'Female' ? 'selected' : ''}>Female</option>
+                        <option value="Other" ${patient.gender === 'Other' ? 'selected' : ''}>Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Address</label>
+                  <input type="text" class="form-control" id="edit_address" value="${patient.address || ''}">
+                </div>
+              </div>
+
+              <div id="edit-wizard-step-2" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Clinical Status & Conditions</h5>
+                <div class="mb-3">
+                  <label class="form-label">Patient Status</label>
+                  <select class="form-control" id="edit_status">
+                    <option value="Active" ${patient.status === 'Active' ? 'selected' : ''}>Active</option>
+                    <option value="Inactive" ${patient.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                    <option value="Critical" ${patient.status === 'Critical' ? 'selected' : ''}>Critical</option>
+                    <option value="Alert" ${patient.status === 'Alert' ? 'selected' : ''}>Alert</option>
+                    <option value="Transferred" ${patient.status === 'Transferred' ? 'selected' : ''}>Transferred</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Primary Condition</label>
+                  <select class="form-control" id="edit_condition">
+                    <option value="">Select condition</option>
+                    <option value="HIV" ${patient.condition === 'HIV' ? 'selected' : ''}>HIV</option>
+                    <option value="Diabetes" ${patient.condition === 'Diabetes' ? 'selected' : ''}>Diabetes</option>
+                    <option value="Hypertension" ${patient.condition === 'Hypertension' ? 'selected' : ''}>Hypertension</option>
+                    <option value="TB" ${patient.condition === 'TB' ? 'selected' : ''}>TB</option>
+                    <option value="Cancer" ${patient.condition === 'Cancer' ? 'selected' : ''}>Cancer</option>
+                    <option value="Asthma" ${patient.condition === 'Asthma' ? 'selected' : ''}>Asthma</option>
+                    <option value="Heart Disease" ${patient.condition === 'Heart Disease' ? 'selected' : ''}>Heart Disease</option>
+                    <option value="Other" ${patient.condition === 'Other' ? 'selected' : ''}>Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">HIV Status</label>
+                  <select class="form-control" id="edit_hiv_status">
+                    <option value="Positive" ${patient.hiv_status === 'Positive' ? 'selected' : ''}>Positive</option>
+                    <option value="Negative" ${patient.hiv_status === 'Negative' ? 'selected' : ''}>Negative</option>
+                    <option value="Unknown" ${patient.hiv_status === 'Unknown' ? 'selected' : ''}>Unknown</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Patient Type</label>
+                  <select class="form-control" id="edit_patient_type">
+                    <option value="">Select patient type</option>
+                    <option value="New" ${patient.patient_type === 'New' ? 'selected' : ''}>New</option>
+                    <option value="Returning" ${patient.patient_type === 'Returning' ? 'selected' : ''}>Returning</option>
+                    <option value="Transferred" ${patient.patient_type === 'Transferred' ? 'selected' : ''}>Transferred In</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="edit-wizard-step-3" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Viral Load & HIV Monitoring</h5>
+                <div class="mb-3">
+                  <label class="form-label">Last Viral Load Date</label>
+                  <input type="date" class="form-control" id="edit_last_viral_load_date" value="${patient.last_viral_load_date || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Viral Load Copies</label>
+                  <input type="number" class="form-control" id="edit_viral_load_copies" value="${patient.viral_load_copies || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Viral Load Status</label>
+                  <select class="form-control" id="edit_viral_load_status">
+                    <option value="">Select status</option>
+                    <option value="Undetectable" ${patient.viral_load_status === 'Undetectable' ? 'selected' : ''}>Undetectable</option>
+                    <option value="Detectable" ${patient.viral_load_status === 'Detectable' ? 'selected' : ''}>Detectable</option>
+                    <option value="Not Done" ${patient.viral_load_status === 'Not Done' ? 'selected' : ''}>Not Done</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="edit-wizard-step-4" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Vital Signs</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Systolic (mmHg)</label>
+                      <input type="number" class="form-control" id="edit_systolic" value="${patient.systolic || ''}">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Diastolic (mmHg)</label>
+                      <input type="number" class="form-control" id="edit_diastolic" value="${patient.diastolic || ''}">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Blood Pressure (Text)</label>
+                  <input type="text" class="form-control" id="edit_blood_pressure" value="${patient.blood_pressure || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Glucose Level (mg/dL)</label>
+                  <input type="number" step="0.1" class="form-control" id="edit_glucose_level" value="${patient.glucose_level || ''}">
+                </div>
+              </div>
+
+              <div id="edit-wizard-step-5" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">HIV Treatment</h5>
+                <div class="mb-3">
+                  <label class="form-label">HIV Regimen</label>
+                  <select class="form-control" id="edit_hiv_regimen">
+                    <option value="">Select regimen</option>
+                    <option value="TDF/FTC/EFV" ${patient.hiv_regimen === 'TDF/FTC/EFV' ? 'selected' : ''}>TDF/FTC/EFV (First-line)</option>
+                    <option value="TDF/FTC/DTG" ${patient.hiv_regimen === 'TDF/FTC/DTG' ? 'selected' : ''}>TDF/FTC/DTG (First-line)</option>
+                    <option value="AZT/3TC/EFV" ${patient.hiv_regimen === 'AZT/3TC/EFV' ? 'selected' : ''}>AZT/3TC/EFV (First-line)</option>
+                    <option value="TDF/FTC/LPV/r" ${patient.hiv_regimen === 'TDF/FTC/LPV/r' ? 'selected' : ''}>TDF/FTC/LPV/r (Second-line)</option>
+                    <option value="AZT/3TC/LPV/r" ${patient.hiv_regimen === 'AZT/3TC/LPV/r' ? 'selected' : ''}>AZT/3TC/LPV/r (Second-line)</option>
+                    <option value="TDF/FTC/DTG/LPV/r" ${patient.hiv_regimen === 'TDF/FTC/DTG/LPV/r' ? 'selected' : ''}>TDF/FTC/DTG/LPV/r (Second-line)</option>
+                    <option value="Other" ${patient.hiv_regimen === 'Other' ? 'selected' : ''}>Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Regimen Start Date</label>
+                  <input type="date" class="form-control" id="edit_regimen_start_date" value="${patient.regimen_start_date || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Regimen Status</label>
+                  <select class="form-control" id="edit_regimen_status">
+                    <option value="">Select status</option>
+                    <option value="Active" ${patient.regimen_status === 'Active' ? 'selected' : ''}>Active</option>
+                    <option value="Changed" ${patient.regimen_status === 'Changed' ? 'selected' : ''}>Changed</option>
+                    <option value="Stopped" ${patient.regimen_status === 'Stopped' ? 'selected' : ''}>Stopped</option>
+                    <option value="Not Started" ${patient.regimen_status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Appointment Type</label>
+                  <select class="form-control" id="edit_appointment_type">
+                    <option value="">Select type</option>
+                    <option value="General" ${patient.appointment_type === 'General' ? 'selected' : ''}>General</option>
+                    <option value="Follow-up" ${patient.appointment_type === 'Follow-up' ? 'selected' : ''}>Follow-up</option>
+                    <option value="Lab Test" ${patient.appointment_type === 'Lab Test' ? 'selected' : ''}>Lab Test</option>
+                    <option value="Counseling" ${patient.appointment_type === 'Counseling' ? 'selected' : ''}>Counseling</option>
+                  </select>
+                </div>
+              </div>
+
+              <div id="edit-wizard-step-6" style="display: none;">
+                 <h5 style="color: #15696B; margin-bottom: 15px;">Important Dates</h5>
+                <div class="mb-3">
+                  <label class="form-label">Patient Registration Date</label>
+                  <input type="date" class="form-control" id="edit_patient_registration_date" value="${patient.patient_registration_date || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">ART Start Date</label>
+                  <input type="date" class="form-control" id="edit_art_start_date" value="${patient.art_start_date || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Last Visit Date</label>
+                  <input type="date" class="form-control" id="edit_visist_date" value="${patient.visist_date || ''}">
+                </div>
+              </div>
+
+              <div id="edit-wizard-step-7" style="display: none;">
+                 <h5 style="color: #15696B; margin-bottom: 15px;">Appointments & Clinical Notes</h5>
+                <div class="mb-3">
+                  <label class="form-label">Next Appointment Date</label>
+                  <input type="date" class="form-control" id="edit_next_appointment" value="${patient.next_appointment || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Appointment Time</label>
+                  <input type="time" class="form-control" id="edit_appointment_time" value="${patient.appointment_time || ''}">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Clinical Note</label>
+                  <textarea class="form-control" id="edit_clinical_note" rows="3">${patient.clinical_note || ''}</textarea>
+                </div>
+                </div>
+            </form>
+          </div>
+        `;
+
+        Swal.fire({
+          title: 'Edit Patient',
+          html: wizardHTML,
+          didOpen: () => {
+            showStep(1);
+            // Initialize Select2 and Air Datepicker
+            setTimeout(() => {
+              initializeSelect2AndDatePicker();
+            }, 100);
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Next',
+          confirmButtonColor: '#15696B',
+          cancelButtonColor: '#6c757d',
+          width: '650px',
+          allowOutsideClick: false,
+          willClose: () => {
+            currentStep = 1;
+          }
+        });
+
+        setTimeout(() => {
+          const footer = document.querySelector('.swal2-actions');
+          if (footer) {
+            footer.innerHTML = `
+              <button id="edit-wizard-prev-btn" class="btn btn-secondary" style="display: none; margin-right: 10px;">Previous</button>
+              <button id="edit-wizard-next-btn" class="btn btn-primary" style="background-color: #15696B; border-color: #15696B;">Next</button>
+              <button id="edit-wizard-submit-btn" class="btn btn-success" style="display: none;">Update Patient</button>
+              <button class="btn btn-outline-secondary" onclick="Swal.close()">Cancel</button>
+            `;
+
+            document.getElementById('edit-wizard-prev-btn').addEventListener('click', () => {
+              if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+              }
+            });
+
+            document.getElementById('edit-wizard-next-btn').addEventListener('click', () => {
+              if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+              }
+            });
+
+            document.getElementById('edit-wizard-submit-btn').addEventListener('click', async () => {
+              const updatedData = {
+                first_name: document.getElementById('edit_first_name').value,
+                last_name: document.getElementById('edit_last_name').value,
+                email: document.getElementById('edit_email').value || null,
+                age: parseInt(document.getElementById('edit_age').value) || null,
+                gender: document.getElementById('edit_gender').value,
+                phone_number: document.getElementById('edit_phone').value || null,
+                address: document.getElementById('edit_address').value || null,
+                status: document.getElementById('edit_status').value,
+                condition: document.getElementById('edit_condition').value || null,
+                hiv_status: document.getElementById('edit_hiv_status').value,
+                patient_type: document.getElementById('edit_patient_type').value || null,
+                last_viral_load_date: document.getElementById('edit_last_viral_load_date').value || null,
+                viral_load_copies: parseInt(document.getElementById('edit_viral_load_copies').value) || null,
+                viral_load_status: document.getElementById('edit_viral_load_status').value || null,
+                systolic: document.getElementById('edit_systolic').value ? parseInt(document.getElementById('edit_systolic').value) : null,
+                diastolic: document.getElementById('edit_diastolic').value ? parseInt(document.getElementById('edit_diastolic').value) : null,
+                blood_pressure: document.getElementById('edit_blood_pressure').value || null,
+                glucose_level: document.getElementById('edit_glucose_level').value ? parseFloat(document.getElementById('edit_glucose_level').value) : null,
+                hiv_regimen: document.getElementById('edit_hiv_regimen').value || null,
+                regimen_start_date: document.getElementById('edit_regimen_start_date').value || null,
+                regimen_status: document.getElementById('edit_regimen_status').value || null,
+                appointment_type: document.getElementById('edit_appointment_type').value || null,
+                patient_registration_date: document.getElementById('edit_patient_registration_date').value || null,
+                art_start_date: document.getElementById('edit_art_start_date').value || null,
+                visist_date: document.getElementById('edit_visist_date').value || null,
+                next_appointment: document.getElementById('edit_next_appointment').value || null,
+                appointment_time: document.getElementById('edit_appointment_time').value || null,
+                clinical_note: document.getElementById('edit_clinical_note').value || null
+                };
+
+              try {
+                const { error } = await supabaseClient
+                  .from('patients')
+                  .update(updatedData)
+                  .eq('patient_no', patientNo);
+
+                if (error) throw error;
+
+                Swal.fire({
+                  title: 'Success',
+                  text: 'Patient updated successfully',
+                  icon: 'success',
+                  confirmButtonColor: '#15696B'
+                });
+
+                const session = JSON.parse(localStorage.getItem('userSession'));
+                await fetchAndPopulatePatients(session);
+              } catch (error) {
+                Swal.fire({
+                  title: 'Error',
+                  text: `Failed to update patient: ${error.message}`,
+                  icon: 'error',
+                  confirmButtonColor: '#15696B'
+                });
+              }
+            });
+          }
+        }, 100);
+      };
+
+      // Delete patient
+      window.deletePatient = function(patientNo) {
+        Swal.fire({
+          title: 'Delete Patient',
+          text: `Are you sure you want to delete patient ${patientNo}? This action cannot be undone.`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete',
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d'
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const { error } = await supabaseClient
+                .from('patients')
+                .delete()
+                .eq('patient_no', patientNo);
+
+              if (error) throw error;
+
+              Swal.fire({
+                title: 'Deleted',
+                text: 'Patient has been deleted successfully',
+                icon: 'success',
+                confirmButtonColor: '#15696B'
+              });
+
+              // Refresh the table
+              const session = JSON.parse(localStorage.getItem('userSession'));
+              await fetchAndPopulatePatients(session);
+            } catch (error) {
+              Swal.fire({
+                title: 'Error',
+                text: `Failed to delete patient: ${error.message}`,
+                icon: 'error',
+                confirmButtonColor: '#15696B'
+              });
+            }
+          }
+        });
+      };
+
+      // Add new patient - Wizard Form
+      window.addNewPatient = function() {
+        let currentStep = 1;
+        const totalSteps = 7;
+
+        function showStep(step) {
+          // Hide all steps
+          for (let i = 1; i <= totalSteps; i++) {
+            const stepEl = document.getElementById(`wizard-step-${i}`);
+            if (stepEl) stepEl.style.display = 'none';
+          }
+          
+          // Show current step
+          const currentStepEl = document.getElementById(`wizard-step-${step}`);
+          if (currentStepEl) currentStepEl.style.display = 'block';
+
+          // Update progress bar
+          const progressBar = document.getElementById('wizard-progress-bar');
+          if (progressBar) {
+            const progress = (step / totalSteps) * 100;
+            progressBar.style.width = progress + '%';
+          }
+
+          // Update step indicator
+          const stepIndicator = document.getElementById('wizard-step-indicator');
+          if (stepIndicator) {
+            stepIndicator.textContent = `Step ${step} of ${totalSteps}`;
+          }
+
+          // Update button states
+          const prevBtn = document.getElementById('wizard-prev-btn');
+          const nextBtn = document.getElementById('wizard-next-btn');
+          const submitBtn = document.getElementById('wizard-submit-btn');
+          
+          if (prevBtn) prevBtn.style.display = step > 1 ? 'block' : 'none';
+          if (nextBtn) nextBtn.style.display = step < totalSteps ? 'block' : 'none';
+          if (submitBtn) submitBtn.style.display = step === totalSteps ? 'block' : 'none';
+        }
+
+        const wizardHTML = `
+          <div style="text-align: left;">
+            <!-- Progress Bar -->
+            <div style="margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span id="wizard-step-indicator" style="font-weight: bold; color: #15696B;">Step 1 of ${totalSteps}</span>
+                <span style="font-size: 12px; color: #666;">Patient Registration Wizard</span>
+              </div>
+              <div style="width: 100%; height: 6px; background-color: #e0e0e0; border-radius: 3px; overflow: hidden;">
+                <div id="wizard-progress-bar" style="height: 100%; background-color: #15696B; width: 14.28%; transition: width 0.3s ease;"></div>
+              </div>
+            </div>
+
+            <form id="addPatientWizardForm">
+              <!-- STEP 1: Personal Information -->
+              <div id="wizard-step-1" style="display: block;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Personal Information</h5>
+                <div class="mb-3">
+                  <label class="form-label">Patient ID *</label>
+                  <input type="text" class="form-control" id="add_patient_no" placeholder="e.g., PAT0001" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">First Name *</label>
+                  <input type="text" class="form-control" id="add_first_name" placeholder="Enter first name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Last Name *</label>
+                  <input type="text" class="form-control" id="add_last_name" placeholder="Enter last name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="add_email" placeholder="Enter email address">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Phone Number</label>
+                  <input type="tel" class="form-control" id="add_phone" placeholder="Enter phone number">
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Age</label>
+                      <input type="number" class="form-control" id="add_age" placeholder="Enter age">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Gender *</label>
+                      <select class="form-control" id="add_gender" required>
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Address</label>
+                  <input type="text" class="form-control" id="add_address" placeholder="Enter residential address">
+                </div>
+              </div>
+
+              <!-- STEP 2: Clinical Status -->
+              <div id="wizard-step-2" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Clinical Status & Conditions</h5>
+                <div class="mb-3">
+                  <label class="form-label">Patient Status *</label>
+                  <select class="form-control" id="add_status" required>
+                    <option value="">Select status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Critical">Critical</option>
+                    <option value="Alert">Alert</option>
+                    <option value="Transferred">Transferred</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Primary Condition</label>
+                  <select class="form-control" id="add_condition">
+                    <option value="">Select condition</option>
+                    <option value="HIV">HIV</option>
+                    <option value="Diabetes">Diabetes</option>
+                    <option value="Hypertension">Hypertension</option>
+                    <option value="TB">TB</option>
+                    <option value="Cancer">Cancer</option>
+                    <option value="Asthma">Asthma</option>
+                    <option value="Heart Disease">Heart Disease</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">HIV Status *</label>
+                  <select class="form-control" id="add_hiv_status" required>
+                    <option value="">Select HIV Status</option>
+                    <option value="Positive">Positive</option>
+                    <option value="Negative">Negative</option>
+                    <option value="Unknown">Unknown</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Patient Type</label>
+                  <select class="form-control" id="add_patient_type">
+                    <option value="">Select patient type</option>
+                    <option value="New">New</option>
+                    <option value="Returning">Returning</option>
+                    <option value="Transferred">Transferred In</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- STEP 3: Viral Load & HIV Monitoring -->
+              <div id="wizard-step-3" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Viral Load & HIV Monitoring</h5>
+                <div class="mb-3">
+                  <label class="form-label">Last Viral Load Date</label>
+                  <input type="date" class="form-control" id="add_last_viral_load_date">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Viral Load Copies</label>
+                  <input type="number" class="form-control" id="add_viral_load_copies" placeholder="Enter viral load count">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Viral Load Status</label>
+                  <select class="form-control" id="add_viral_load_status">
+                    <option value="">Select status</option>
+                    <option value="Undetectable">Undetectable</option>
+                    <option value="Detectable">Detectable</option>
+                    <option value="Not Done">Not Done</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- STEP 4: NCD Management -->
+              <div id="wizard-step-4" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Vital Signs</h5>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Systolic (mmHg)</label>
+                      <input type="number" class="form-control" id="add_systolic" placeholder="e.g., 120">
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label class="form-label">Diastolic (mmHg)</label>
+                      <input type="number" class="form-control" id="add_diastolic" placeholder="e.g., 80">
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Blood Pressure (Text)</label>
+                  <input type="text" class="form-control" id="add_blood_pressure" placeholder="e.g., 120/80">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Glucose Level (mg/dL)</label>
+                  <input type="number" step="0.1" class="form-control" id="add_glucose_level" placeholder="Enter glucose level">
+                </div>
+              </div>
+
+              <!-- STEP 5: HIV Treatment Regimen -->
+              <div id="wizard-step-5" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">HIV Treatment</h5>
+                <div class="mb-3">
+                  <label class="form-label">HIV Regimen</label>
+                  <select class="form-control" id="add_hiv_regimen">
+                    <option value="">Select regimen</option>
+                    <option value="TDF/FTC/EFV">TDF/FTC/EFV (First-line)</option>
+                    <option value="TDF/FTC/DTG">TDF/FTC/DTG (First-line)</option>
+                    <option value="AZT/3TC/EFV">AZT/3TC/EFV (First-line)</option>
+                    <option value="TDF/FTC/LPV/r">TDF/FTC/LPV/r (Second-line)</option>
+                    <option value="AZT/3TC/LPV/r">AZT/3TC/LPV/r (Second-line)</option>
+                    <option value="TDF/FTC/DTG/LPV/r">TDF/FTC/DTG/LPV/r (Second-line)</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Regimen Start Date</label>
+                  <input type="date" class="form-control" id="add_regimen_start_date">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Regimen Status</label>
+                  <select class="form-control" id="add_regimen_status">
+                    <option value="">Select status</option>
+                    <option value="Active">Active</option>
+                    <option value="Changed">Changed</option>
+                    <option value="Stopped">Stopped</option>
+                    <option value="Not Started">Not Started</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Appointment Type</label>
+                  <select class="form-control" id="add_appointment_type">
+                    <option value="">Select type</option>
+                    <option value="General">General</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Lab Test">Lab Test</option>
+                    <option value="Counseling">Counseling</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- STEP 6: Important Dates -->
+              <div id="wizard-step-6" style="display: none;">
+                <h5 style="color: #15696B; margin-bottom: 15px;">Important Dates</h5>
+                <div class="mb-3">
+                  <label class="form-label">Patient Registration Date</label>
+                  <input type="date" class="form-control" id="add_patient_registration_date">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">ART Start Date</label>
+                  <input type="date" class="form-control" id="add_art_start_date">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Last Visit Date</label>
+                  <input type="date" class="form-control" id="add_visist_date">
+                </div>
+              </div>
+
+              <!-- STEP 7: Appointments & Notes -->
+              <div id="wizard-step-7" style="display: none;">
+                 <h5 style="color: #15696B; margin-bottom: 15px;">Appointments & Clinical Notes</h5>
+                <div class="mb-3">
+                  <label class="form-label">Next Appointment Date</label>
+                  <input type="date" class="form-control" id="add_next_appointment">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Appointment Time</label>
+                  <input type="time" class="form-control" id="add_appointment_time">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Clinical Note</label>
+                  <textarea class="form-control" id="add_clinical_note" rows="3" placeholder="Enter detailed clinical notes"></textarea>
+                </div>
+                </div>
+            </form>
+          </div>
+        `;
+
+        Swal.fire({
+          title: 'Add New Patient',
+          html: wizardHTML,
+          didOpen: () => {
+            showStep(1);
+            // Set facility info from session
+            const session = JSON.parse(localStorage.getItem('userSession'));
+            const facilityEl = document.getElementById('add_facility_id_code');
+            if (facilityEl && session) {
+              facilityEl.value = session.facility_id_code || 'N/A';
+            }
+            // Initialize Select2 and Air Datepicker
+            setTimeout(() => {
+              initializeSelect2AndDatePicker();
+            }, 100);
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Next',
+          confirmButtonColor: '#15696B',
+          cancelButtonColor: '#6c757d',
+          width: '650px',
+          allowOutsideClick: false,
+          willClose: () => {
+            // Reset when modal closes
+            currentStep = 1;
+          }
+        });
+
+        // Add custom navigation buttons
+        setTimeout(() => {
+          const footer = document.querySelector('.swal2-actions');
+          if (footer) {
+            footer.innerHTML = `
+              <button id="wizard-prev-btn" class="btn btn-secondary" style="display: none; margin-right: 10px;">Previous</button>
+              <button id="wizard-next-btn" class="btn btn-primary" style="background-color: #15696B; border-color: #15696B;">Next</button>
+              <button id="wizard-submit-btn" class="btn btn-success" style="display: none;">Submit</button>
+              <button class="btn btn-outline-secondary" onclick="Swal.close()">Cancel</button>
+            `;
+
+            document.getElementById('wizard-prev-btn').addEventListener('click', () => {
+              if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                document.querySelector('.swal2-confirm').textContent = currentStep === totalSteps ? 'Submit' : 'Next';
+              }
+            });
+
+            document.getElementById('wizard-next-btn').addEventListener('click', () => {
+              if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+              }
+            });
+
+            document.getElementById('wizard-submit-btn').addEventListener('click', async () => {
+              const patientNo = document.getElementById('add_patient_no').value;
+              const firstName = document.getElementById('add_first_name').value;
+              const lastName = document.getElementById('add_last_name').value;
+              const gender = document.getElementById('add_gender').value;
+              const status = document.getElementById('add_status').value;
+              const hivStatus = document.getElementById('add_hiv_status').value;
+
+              if (!patientNo || !firstName || !lastName || !gender || !status || !hivStatus) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return;
+              }
+
+              const session = JSON.parse(localStorage.getItem('userSession'));
+              const newPatientData = {
+                patient_no: patientNo,
+                first_name: firstName,
+                last_name: lastName,
+                email: document.getElementById('add_email').value || null,
+                age: parseInt(document.getElementById('add_age').value) || null,
+                gender: gender,
+                phone_number: document.getElementById('add_phone').value || null,
+                address: document.getElementById('add_address').value || null,
+                status: status,
+                condition: document.getElementById('add_condition').value || null,
+                hiv_status: hivStatus,
+                patient_type: document.getElementById('add_patient_type').value || null,
+                last_viral_load_date: document.getElementById('add_last_viral_load_date').value || null,
+                viral_load_copies: parseInt(document.getElementById('add_viral_load_copies').value) || null,
+                viral_load_status: document.getElementById('add_viral_load_status').value || null,
+                systolic: document.getElementById('add_systolic').value ? parseInt(document.getElementById('add_systolic').value) : null,
+                diastolic: document.getElementById('add_diastolic').value ? parseInt(document.getElementById('add_diastolic').value) : null,
+                blood_pressure: document.getElementById('add_blood_pressure').value || null,
+                glucose_level: document.getElementById('add_glucose_level').value ? parseFloat(document.getElementById('add_glucose_level').value) : null,
+                hiv_regimen: document.getElementById('add_hiv_regimen').value || null,
+                regimen_start_date: document.getElementById('add_regimen_start_date').value || null,
+                regimen_status: document.getElementById('add_regimen_status').value || null,
+                appointment_type: document.getElementById('add_appointment_type').value || null,
+                patient_registration_date: document.getElementById('add_patient_registration_date').value || null,
+                art_start_date: document.getElementById('add_art_start_date').value || null,
+                visist_date: document.getElementById('add_visist_date').value || null,
+                next_appointment: document.getElementById('add_next_appointment').value || null,
+                appointment_time: document.getElementById('add_appointment_time').value || null,
+                clinical_note: document.getElementById('add_clinical_note').value || null,
+                fid: session.fid || session.facility_id
+              };
+
+              try {
+                const { error } = await supabaseClient
+                  .from('patients')
+                  .insert([newPatientData]);
+
+                if (error) throw error;
+
+                Swal.fire({
+                  title: 'Success',
+                  text: 'Patient added successfully',
+                  icon: 'success',
+                  confirmButtonColor: '#15696B'
+                });
+
+                const updatedSession = JSON.parse(localStorage.getItem('userSession'));
+                await fetchAndPopulatePatients(updatedSession);
+              } catch (error) {
+                Swal.fire({
+                  title: 'Error',
+                  text: `Failed to add patient: ${error.message}`,
+                  icon: 'error',
+                  confirmButtonColor: '#15696B'
+                });
+              }
+            });
+          }
+        }, 100);
       };
 
       // Get patient data for export
@@ -1730,6 +2684,60 @@
           }
         }
       });
+    </script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- Air Datepicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.4.0/air-datepicker.js"></script>
+    
+    <!-- Initialize Select2 and Air Datepicker -->
+    <script>
+      function initializeSelect2AndDatePicker() {
+        try {
+          // Initialize Select2 for all select elements
+          const selectElements = document.querySelectorAll('.swal2-html-container select.form-control');
+          selectElements.forEach(function(selectEl) {
+            const $select = jQuery(selectEl);
+            
+            // Destroy existing Select2 if it exists
+            if ($select.data('select2')) {
+              $select.select2('destroy');
+            }
+            
+            // Initialize Select2 with dropdown parent set to html-container
+            $select.select2({
+              width: '100%',
+              allowClear: false,
+              dropdownParent: jQuery('.swal2-html-container')
+            });
+          });
+
+          // Initialize Air Datepicker for all date inputs
+          const dateElements = document.querySelectorAll('.swal2-html-container input[type="date"]');
+          dateElements.forEach(function(dateEl) {
+            if (!dateEl.hasAttribute('data-datepicker-initialized')) {
+              try {
+                new AirDatepicker(dateEl, {
+                  isMobile: true,
+                  autoClose: true,
+                  position: 'bottom left',
+                  dateFormat: 'yyyy-MM-dd'
+                });
+                dateEl.setAttribute('data-datepicker-initialized', 'true');
+              } catch(e) {
+                console.log('AirDatepicker init info:', e.message);
+              }
+            }
+          });
+        } catch(error) {
+          console.log('Initialization info:', error);
+        }
+      }
+
+      // Make function globally accessible
+      window.initializeSelect2AndDatePicker = initializeSelect2AndDatePicker;
     </script>
   </body>
 

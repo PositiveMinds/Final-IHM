@@ -91,6 +91,6 @@ var options = {
   },
 };
 
-var chart = new ApexCharts(document.querySelector("#treatment"), options);
-
-chart.render();
+// Chart initialization removed - card only
+// var chart = new ApexCharts(document.querySelector("#treatment"), options);
+// chart.render();
