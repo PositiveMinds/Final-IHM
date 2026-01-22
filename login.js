@@ -89,22 +89,22 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         }
 
         // Store session data
-        const sessionData = {
-          id: users.uid,
-          email: users.email,
-          fullname: users.fullname || facilityName,
-          username: users.username,
-          facilityName: facilityName,
-          facility_id: facilityId || users.fid,
-          fid: users.fid,
-          facilityIdCode: users.facility_id,
-          facilityRegion: facilityRegion,
-          userRole: users.user_role,
-          isActive: users.is_active,
-          loginTime: new Date().toISOString(),
-        };
+         const sessionData = {
+           id: users.uid,
+           email: users.email,
+           fullname: users.fullname || facilityName,
+           username: users.username,
+           facilityName: facilityName,
+           facility_id: facilityId || users.fid,
+           fid: users.fid,
+           facilityIdCode: users.facility_id,
+           facilityRegion: facilityRegion,
+           userRole: users.user_role,
+           isActive: users.is_active,
+           loginTime: new Date().toISOString(),
+         };
 
-      localStorage.setItem("healthflow_session", JSON.stringify(sessionData));
+        localStorage.setItem("userSession", JSON.stringify(sessionData));
 
       if (rememberMe) {
         localStorage.setItem("healthflow_email", email);

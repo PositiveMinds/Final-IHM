@@ -1686,10 +1686,18 @@
       // Function to generate unique Patient ID
       window.generatePatientID = async function() {
         try {
-          // Get the highest patient number from the database
+          // Get facility name from session
+          const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+          const facilityName = session.facilityName || session.facility_name || 'FAC';
+          
+          // Get first 3 letters of facility name in uppercase
+          const facilityPrefix = facilityName.substring(0, 3).toUpperCase();
+          
+          // Get the highest patient number from the database for this facility
           const { data: patients, error } = await supabaseClient
             .from('patients')
             .select('patient_no')
+            .like('patient_no', 'PAT-' + facilityPrefix + '%')
             .order('patient_no', { ascending: false })
             .limit(1);
           
@@ -1698,15 +1706,19 @@
           let nextNumber = 1001;
           if (patients && patients.length > 0) {
             const lastPatientNo = patients[0].patient_no;
-            const lastNumber = parseInt(lastPatientNo.replace('PAT', '')) || 1000;
+            // Extract number from patient ID (e.g., "PAT-KIT 1005" -> 1005)
+            const lastNumber = parseInt(lastPatientNo.replace(/PAT-[A-Z]+\s/, '')) || 1000;
             nextNumber = lastNumber + 1;
           }
           
-          return 'PAT' + nextNumber;
+          return 'PAT-' + facilityPrefix + ' ' + nextNumber;
         } catch (error) {
           console.error('Error generating Patient ID:', error);
           // Fallback: generate with timestamp
-          return 'PAT' + (1000 + Math.floor(Math.random() * 9000));
+          const session = JSON.parse(localStorage.getItem('userSession') || '{}');
+          const facilityName = session.facilityName || session.facility_name || 'FAC';
+          const facilityPrefix = facilityName.substring(0, 3).toUpperCase();
+          return 'PAT-' + facilityPrefix + ' ' + (1000 + Math.floor(Math.random() * 9000));
         }
       };
 
