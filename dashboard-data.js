@@ -250,6 +250,39 @@ async function loadViralLoadData() {
     }
 }
 
+// Fetch total appointments count
+async function loadTotalAppointments() {
+    try {
+        const session = JSON.parse(localStorage.getItem('healthflow_session'));
+        if (!session) return;
+
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+
+        // Count all patients (each patient has an appointment record/status)
+        let query = supabaseClient
+            .from('patients')
+            .select('*', { count: 'exact', head: true });
+        
+        if (numericFacilityId) {
+            query = query.eq('fid', numericFacilityId);
+        }
+
+        const { count: totalAppointments, error } = await query;
+
+        if (error) throw error;
+
+        // Update the appointments card
+        const appointmentsCard = document.getElementById('totalAppointmentsCount');
+        if (appointmentsCard) {
+            appointmentsCard.textContent = totalAppointments || 0;
+        }
+
+        console.log('Total appointments loaded:', totalAppointments);
+    } catch (error) {
+        console.error('Error loading total appointments:', error);
+    }
+}
+
 // Fetch chronic conditions data from patients table
 async function loadChronicConditionsData() {
     try {
@@ -486,6 +519,7 @@ async function loadPatientChart() {
 // Load all dashboard data on page load
 function initializeDashboardData() {
     loadDashboardStats();
+    loadTotalAppointments();
     loadRecentPatients();
     loadRecentAppointments();
     loadViralLoadData();

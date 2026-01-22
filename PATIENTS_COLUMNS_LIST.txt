@@ -1,0 +1,132 @@
+PATIENTS TABLE - COMPLETE COLUMN LIST
+=====================================
+
+From: sample_facilities_and_patients_fixed.sql (Line 23)
+
+Total Columns: 32
+
+1. pid (PATIENT ID - e.g., PAT0001, PAT1233)
+2. first_name
+3. last_name
+4. age
+5. gender
+6. phone_number
+7. email
+8. facility_id_code (FACILITY CODE - e.g., FAC001, FAC002)
+9. status
+10. registered_date
+11. notes
+12. created_at
+13. updated_at
+14. fid (FACILITY ID - numeric foreign key)
+15. address
+16. major_condition
+17. viral_load_copies
+18. viral_load_status
+19. visist_date
+20. next_appointment
+21. appointment_time
+22. facility_phone
+23. facility_email
+24. health_worker_name
+25. health_worker_role
+26. clinical_note
+27. patient_registration_date
+28. art_start_date
+
+ADDITIONAL FIELDS FROM MIGRATIONS:
+29. condition (added via ALTER TABLE)
+30. hiv_status (added via ALTER TABLE - ALTER_TABLE_ADD_HIV_STATUS.sql)
+31. last_viral_load_date (added via ALTER TABLE - ALTER_TABLE_ADD_LAST_VIRAL_LOAD_DATE.sql)
+32. ncd_conditions (added via ALTER TABLE - mentioned in migrations)
+33. blood_pressure (added via ALTER TABLE - mentioned in migrations)
+34. patient_type (added via ALTER TABLE - mentioned in migrations)
+35. glucose_level (added via ALTER TABLE - mentioned in migrations)
+
+TOTAL WITH MIGRATIONS: 35 columns
+
+=====================================
+KEY FIELD CLARIFICATIONS
+=====================================
+
+✓ CONFIRMED: patient_no and facility_id_code are DIFFERENT
+- patient_no (mapped to: pid) = Unique patient identifier (e.g., PAT0001, PAT1233)
+- facility_id_code = Facility identifier code (e.g., FAC001, FAC002)
+- fid = Facility foreign key (numeric ID: 1, 2, 3, 4)
+
+=====================================
+MAPPING TO CURRENT FORM FIELDS
+=====================================
+
+FORM SECTION: Patient Identification
+- patient_no (column: pid) ✓
+- first_name ✓
+- last_name ✓
+
+FORM SECTION: Demographics
+- age ✓
+- gender ✓
+- phone_number ✓
+- address ✓
+
+FORM SECTION: Clinical Information
+- condition ✓ (from migrations)
+- hiv_status ✓ (from migrations)
+- last_viral_load_date ✓ (from migrations)
+
+FORM SECTION: NCD
+- ncd_conditions ✓ (from migrations)
+- blood_pressure ✓ (from migrations)
+- glucose_level ✓ (from migrations)
+
+FORM SECTION: Current Status
+- status ✓
+
+FORM SECTION: Additional Information
+- notes ✓
+
+=====================================
+FIELDS IN DATABASE BUT NOT IN FORM
+=====================================
+
+- pid (auto-increment ID)
+- email
+- facility_id_code
+- registered_date
+- created_at
+- updated_at
+- fid (facility ID - foreign key)
+- major_condition
+- viral_load_copies
+- viral_load_status
+- visist_date (typo: should be visit_date)
+- next_appointment
+- appointment_time
+- facility_phone
+- facility_email
+- health_worker_name
+- health_worker_role
+- clinical_note (separate from notes)
+- patient_registration_date
+- art_start_date
+
+=====================================
+QUESTIONS TO CLARIFY
+=====================================
+
+1. Is "patient_no" the same as "facility_id_code"?
+   - Sample shows: facility_id_code = 'FAC001'
+   - But we use patient_no = 'PAT0001' in forms
+   
+2. Should we add these to the form?
+   - email
+   - facility_id_code / patient_no
+   - health_worker_name
+   - health_worker_role
+   - art_start_date
+   - patient_registration_date
+   - appointment_time
+   - next_appointment
+   - clinical_note (vs notes)
+   - facility contact info
+

@@ -78,5 +78,6 @@ var options = {
     "#116AEF", "#327FF2", "#5394F5", "#75AAF9", "#96BFFC", "#B7D4FF"
   ],
 };
-var chart = new ApexCharts(document.querySelector("#claims"), options);
-chart.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart = new ApexCharts(document.querySelector("#claims"), options);
+// chart.render();

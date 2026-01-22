@@ -16,5 +16,6 @@ var options = {
   },
   colors: ["#116AEF", "#0ebb13", "#ff5a39", "#3e3e42", "#75C2F6"],
 };
-var chart = new ApexCharts(document.querySelector("#genderAge"), options);
-chart.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart = new ApexCharts(document.querySelector("#genderAge"), options);
+// chart.render();

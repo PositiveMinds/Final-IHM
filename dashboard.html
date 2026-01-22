@@ -37,6 +37,67 @@
         --bs-link-color: var(--logo-flow);
         --bs-link-hover-color: #0F4449;
       }
+
+      /* Fix SweetAlert2 input interaction - AGGRESSIVE */
+      .swal2-popup {
+        pointer-events: auto !important;
+      }
+
+      .swal2-html-container {
+        pointer-events: auto !important;
+      }
+
+      .swal2-html-container * {
+        pointer-events: auto !important;
+      }
+
+      .swal2-html-container input,
+      .swal2-html-container select,
+      .swal2-html-container textarea,
+      input#editFullname,
+      input#editEmail,
+      select#editRole,
+      input#editActive {
+        pointer-events: auto !important;
+        cursor: text !important;
+        user-select: text !important;
+        -webkit-user-select: text !important;
+        position: relative !important;
+        z-index: 1060 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        display: block !important;
+      }
+
+      input#editFullname:focus,
+      input#editEmail:focus,
+      select#editRole:focus,
+      input#editActive:focus {
+        outline: 2px solid #15696B !important;
+        outline-offset: 2px !important;
+      }
+
+      .swal2-html-container input[type="checkbox"],
+      .swal2-html-container input[type="radio"],
+      input#editActive {
+        cursor: pointer !important;
+        width: 18px !important;
+        height: 18px !important;
+      }
+
+      .swal2-modal {
+        pointer-events: auto !important;
+        z-index: 1050 !important;
+      }
+
+      .swal2-backdrop {
+        z-index: 1049 !important;
+      }
+
+      .swal2-icon,
+      .swal2-loader {
+        pointer-events: none !important;
+      }
       
       .app-header {
          background-color: white !important;
@@ -202,6 +263,108 @@
       
       .air-datepicker-input {
         width: 100%;
+      }
+      
+      /* Modal Table No Wrap */
+      #statDetailModal .table td,
+      #statDetailModal .table th {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Spinner Animation */
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* SweetAlert2 Modal Z-Index Fix - Highest Priority */
+      .swal2-container.swal2-shown {
+        z-index: 99999 !important;
+      }
+
+      .swal2-container {
+        z-index: 99999 !important;
+        position: fixed !important;
+      }
+
+      .swal2-backdrop {
+        z-index: 99998 !important;
+      }
+
+      .swal2-popup {
+        z-index: 100000 !important;
+        position: fixed !important;
+      }
+
+      .swal2-popup * {
+        pointer-events: auto !important;
+      }
+
+      /* User Management Modal - Lower Z-Index */
+      .modal#userManagementModal {
+        z-index: 1050 !important;
+      }
+
+      .modal-backdrop {
+        z-index: 1049 !important;
+      }
+
+      /* SweetAlert2 Form Input Fix */
+      .swal2-html-container {
+        overflow: visible !important;
+        pointer-events: auto !important;
+      }
+
+      .swal2-html-container input,
+      .swal2-html-container select,
+      .swal2-html-container textarea {
+        width: 100% !important;
+        padding: 0.5rem 0.75rem !important;
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+        font-size: 1rem !important;
+        color: #495057 !important;
+        background-color: #fff !important;
+        margin-bottom: 0.5rem !important;
+        pointer-events: auto !important;
+        cursor: text !important;
+        position: relative !important;
+        z-index: 10 !important;
+      }
+
+      .swal2-html-container input:focus,
+      .swal2-html-container select:focus,
+      .swal2-html-container textarea:focus {
+        outline: none !important;
+        border-color: #15696B !important;
+        box-shadow: 0 0 0 0.2rem rgba(21, 105, 107, 0.25) !important;
+      }
+
+      .swal2-html-container label {
+        display: block !important;
+        margin-bottom: 0.3rem !important;
+        font-weight: 500 !important;
+        font-size: 0.9rem !important;
+        color: #333 !important;
+        pointer-events: auto !important;
+      }
+
+      .swal2-html-container .form-check-label {
+        display: flex !important;
+        align-items: center !important;
+        margin-bottom: 0.5rem !important;
+        font-weight: normal !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+      }
+
+      .swal2-html-container .form-check-label input {
+        width: auto !important;
+        margin-right: 0.5rem !important;
+        margin-bottom: 0 !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
       }
       
       /* Wizard Form Button Styling */
@@ -769,7 +932,7 @@
                 </a>
                 <ul class="treeview-menu">
                   <li>
-                    <a href="#">Income</a>
+                    <a href="#!" onclick="openUserManagementModal()">Users</a>
                   </li>
                   <li>
                     <a href="#">Payments</a>
@@ -1029,88 +1192,101 @@
             <!-- Row starts -->
             <div class="row gx-3">
               <div class="col-xl-2 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex flex-column align-items-center">
-                      <div class="icon-box md rounded-5 bg-primary mb-3">
-                        <i class="ri-verified-badge-line fs-4 lh-1"></i>
+                <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#statDetailModal" onclick="openStatDetail('all-appointments', this)">
+                  <div class="card mb-3" style="cursor: pointer;">
+                    <div class="card-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="icon-box md rounded-5 bg-primary mb-3">
+                          <i class="ri-verified-badge-line fs-4 lh-1"></i>
+                        </div>
+                        <h6>Appointments</h6>
+                        <h2 class="text-primary m-0" id="totalAppointmentsCount">0</h2>
                       </div>
-                      <h6>Appointments</h6>
-                      <h2 class="text-primary m-0" id="totalAppointmentsCount">0</h2>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
               <div class="col-xl-2 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex flex-column align-items-center">
-                      <div class="icon-box md rounded-5 bg-primary mb-3">
-                        <i class="ri-stethoscope-line fs-4 lh-1"></i>
+                <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#statDetailModal" onclick="openStatDetail('next-week', this)">
+                  <div class="card mb-3" style="cursor: pointer;">
+                    <div class="card-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="icon-box md rounded-5 bg-success mb-3">
+                          <i class="ri-calendar-event-line fs-4 lh-1"></i>
+                        </div>
+                        <h6>Next Week</h6>
+                        <h2 class="text-success m-0" id="nextWeekAppointmentsCount">0</h2>
                       </div>
-                      <h6>Doctors</h6>
-                      <h2 class="text-primary m-0">83</h2>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
               <div class="col-xl-2 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex flex-column align-items-center">
-                      <div class="icon-box md rounded-5 bg-primary mb-3">
-                        <i class="ri-psychotherapy-line fs-4 lh-1"></i>
+                <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#statDetailModal" onclick="openStatDetail('overdue', this)">
+                  <div class="card mb-3" style="cursor: pointer;">
+                    <div class="card-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="icon-box md rounded-5 bg-danger mb-3">
+                          <i class="ri-time-line fs-4 lh-1"></i>
+                        </div>
+                        <h6>Overdue</h6>
+                        <h2 class="text-danger m-0" id="overdueAppointmentsCount">0</h2>
                       </div>
-                      <h6>Staff</h6>
-                      <h2 class="text-primary m-0">296</h2>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
               <div class="col-xl-2 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex flex-column align-items-center">
-                      <div class="icon-box md rounded-5 bg-primary mb-3">
-                        <i class="ri-lungs-line fs-4 lh-1"></i>
+                <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#statDetailModal" onclick="openStatDetail('missed', this)">
+                  <div class="card mb-3" style="cursor: pointer;">
+                    <div class="card-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="icon-box md rounded-5 bg-warning mb-3">
+                          <i class="ri-close-circle-line fs-4 lh-1"></i>
+                        </div>
+                        <h6>Missed</h6>
+                        <h2 class="text-warning m-0" id="missedAppointmentsCount">0</h2>
                       </div>
-                      <h6>Operations</h6>
-                      <h2 class="text-primary m-0">49</h2>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
               <div class="col-xl-2 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex flex-column align-items-center">
-                      <div class="icon-box md rounded-5 bg-primary mb-3">
-                        <i class="ri-hotel-bed-line fs-4 lh-1"></i>
+                <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#statDetailModal" onclick="openStatDetail('high-viral', this)">
+                  <div class="card mb-3" style="cursor: pointer;">
+                    <div class="card-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="icon-box md rounded-5 bg-danger mb-3">
+                          <i class="ri-alert-line fs-4 lh-1"></i>
+                        </div>
+                        <h6>High Viraemia</h6>
+                        <h2 class="text-danger m-0" id="highViraemiaCount">0</h2>
                       </div>
-                      <h6>Admitted</h6>
-                      <h2 class="text-primary m-0">372</h2>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
               <div class="col-xl-2 col-sm-6 col-12">
-                <div class="card mb-3">
-                  <div class="card-body">
-                    <div class="d-flex flex-column align-items-center">
-                      <div class="icon-box md rounded-5 bg-primary mb-3">
-                        <i class="ri-walk-line fs-4 lh-1"></i>
+                <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start" data-bs-toggle="modal" data-bs-target="#statDetailModal" onclick="openStatDetail('low-viral', this)">
+                  <div class="card mb-3" style="cursor: pointer;">
+                    <div class="card-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <div class="icon-box md rounded-5 bg-info mb-3">
+                          <i class="ri-lungs-line fs-4 lh-1"></i>
+                        </div>
+                        <h6>Low Viraemia</h6>
+                        <h2 class="text-info m-0" id="lowViraemiaCount">0</h2>
                       </div>
-                      <h6>Discharged</h6>
-                      <h2 class="text-primary m-0">253</h2>
                     </div>
                   </div>
-                </div>
+                </button>
               </div>
+
             </div>
             <!-- Row ends -->
 
             <!-- Row starts -->
-            <div class="row gx-3">
+            <div class="row gx-3" id="patientsTable">
               <div class="col-xxl-12 col-sm-12">
                 <div class="card mb-3">
                   <div class="card-header">
@@ -1334,6 +1510,90 @@
             </div>
             <!-- Row ends -->
 
+            <!-- Patient Medical History & Appointments Section -->
+            <div class="row gx-3" id="patient-records" style="display: none;">
+              <div class="col-12">
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <h5 class="card-title mb-0">
+                      <i class="ri-file-medical-line me-2"></i>Patient Medical History & Appointments
+                    </h5>
+                    <small class="text-muted d-block mt-2">Click "View Details" button on any patient in the table above to display their information</small>
+                  </div>
+                  <div class="card-body">
+                    <!-- Tabs for Medical History and Appointments -->
+                    <ul class="nav nav-tabs mb-4" role="tablist">
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="medical-history-tab" data-bs-toggle="tab" data-bs-target="#medical-history-content" type="button" role="tab" aria-controls="medical-history-content" aria-selected="true">
+                          <i class="ri-file-text-line me-2"></i>Medical History
+                        </button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments-content" type="button" role="tab" aria-controls="appointments-content" aria-selected="false">
+                          <i class="ri-calendar-line me-2"></i>Appointments
+                        </button>
+                      </li>
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="clinical-notes-tab" data-bs-toggle="tab" data-bs-target="#clinical-notes-content" type="button" role="tab" aria-controls="clinical-notes-content" aria-selected="false">
+                          <i class="ri-note-line me-2"></i>Clinical Notes
+                        </button>
+                      </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                      <!-- Medical History Tab -->
+                      <div class="tab-pane fade show active" id="medical-history-content" role="tabpanel" aria-labelledby="medical-history-tab">
+                        <div id="medicalHistoryContent">
+                          <p class="text-muted text-center py-5">
+                            <i class="ri-eye-line me-2" style="font-size: 2rem;"></i><br>
+                            Click the <strong>View Details</strong> button on any patient in the table above
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Appointments Tab -->
+                      <div class="tab-pane fade" id="appointments-content" role="tabpanel" aria-labelledby="appointments-tab">
+                        <div id="appointmentsContent">
+                          <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="appointmentsTable">
+                              <thead class="table-light">
+                                <tr>
+                                  <th>Patient Name</th>
+                                  <th>Appointment Date</th>
+                                  <th>Time</th>
+                                  <th>Status</th>
+                                  <th>Type</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody id="appointmentsTableBody">
+                                <tr>
+                                  <td colspan="6" class="text-center text-muted py-4">
+                                    No appointments scheduled
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Clinical Notes Tab -->
+                      <div class="tab-pane fade" id="clinical-notes-content" role="tabpanel" aria-labelledby="clinical-notes-tab">
+                        <div id="clinicalNotesContent">
+                          <p class="text-muted text-center py-4">
+                            <i class="ri-file-text-line me-2"></i>Select a patient to view clinical notes
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Patient Medical History & Appointments Section Ends -->
+
           </div>
           <!-- App body ends -->
 
@@ -1352,6 +1612,140 @@
     </div>
     <!-- Page wrapper ends -->
 
+    <!-- Stat Detail Modal -->
+    <div class="modal fade" id="statDetailModal" tabindex="-1" aria-labelledby="statDetailModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="statDetailModalLabel">Detail View</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="statDetailContent">
+              <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-sm btn-outline-success" id="exportExcelBtn" onclick="exportStatToExcel()">
+                <i class="ri-file-excel-line me-1"></i>Export Excel
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" id="exportPdfBtn" onclick="exportStatToPdf()">
+                <i class="ri-file-pdf-line me-1"></i>Export PDF
+              </button>
+            </div>
+            <div class="d-flex gap-2 ms-auto">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" id="viewAllBtn" onclick="viewAllInTable()">View All in Table</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Management Modal -->
+    <div class="modal fade" id="userManagementModal" tabindex="-1" aria-labelledby="userManagementModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #15696B; color: white;">
+            <h5 class="modal-title" id="userManagementModalLabel">User Management</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+              <h6 class="mb-0">System Users</h6>
+              <button type="button" class="btn btn-sm btn-primary" onclick="openCreateUserModal()">
+                <i class="ri-add-line"></i> Create New User
+              </button>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead class="table-light">
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                    <th style="width: 100px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                      <i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Loading users...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: #15696B; color: white;">
+            <h5 class="modal-title">Create New User</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+          </div>
+          <div class="modal-body">
+            <div id="createUserMessage" style="display: none;"></div>
+            <form id="createUserForm">
+              <div class="mb-3">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" id="newUserFullname" placeholder="John Doe" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email Address *</label>
+                <input type="email" class="form-control" id="newUserEmail" placeholder="john@example.com" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Username *</label>
+                <input type="text" class="form-control" id="newUserUsername" placeholder="@johndoe123" readonly>
+                <small class="text-muted">Auto-generated from full name</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Role *</label>
+                <select class="form-control" id="newUserRole" required>
+                  <option value="">Select a role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Staff">Staff</option>
+                  <option value="User">User</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Password *</label>
+                <input type="password" class="form-control" id="newUserPassword" placeholder="Enter password" required>
+                <small class="text-muted">Min 8 chars, uppercase, lowercase, numbers</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Confirm Password *</label>
+                <input type="password" class="form-control" id="newUserConfirmPassword" placeholder="Confirm password" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="submitCreateUserBtn" onclick="handleCreateUser(event)">Create User</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- *************
 			************ JavaScript Files *************
 		************* -->
@@ -1362,6 +1756,7 @@
 
     <!-- Export Libraries -->
     <script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/exceljs@4.3.0/dist/exceljs.min.js"></script>
     <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/jspdf-autotable@3.5.31/dist/jspdf.plugin.autotable.min.js"></script>
 
@@ -1543,22 +1938,117 @@
             criticalError = facilityPatientsError;
           }
 
+          // Fetch next week appointments from appointments table
+          // Next week = Monday through Sunday
+          const today = new Date();
+          const dayOfWeek = today.getDay();
+          
+          // Calculate next Monday (0 = Sunday, 1 = Monday)
+          const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+          const nextMonday = new Date(today);
+          nextMonday.setDate(nextMonday.getDate() + daysUntilMonday);
+          
+          // Calculate Sunday of next week
+          const nextSunday = new Date(nextMonday);
+          nextSunday.setDate(nextSunday.getDate() + 6);
+          
+          const nextMondayStr = nextMonday.toISOString().split('T')[0];
+          const nextSundayStr = nextSunday.toISOString().split('T')[0];
+          
+          const { data: nextWeekAppointments, error: nextWeekError } = await supabaseClient
+            .from('patients')
+            .select('pid, next_appointment')
+            .eq('fid', numericFacilityId)
+            .not('next_appointment', 'is', null)
+            .gte('next_appointment', nextMondayStr)
+            .lte('next_appointment', nextSundayStr);
+          
+          const nextWeekCount = !nextWeekError && nextWeekAppointments ? nextWeekAppointments.length : 0;
+          
+          // Fetch overdue appointments from patients table
+          const todayStr = today.toISOString().split('T')[0];
+          
+          const { data: overdueAppointments, error: overdueError } = await supabaseClient
+            .from('patients')
+            .select('pid, next_appointment')
+            .eq('fid', numericFacilityId)
+            .not('next_appointment', 'is', null)
+            .lt('next_appointment', todayStr);
+          
+          const overdueCount = !overdueError && overdueAppointments ? overdueAppointments.length : 0;
+          
+          // Fetch missed appointments from patients table
+          // Missed = next_appointment is in the past and status is not Completed
+          const { data: missedAppointments, error: missedError } = await supabaseClient
+            .from('patients')
+            .select('pid, next_appointment')
+            .eq('fid', numericFacilityId)
+            .not('next_appointment', 'is', null)
+            .lt('next_appointment', todayStr)
+            .neq('status', 'Completed');
+          
+          const missedCount = !missedError && missedAppointments ? missedAppointments.length : 0;
+          
+          // Fetch high viraemia patients (viral_load_copies >= 1000)
+          const { data: highViraemiaPatients, error: highViraemiaError } = await supabaseClient
+            .from('patients')
+            .select('pid, viral_load_copies')
+            .eq('fid', numericFacilityId)
+            .gte('viral_load_copies', 1000);
+          
+          const highViraemiaCount = !highViraemiaError && highViraemiaPatients ? highViraemiaPatients.length : 0;
+          
+          // Fetch low viraemia patients (viral_load_copies between 201 and 999)
+          const { data: lowViraemiaPatients, error: lowViraemiaError } = await supabaseClient
+            .from('patients')
+            .select('pid, viral_load_copies')
+            .eq('fid', numericFacilityId)
+            .gte('viral_load_copies', 201)
+            .lte('viral_load_copies', 999);
+          
+          const lowViraemiaCount = !lowViraemiaError && lowViraemiaPatients ? lowViraemiaPatients.length : 0;
+          
+          // Debug: fetch all viral load values to inspect
+          const { data: allVLData } = await supabaseClient
+            .from('patients')
+            .select('pid, viral_load_copies')
+            .eq('fid', numericFacilityId)
+            .limit(10);
+          
+          console.log('Sample viral load data:', allVLData);
+          console.log('High viraemia patients raw data:', highViraemiaPatients);
+          console.log('High viraemia patients:', { highViraemiaCount, highViraemiaError, numericFacilityId });
+          console.log('Missed appointments:', { missedCount, missedError, numericFacilityId });
+          console.log('Overdue appointments:', { todayStr, overdueCount, overdueError, numericFacilityId });
+          console.log('Next week appointments:', { nextMondayStr, nextSundayStr, nextWeekCount, nextWeekError, numericFacilityId });
+
           // Update UI with fetched data
           const patientCount = !patientError ? patients.length : 0;
           const newPatientCount = !newPatientError && newPatients ? newPatients.length : 0;
           const criticalPatientCount = !criticalError && criticalPatients ? criticalPatients.length : 0;
           const allAppointmentsCount = !totalAppointmentError ? totalAppointmentCount : 0;
+          const nextWeekAppointmentsCount = !nextWeekError ? nextWeekCount : 0;
 
           // Update only if elements exist
           const patientsCountEl = document.getElementById('patientsCount');
           const totalAppointmentsCountEl = document.getElementById('totalAppointmentsCount');
           const newPatientsCountEl = document.getElementById('newPatientsCount');
           const criticalPatientsCountEl = document.getElementById('criticalPatientsCount');
+          const nextWeekAppointmentsCountEl = document.getElementById('nextWeekAppointmentsCount');
+          const overdueAppointmentsCountEl = document.getElementById('overdueAppointmentsCount');
+          const missedAppointmentsCountEl = document.getElementById('missedAppointmentsCount');
+          const highViraemiaCountEl = document.getElementById('highViraemiaCount');
+          const lowViraemiaCountEl = document.getElementById('lowViraemiaCount');
 
           if (patientsCountEl) patientsCountEl.textContent = patientCount;
           if (totalAppointmentsCountEl) totalAppointmentsCountEl.textContent = allAppointmentsCount;
           if (newPatientsCountEl) newPatientsCountEl.textContent = newPatientCount;
           if (criticalPatientsCountEl) criticalPatientsCountEl.textContent = criticalPatientCount;
+          if (nextWeekAppointmentsCountEl) nextWeekAppointmentsCountEl.textContent = nextWeekAppointmentsCount;
+          if (overdueAppointmentsCountEl) overdueAppointmentsCountEl.textContent = overdueCount;
+          if (missedAppointmentsCountEl) missedAppointmentsCountEl.textContent = missedCount;
+          if (highViraemiaCountEl) highViraemiaCountEl.textContent = highViraemiaCount;
+          if (lowViraemiaCountEl) lowViraemiaCountEl.textContent = lowViraemiaCount;
         } catch (error) {
           console.error('Error fetching dashboard stats:', error);
         }
@@ -1569,6 +2059,41 @@
       let filteredPatients = [];
       let currentPatientPage = 1;
       const PATIENTS_PER_PAGE = 5;
+
+      // Filter patients from stat card clicks
+      function filterPatients(filterType, filterValue) {
+        const searchInput = document.getElementById('patientSearchInput');
+        const conditionFilter = document.getElementById('patientConditionFilter');
+        const statusFilter = document.getElementById('patientStatusFilter');
+        
+        // Clear previous filters
+        if (searchInput) searchInput.value = '';
+        if (conditionFilter) conditionFilter.value = '';
+        if (statusFilter) statusFilter.value = '';
+        
+        // Apply the clicked filter
+        if (filterType === 'appointment-type') {
+          if (filterValue === 'next-week') {
+            statusFilter.value = 'Next Week';
+          } else if (filterValue === 'overdue') {
+            statusFilter.value = 'Overdue';
+          } else if (filterValue === 'missed') {
+            statusFilter.value = 'Missed';
+          }
+        } else if (filterType === 'viral-status') {
+          if (filterValue === 'high') {
+            conditionFilter.value = 'High Viraemia';
+          } else if (filterValue === 'low') {
+            conditionFilter.value = 'Low Viraemia';
+          }
+        }
+        
+        // Scroll to patients table
+        document.getElementById('patientsTable').scrollIntoView({ behavior: 'smooth' });
+        
+        // Apply filters
+        filterAndDisplayPatients();
+      }
 
       // Setup search and filter controls
        function setupPatientTableControls() {
@@ -1618,38 +2143,49 @@
         }
 
         // Table view (responsive with horizontal scroll on mobile)
-        tableBody.innerHTML = pagePatients.map(patient => `
-          <tr>
-            <td>${patient.patient_no || '-'}</td>
-            <td>${patient.first_name || '-'} ${patient.last_name || '-'}</td>
-            <td>${patient.age || '-'}</td>
-            <td>${patient.gender || '-'}</td>
-            <td>${patient.phone_number || '-'}</td>
-            <td>${patient.address || '-'}</td>
-            <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
-            <td>
-              <span class="badge ${getStatusBadgeClass(patient.status)}">
-                ${patient.status || 'Unknown'}
-              </span>
-            </td>
-            <td>
-              <span class="badge ${getHIVStatusBadgeClass(patient.hiv_status)}">
-                ${patient.hiv_status || 'Unknown'}
-              </span>
-            </td>
-            <td>${patient.notes || '-'}</td>
-            <td>
-              <div class="btn-group btn-group-sm" role="group">
-                <button type="button" class="btn btn-sm btn-primary" title="Edit" onclick="editPatient('${patient.patient_no}')">
-                  <i class="ri-pencil-line"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deletePatient('${patient.patient_no}')">
-                  <i class="ri-delete-bin-line"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
+         tableBody.innerHTML = pagePatients.map(patient => `
+           <tr data-patient-id="${patient.pid}">
+             <td>${patient.patient_no || '-'}</td>
+             <td>${patient.first_name || '-'} ${patient.last_name || '-'}</td>
+             <td>${patient.age || '-'}</td>
+             <td>${patient.gender || '-'}</td>
+             <td>${patient.phone_number || '-'}</td>
+             <td>${patient.address || '-'}</td>
+             <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
+             <td>
+               <span class="badge ${getStatusBadgeClass(patient.status)}">
+                 ${patient.status || 'Unknown'}
+               </span>
+             </td>
+             <td>
+               <span class="badge ${getHIVStatusBadgeClass(patient.hiv_status)}">
+                 ${patient.hiv_status || 'Unknown'}
+               </span>
+             </td>
+             <td>${patient.notes || '-'}</td>
+             <td>
+               <div class="btn-group btn-group-sm" role="group">
+                 <button type="button" class="btn btn-sm btn-info patient-view-btn" title="View Details">
+                   <i class="ri-eye-line"></i>
+                 </button>
+                 <button type="button" class="btn btn-sm btn-primary" title="Edit" onclick="editPatient('${patient.patient_no}')">
+                   <i class="ri-pencil-line"></i>
+                 </button>
+                 <button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="deletePatient('${patient.patient_no}')">
+                   <i class="ri-delete-bin-line"></i>
+                 </button>
+               </div>
+             </td>
+           </tr>
+         `).join('');
+         
+         // Add event listeners for view buttons
+         document.querySelectorAll('.patient-view-btn').forEach(btn => {
+           btn.addEventListener('click', function() {
+             const patientId = this.closest('tr').dataset.patientId;
+             viewPatientDetails(patientId);
+           });
+         });
       }
 
       // Update pagination info and button states
@@ -2263,20 +2799,12 @@
                 last_viral_load_date: document.getElementById('edit_last_viral_load_date').value || null,
                 viral_load_copies: parseInt(document.getElementById('edit_viral_load_copies').value) || null,
                 viral_load_status: document.getElementById('edit_viral_load_status').value || null,
-                systolic: document.getElementById('edit_systolic').value ? parseInt(document.getElementById('edit_systolic').value) : null,
-                diastolic: document.getElementById('edit_diastolic').value ? parseInt(document.getElementById('edit_diastolic').value) : null,
-                blood_pressure: document.getElementById('edit_blood_pressure').value || null,
                 glucose_level: document.getElementById('edit_glucose_level').value ? parseFloat(document.getElementById('edit_glucose_level').value) : null,
-                hiv_regimen: document.getElementById('edit_hiv_regimen').value || null,
-                regimen_start_date: document.getElementById('edit_regimen_start_date').value || null,
-                regimen_status: document.getElementById('edit_regimen_status').value || null,
-                appointment_type: document.getElementById('edit_appointment_type').value || null,
                 patient_registration_date: document.getElementById('edit_patient_registration_date').value || null,
                 art_start_date: document.getElementById('edit_art_start_date').value || null,
-                visist_date: document.getElementById('edit_visist_date').value || null,
                 next_appointment: document.getElementById('edit_next_appointment').value || null,
                 appointment_time: document.getElementById('edit_appointment_time').value || null,
-                clinical_note: document.getElementById('edit_clinical_note').value || null
+                notes: document.getElementById('edit_clinical_note').value || null
                 };
 
               try {
@@ -2715,20 +3243,12 @@
                 last_viral_load_date: document.getElementById('add_last_viral_load_date').value || null,
                 viral_load_copies: parseInt(document.getElementById('add_viral_load_copies').value) || null,
                 viral_load_status: document.getElementById('add_viral_load_status').value || null,
-                systolic: document.getElementById('add_systolic').value ? parseInt(document.getElementById('add_systolic').value) : null,
-                diastolic: document.getElementById('add_diastolic').value ? parseInt(document.getElementById('add_diastolic').value) : null,
-                blood_pressure: document.getElementById('add_blood_pressure').value || null,
                 glucose_level: document.getElementById('add_glucose_level').value ? parseFloat(document.getElementById('add_glucose_level').value) : null,
-                hiv_regimen: document.getElementById('add_hiv_regimen').value || null,
-                regimen_start_date: document.getElementById('add_regimen_start_date').value || null,
-                regimen_status: document.getElementById('add_regimen_status').value || null,
-                appointment_type: document.getElementById('add_appointment_type').value || null,
                 patient_registration_date: document.getElementById('add_patient_registration_date').value || null,
                 art_start_date: document.getElementById('add_art_start_date').value || null,
-                visist_date: document.getElementById('add_visist_date').value || null,
                 next_appointment: document.getElementById('add_next_appointment').value || null,
                 appointment_time: document.getElementById('add_appointment_time').value || null,
-                clinical_note: document.getElementById('add_clinical_note').value || null,
+                notes: document.getElementById('add_clinical_note').value || null,
                 fid: session.fid || session.facility_id
               };
 
@@ -2907,10 +3427,16 @@
           // Fetch all patients for the facility with relevant fields
            const { data: patients, error: patientError } = await supabaseClient
              .from('patients')
-             .select('patient_no, first_name, last_name, age, gender, phone_number, address, condition, status, hiv_status, notes')
+             .select('pid, patient_no, first_name, last_name, age, gender, phone_number, address, condition, status, hiv_status, notes')
              .eq('fid', numericFacilityId);
 
           console.log('Patients fetch result:', { patients, error: patientError });
+          
+          // Log first patient to see what fields are available
+          if (patients && patients.length > 0) {
+            console.log('First patient object keys:', Object.keys(patients[0]));
+            console.log('First patient pid:', patients[0].pid);
+          }
 
           if (patientError) {
             console.error('Error fetching patients:', patientError);
@@ -3131,6 +3657,1550 @@
 
       // Make function globally accessible
       window.initializeSelect2AndDatePicker = initializeSelect2AndDatePicker;
+
+      // ============================================
+      // Patient Medical History & Appointments Functions
+      // ============================================
+
+      // View patient details when clicked from table
+      async function viewPatientDetails(patientId) {
+        try {
+          console.log('viewPatientDetails called with patientId:', patientId);
+          
+          if (!patientId) {
+            Swal.fire('Error', 'Invalid patient ID', 'error');
+            return;
+          }
+          
+          const session = window.currentSession || JSON.parse(localStorage.getItem('healthflow_session'));
+          const facilityId = session.fid || session.facility_id;
+
+          console.log('Fetching patient details for patientId:', patientId, 'facilityId:', facilityId);
+
+          // Fetch patient details
+          const { data: patients, error } = await supabaseClient
+            .from('patients')
+            .select('*')
+            .eq('pid', patientId)
+            .eq('fid', facilityId)
+            .single();
+
+          console.log('Patient fetch result:', { patients, error });
+
+          if (error) {
+            Swal.fire('Error', 'Failed to load patient details: ' + error.message, 'error');
+            return;
+          }
+
+          if (!patients) {
+            Swal.fire('Not Found', 'Patient not found', 'warning');
+            return;
+          }
+
+          // Show and scroll to the medical history section
+          const medicalHistorySection = document.getElementById('patient-records');
+          if (medicalHistorySection) {
+            medicalHistorySection.style.display = 'flex';
+            setTimeout(() => {
+              medicalHistorySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+          }
+
+          // Display patient information
+          displayPatientMedicalHistory(patients);
+          displayPatientAppointments(patients);
+          displayPatientClinicalNotes(patients);
+        } catch (err) {
+          console.error('Error loading patient details:', err);
+          Swal.fire('Error', 'Failed to load patient details', 'error');
+        }
+      }
+
+      // Display patient medical history
+      function displayPatientMedicalHistory(patient) {
+        try {
+          const medicalHistoryDiv = document.getElementById('medicalHistoryContent');
+          
+          // Format the medical history content
+          const historyHTML = `
+            <div class="patient-record-header mb-4">
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-3">Patient Information</h6>
+                  <table class="table table-sm table-borderless">
+                    <tbody>
+                      <tr>
+                        <td class="fw-500" style="width: 40%;">Patient ID:</td>
+                        <td>${patient.patient_no || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Name:</td>
+                        <td>${patient.first_name || ''} ${patient.last_name || ''}</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Age:</td>
+                        <td>${patient.age || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Gender:</td>
+                        <td>${patient.gender || '-'}</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Phone:</td>
+                        <td>${patient.phone_number || '-'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-muted mb-3">Clinical Information</h6>
+                  <table class="table table-sm table-borderless">
+                    <tbody>
+                      <tr>
+                        <td class="fw-500" style="width: 40%;">Condition:</td>
+                        <td><span class="badge bg-primary">${patient.condition || 'N/A'}</span></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Status:</td>
+                        <td><span class="badge ${getStatusBadgeClass(patient.status)}">${patient.status || 'Unknown'}</span></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">HIV Status:</td>
+                        <td><span class="badge ${getHIVStatusBadgeClass(patient.hiv_status)}">${patient.hiv_status || 'Unknown'}</span></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Viral Load:</td>
+                        <td>${patient.viral_load_copies ? patient.viral_load_copies.toLocaleString() + ' copies/mL' : '-'}</td>
+                      </tr>
+                      <tr>
+                        <td class="fw-500">Last Viral Load Date:</td>
+                        <td>${patient.last_viral_load_date ? new Date(patient.last_viral_load_date).toLocaleDateString() : '-'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <h6 class="text-muted mb-3">Medical History Notes</h6>
+            <div class="alert alert-light border">
+              <p>${patient.notes || 'No medical history notes available'}</p>
+            </div>
+          `;
+
+          medicalHistoryDiv.innerHTML = historyHTML;
+        } catch (err) {
+          console.error('Error displaying medical history:', err);
+          document.getElementById('medicalHistoryContent').innerHTML = '<p class="text-danger">Error loading medical history</p>';
+        }
+      }
+
+      // Display patient appointments
+      function displayPatientAppointments(patient) {
+        try {
+          const appointmentsDiv = document.getElementById('appointmentsContent');
+
+          let appointmentHTML = `
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Appointment Date</th>
+                    <th>Status</th>
+                    <th>Days Until</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+
+          if (patient.next_appointment) {
+            const apptDate = new Date(patient.next_appointment);
+            const today = new Date();
+            const daysUntil = Math.ceil((apptDate - today) / (1000 * 60 * 60 * 24));
+            const apptStatus = daysUntil < 0 ? 'Overdue' : daysUntil === 0 ? 'Today' : 'Upcoming';
+            const statusBadgeClass = daysUntil < 0 ? 'bg-danger' : daysUntil === 0 ? 'bg-warning' : 'bg-success';
+
+            appointmentHTML += `
+              <tr>
+                <td>${apptDate.toLocaleDateString()}</td>
+                <td><span class="badge ${statusBadgeClass}">${apptStatus}</span></td>
+                <td>${daysUntil} days</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="editAppointment('${patient.pid}')">
+                    <i class="ri-edit-line"></i>
+                  </button>
+                </td>
+              </tr>
+            `;
+          } else {
+            appointmentHTML += `
+              <tr>
+                <td colspan="4" class="text-center text-muted py-4">No appointments scheduled</td>
+              </tr>
+            `;
+          }
+
+          appointmentHTML += `
+                </tbody>
+              </table>
+            </div>
+          `;
+
+          appointmentsDiv.innerHTML = appointmentHTML;
+        } catch (err) {
+          console.error('Error displaying appointments:', err);
+        }
+      }
+
+      // Display patient clinical notes
+      function displayPatientClinicalNotes(patient) {
+        try {
+          const clinicalNotesDiv = document.getElementById('clinicalNotesContent');
+
+          const clinicalNote = patient.notes || 'No clinical notes available';
+
+          const notesHTML = `
+            <div class="clinical-notes-section">
+              <div class="mb-3">
+                <label class="form-label text-muted small">Clinical Notes</label>
+                <div class="alert alert-light border p-3">
+                  <p>${clinicalNote}</p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          clinicalNotesDiv.innerHTML = notesHTML;
+        } catch (err) {
+          console.error('Error displaying clinical notes:', err);
+        }
+      }
+
+      // Edit appointment function
+      async function editAppointment(patientId) {
+        try {
+          console.log('editAppointment called with patientId:', patientId);
+          
+          if (!patientId) {
+            Swal.fire('Error', 'Invalid patient ID', 'error');
+            return;
+          }
+          
+          const session = window.currentSession || JSON.parse(localStorage.getItem('healthflow_session'));
+          const facilityId = session.fid || session.facility_id;
+
+          // Fetch patient appointment details
+          const { data: patient, error } = await supabaseClient
+            .from('patients')
+            .select('*')
+            .eq('pid', patientId)
+            .eq('fid', facilityId)
+            .single();
+
+          if (error) {
+            Swal.fire('Error', 'Failed to load appointment: ' + error.message, 'error');
+            return;
+          }
+
+          if (!patient) {
+            Swal.fire('Error', 'Patient not found', 'error');
+            return;
+          }
+
+          // Format current appointment date for input
+          const currentDate = patient.next_appointment ? new Date(patient.next_appointment).toISOString().split('T')[0] : '';
+          const currentTime = patient.appointment_time || '09:00';
+
+          // Show SweetAlert2 modal with appointment form
+          const { value: formValues } = await Swal.fire({
+            title: 'Edit Appointment',
+            html: `
+              <div class="swal2-form-group">
+                <label for="appointmentDate" class="swal2-label">Appointment Date</label>
+                <input type="date" id="appointmentDate" class="swal2-input" value="${currentDate}" required>
+              </div>
+              <div class="swal2-form-group">
+                <label for="appointmentTime" class="swal2-label">Appointment Time</label>
+                <input type="time" id="appointmentTime" class="swal2-input" value="${currentTime}" required>
+              </div>
+              <div class="swal2-form-group">
+                <label for="appointmentNotes" class="swal2-label">Notes (Optional)</label>
+                <textarea id="appointmentNotes" class="swal2-textarea" placeholder="Add appointment notes..."></textarea>
+              </div>
+            `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Save Appointment',
+            cancelButtonText: 'Cancel',
+            didOpen: (modal) => {
+              // Add custom styling for the form
+              const form = modal.querySelector('.swal2-html-container');
+              if (form) {
+                form.style.textAlign = 'left';
+                form.style.maxHeight = '400px';
+                form.style.overflowY = 'auto';
+              }
+              
+              // Style form groups
+              const formGroups = modal.querySelectorAll('.swal2-form-group');
+              formGroups.forEach(group => {
+                group.style.marginBottom = '15px';
+                group.style.textAlign = 'left';
+              });
+              
+              // Style labels
+              const labels = modal.querySelectorAll('.swal2-label');
+              labels.forEach(label => {
+                label.style.display = 'block';
+                label.style.marginBottom = '5px';
+                label.style.fontWeight = '500';
+                label.style.fontSize = '14px';
+              });
+              
+              // Style inputs and textarea
+              const inputs = modal.querySelectorAll('.swal2-input, .swal2-textarea');
+              inputs.forEach(input => {
+                input.style.width = '100%';
+                input.style.padding = '8px';
+                input.style.border = '1px solid #ced4da';
+                input.style.borderRadius = '4px';
+                input.style.fontSize = '14px';
+                input.style.fontFamily = 'inherit';
+              });
+              
+              const textarea = modal.querySelector('.swal2-textarea');
+              if (textarea) {
+                textarea.style.minHeight = '80px';
+                textarea.style.resize = 'vertical';
+              }
+            },
+            preConfirm: () => {
+              const date = document.getElementById('appointmentDate').value;
+              const time = document.getElementById('appointmentTime').value;
+              const notes = document.getElementById('appointmentNotes').value;
+
+              if (!date) {
+                Swal.showValidationMessage('Please select an appointment date');
+                return false;
+              }
+              if (!time) {
+                Swal.showValidationMessage('Please select an appointment time');
+                return false;
+              }
+
+              return { date, time, notes };
+            }
+          });
+
+          if (formValues) {
+            // Combine date and time
+            const appointmentDateTime = new Date(`${formValues.date}T${formValues.time}`);
+
+            // Update appointment in database
+            const { error: updateError } = await supabaseClient
+              .from('patients')
+              .update({
+                next_appointment: appointmentDateTime.toISOString().split('T')[0],
+                appointment_time: formValues.time
+              })
+              .eq('pid', patientId)
+              .eq('fid', facilityId);
+
+            if (updateError) {
+              Swal.fire('Error', 'Failed to save appointment: ' + updateError.message, 'error');
+              return;
+            }
+
+            // Reload patient details to show updated appointment
+            await viewPatientDetails(patientId);
+            
+            Swal.fire('Success', 'Appointment updated successfully', 'success');
+          }
+        } catch (err) {
+          console.error('Error editing appointment:', err);
+          Swal.fire('Error', 'An error occurred while editing the appointment', 'error');
+        }
+      }
+
+      // Store current stat filter for later use
+      let currentStatFilter = null;
+      let currentStatData = [];
+
+      // Export stat data to Excel with proper styling using ExcelJS
+      async function exportStatToExcel() {
+        const titles = {
+          'all-appointments': 'All Appointments',
+          'next-week': 'Next Week Appointments',
+          'overdue': 'Overdue Appointments',
+          'missed': 'Missed Appointments',
+          'high-viral': 'High Viraemia Patients',
+          'low-viral': 'Low Viraemia Patients'
+        };
+        
+        if (currentStatData.length === 0) {
+          alert('No data to export');
+          return;
+        }
+        
+        try {
+          // Create workbook
+          const workbook = new ExcelJS.Workbook();
+          const worksheet = workbook.addWorksheet('Patients');
+          
+          // Add headers
+          const headers = [
+            'Patient Name', 'Patient No', 'Gender', 'Age', 'Phone Number',
+            'Condition', 'Next Appointment', 'Appointment Type', 'Viral Load Copies',
+            'Last VL Date', 'Address'
+          ];
+          
+          const headerRow = worksheet.addRow(headers);
+          
+          // Style header row
+          headerRow.eachCell((cell) => {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'FF156B6B' }
+            };
+            cell.font = {
+              bold: true,
+              color: { argb: 'FFFFFFFF' },
+              size: 11
+            };
+            cell.alignment = {
+              horizontal: 'center',
+              vertical: 'center'
+            };
+            cell.border = {
+              top: { style: 'thin', color: { argb: 'FF000000' } },
+              left: { style: 'thin', color: { argb: 'FF000000' } },
+              bottom: { style: 'thin', color: { argb: 'FF000000' } },
+              right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+          });
+          
+          // Check if this is next-week filter for grouping by weekday
+          const isNextWeek = currentStatFilter === 'next-week';
+          let dataToProcess = currentStatData;
+          
+          if (isNextWeek) {
+            // Group appointments by weekday
+            dataToProcess = groupByWeekday(currentStatData);
+          }
+          
+          // Add data rows
+          let dataRowIndex = 0;
+          if (isNextWeek && Array.isArray(dataToProcess) && dataToProcess.length > 0 && dataToProcess[0].weekday) {
+            // Process grouped data with weekday headers
+            dataToProcess.forEach((group) => {
+              // Add weekday header row
+              const weekdayRow = worksheet.addRow([
+                group.weekday, '', '', '', '', '', '', '', '', '', ''
+              ]);
+              
+              weekdayRow.eachCell((cell) => {
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'FF4A9B8E' }
+                };
+                cell.font = {
+                  bold: true,
+                  color: { argb: 'FFFFFFFF' },
+                  size: 10
+                };
+                cell.alignment = {
+                  horizontal: 'left',
+                  vertical: 'center'
+                };
+              });
+              
+              // Add patients for this weekday
+              group.patients.forEach((patient, index) => {
+                const row = worksheet.addRow([
+                  `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
+                  patient.patient_no || '-',
+                  patient.gender || '-',
+                  patient.age || '-',
+                  patient.phone_number || '-',
+                  patient.condition || '-',
+                  patient.next_appointment || '-',
+                  patient.appointment_type || '-',
+                  patient.viral_load_copies || '-',
+                  patient.last_viral_load_date || '-',
+                  patient.address || '-'
+                ]);
+                
+                // Style data rows with alternating colors
+                const isEvenRow = index % 2 === 0;
+                row.eachCell((cell) => {
+                  cell.font = { size: 10 };
+                  cell.alignment = {
+                    horizontal: 'left',
+                    vertical: 'center'
+                  };
+                  cell.border = {
+                    top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                    left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                    bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                    right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
+                  };
+                  
+                  // Alternating row colors
+                  if (isEvenRow) {
+                    cell.fill = {
+                      type: 'pattern',
+                      pattern: 'solid',
+                      fgColor: { argb: 'FFDCE6E6' }
+                    };
+                  } else {
+                    cell.fill = {
+                      type: 'pattern',
+                      pattern: 'solid',
+                      fgColor: { argb: 'FFFFFFFF' }
+                    };
+                  }
+                });
+              });
+              
+              // Add summary row for the day
+              const summaryRow = worksheet.addRow([
+                `Total: ${group.patients.length} appointments`, '', '', '', '', '', '', '', '', '', ''
+              ]);
+              
+              summaryRow.eachCell((cell) => {
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'FFE8F5F4' }
+                };
+                cell.font = {
+                  bold: true,
+                  size: 9,
+                  italic: true
+                };
+                cell.alignment = {
+                  horizontal: 'right',
+                  vertical: 'center'
+                };
+              });
+              
+              // Add blank row for spacing
+              worksheet.addRow([]);
+            });
+          } else {
+            // Non-grouped data (default format)
+            currentStatData.forEach((patient, index) => {
+              const row = worksheet.addRow([
+                `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
+                patient.patient_no || '-',
+                patient.gender || '-',
+                patient.age || '-',
+                patient.phone_number || '-',
+                patient.condition || '-',
+                patient.next_appointment || '-',
+                patient.appointment_type || '-',
+                patient.viral_load_copies || '-',
+                patient.last_viral_load_date || '-',
+                patient.address || '-'
+              ]);
+              
+              // Style data rows with alternating colors
+              const isEvenRow = index % 2 === 0;
+              row.eachCell((cell) => {
+                cell.font = { size: 10 };
+                cell.alignment = {
+                  horizontal: 'left',
+                  vertical: 'center'
+                };
+                cell.border = {
+                  top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                  left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                  bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                  right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
+                };
+                
+                // Alternating row colors
+                if (isEvenRow) {
+                  cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFDCE6E6' }
+                  };
+                } else {
+                  cell.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFFFFFF' }
+                  };
+                }
+              });
+            });
+          }
+          
+          // Set column widths
+          worksheet.columns = [
+            { width: 22 },
+            { width: 14 },
+            { width: 12 },
+            { width: 10 },
+            { width: 16 },
+            { width: 18 },
+            { width: 16 },
+            { width: 16 },
+            { width: 16 },
+            { width: 16 },
+            { width: 28 }
+          ];
+          
+          // Generate file and save as blob
+          const fileName = `${titles[currentStatFilter] || 'Export'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+          const blob = await workbook.xlsx.writeBuffer();
+          
+          // Create download link
+          const url = window.URL.createObjectURL(new Blob([blob]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', fileName);
+          document.body.appendChild(link);
+          link.click();
+          link.parentNode.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          
+        } catch (error) {
+          console.error('Error exporting to Excel:', error);
+          alert('Error exporting file: ' + error.message);
+        }
+      }
+      
+      // Helper function to group appointments by weekday
+      function groupByWeekday(patients) {
+        const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const grouped = {};
+        
+        // Group by weekday
+        patients.forEach(patient => {
+          if (patient.next_appointment) {
+            const date = new Date(patient.next_appointment);
+            const weekdayIndex = date.getDay();
+            const weekdayName = weekdayNames[weekdayIndex];
+            
+            if (!grouped[weekdayIndex]) {
+              grouped[weekdayIndex] = {
+                weekday: weekdayName,
+                patients: []
+              };
+            }
+            grouped[weekdayIndex].patients.push(patient);
+          }
+        });
+        
+        // Sort by weekday (starting from Monday if today is not Sunday)
+        const result = [];
+        const today = new Date();
+        const todayWeekday = today.getDay();
+        
+        // Sort by appointment date within each weekday
+        Object.values(grouped).forEach(group => {
+          group.patients.sort((a, b) => {
+            return new Date(a.next_appointment) - new Date(b.next_appointment);
+          });
+        });
+        
+        // Order groups by next occurring weekday
+        for (let i = 0; i < 7; i++) {
+          const index = (todayWeekday + i) % 7;
+          if (grouped[index]) {
+            result.push(grouped[index]);
+          }
+        }
+        
+        return result;
+      }
+
+      // Export stat data to PDF
+      function exportStatToPdf() {
+        const titles = {
+          'all-appointments': 'All Appointments',
+          'next-week': 'Next Week Appointments',
+          'overdue': 'Overdue Appointments',
+          'missed': 'Missed Appointments',
+          'high-viral': 'High Viraemia Patients',
+          'low-viral': 'Low Viraemia Patients'
+        };
+        
+        if (currentStatData.length === 0) {
+          alert('No data to export');
+          return;
+        }
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape' });
+        const title = titles[currentStatFilter] || 'Report';
+        
+        // Add title
+        doc.setFontSize(16);
+        doc.text(title, 14, 15);
+        
+        // Add export date
+        doc.setFontSize(9);
+        doc.text(`Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 14, 22);
+        
+        // Prepare table data
+        const tableData = currentStatData.map(patient => [
+          `${patient.first_name || ''} ${patient.last_name || ''}`.trim(),
+          patient.patient_no || '-',
+          patient.gender || '-',
+          patient.age || '-',
+          patient.phone_number || '-',
+          patient.condition || '-',
+          patient.next_appointment || '-',
+          patient.appointment_type || '-',
+          patient.viral_load_copies || '-',
+          patient.last_viral_load_date || '-',
+          patient.address || '-'
+        ]);
+        
+        // Create table
+        const columns = [
+          'Patient Name',
+          'Patient ID',
+          'Gender',
+          'Age',
+          'Phone',
+          'Primary Condition',
+          'Next Appt',
+          'Appt Type',
+          'VL Copies',
+          'Last VL Date',
+          'Address'
+        ];
+        
+        doc.autoTable({
+          head: [columns],
+          body: tableData,
+          startY: 28,
+          styles: {
+            fontSize: 8,
+            cellPadding: 3,
+            overflow: 'linebreak'
+          },
+          columnStyles: {
+            0: { cellWidth: 18 },
+            1: { cellWidth: 12 },
+            2: { cellWidth: 10 },
+            3: { cellWidth: 8 },
+            4: { cellWidth: 14 },
+            5: { cellWidth: 14 },
+            6: { cellWidth: 12 },
+            7: { cellWidth: 12 },
+            8: { cellWidth: 12 },
+            9: { cellWidth: 12 },
+            10: { cellWidth: 18 }
+          },
+          headStyles: {
+            fillColor: [21, 105, 107],
+            textColor: 255,
+            fontStyle: 'bold',
+            fontSize: 8
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 245]
+          },
+          margin: { top: 28 }
+        });
+        
+        // Save PDF
+        const fileName = `${title}_${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(fileName);
+      }
+
+      // Open stat detail modal
+      async function openStatDetail(statType, element) {
+        currentStatFilter = statType;
+        const modalTitle = document.getElementById('statDetailModalLabel');
+        const contentDiv = document.getElementById('statDetailContent');
+        
+        // Update modal title based on stat type
+        const titles = {
+          'all-appointments': 'All Appointments',
+          'next-week': 'Next Week Appointments',
+          'overdue': 'Overdue Appointments',
+          'missed': 'Missed Appointments',
+          'high-viral': 'High Viraemia Patients',
+          'low-viral': 'Low Viraemia Patients'
+        };
+        
+        modalTitle.textContent = titles[statType] || 'Details';
+        contentDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        // Fetch and display data
+        const sessionData = localStorage.getItem('healthflow_session');
+        const session = JSON.parse(sessionData);
+        const numericFacilityId = session.fid || session.facility_id || session.facilityId;
+        
+        console.log('Opening stat detail for:', statType, 'Facility ID:', numericFacilityId);
+        
+        try {
+          let patients = [];
+          const selectFields = 'pid, patient_no, first_name, last_name, gender, age, phone_number, condition, next_appointment, appointment_type, viral_load_copies, last_viral_load_date, address';
+          
+          if (statType === 'all-appointments') {
+            const { data, error } = await supabaseClient
+              .from('patients')
+              .select(selectFields)
+              .eq('fid', numericFacilityId)
+              .not('art_start_date', 'is', null);
+            console.log('All appointments:', data, error);
+            patients = data || [];
+          } else if (statType === 'next-week') {
+            const nextMonday = new Date();
+            nextMonday.setDate(nextMonday.getDate() + (1 - nextMonday.getDay()));
+            const nextSunday = new Date(nextMonday);
+            nextSunday.setDate(nextSunday.getDate() + 6);
+            
+            const { data, error } = await supabaseClient
+              .from('patients')
+              .select(selectFields)
+              .eq('fid', numericFacilityId)
+              .gte('next_appointment', nextMonday.toISOString().split('T')[0])
+              .lte('next_appointment', nextSunday.toISOString().split('T')[0]);
+            console.log('Next week:', data, error);
+            patients = data || [];
+          } else if (statType === 'overdue') {
+            const today = new Date().toISOString().split('T')[0];
+            const { data, error } = await supabaseClient
+              .from('patients')
+              .select(selectFields)
+              .eq('fid', numericFacilityId)
+              .lt('next_appointment', today)
+              .not('next_appointment', 'is', null);
+            console.log('Overdue:', data, error);
+            patients = data || [];
+          } else if (statType === 'missed') {
+            const today = new Date().toISOString().split('T')[0];
+            const { data, error } = await supabaseClient
+              .from('patients')
+              .select(selectFields)
+              .eq('fid', numericFacilityId)
+              .not('next_appointment', 'is', null)
+              .lt('next_appointment', today)
+              .neq('status', 'Completed');
+            console.log('Missed:', data, error);
+            patients = data || [];
+          } else if (statType === 'high-viral') {
+            const { data, error } = await supabaseClient
+              .from('patients')
+              .select(selectFields)
+              .eq('fid', numericFacilityId)
+              .gte('viral_load_copies', 1000);
+            console.log('High viral:', data, error);
+            patients = data || [];
+          } else if (statType === 'low-viral') {
+            const { data, error } = await supabaseClient
+              .from('patients')
+              .select(selectFields)
+              .eq('fid', numericFacilityId)
+              .gte('viral_load_copies', 201)
+              .lte('viral_load_copies', 999);
+            console.log('Low viral:', data, error);
+            patients = data || [];
+          }
+          
+          // Store data for export
+          currentStatData = patients;
+          
+          // Display patients in modal with pagination
+          if (patients.length === 0) {
+            contentDiv.innerHTML = '<p class="text-center text-muted py-4">No patients found</p>';
+            return;
+          }
+          
+          // Pagination settings
+          const itemsPerPage = 10;
+          const totalPages = Math.ceil(patients.length / itemsPerPage);
+          let currentPage = 1;
+          
+          // Function to render table for current page
+          function renderPage(page) {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, patients.length);
+            const pagePatients = patients.slice(startIndex, endIndex);
+            
+            let html = `<div class="table-responsive">
+              <table class="table table-hover table-sm mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Patient Name</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Phone Number</th>
+                    <th>Condition</th>
+                    <th>Next Appointment</th>
+                    <th>Appt Type</th>
+                    <th>Viral Load</th>
+                    <th>Last VL Date</th>
+                    <th>Address</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>`;
+            
+            pagePatients.forEach(patient => {
+              const name = `${patient.first_name || ''} ${patient.last_name || ''}`.trim();
+              html += `<tr>
+                <td>${name}</td>
+                <td>${patient.gender || '-'}</td>
+                <td>${patient.age || '-'}</td>
+                <td>${patient.phone_number || '-'}</td>
+                <td>${patient.condition || '-'}</td>
+                <td>${patient.next_appointment || '-'}</td>
+                <td>${patient.appointment_type || '-'}</td>
+                <td>${patient.viral_load_copies || '-'}</td>
+                <td>${patient.last_viral_load_date || '-'}</td>
+                <td>${patient.address || '-'}</td>
+                <td><button class="btn btn-sm btn-outline-primary" onclick="viewPatientDetails('${patient.pid}')">View</button></td>
+              </tr>`;
+            });
+            
+            html += `</tbody></table></div>`;
+            
+            // Add pagination controls
+            if (totalPages > 1) {
+              html += `<div class="d-flex justify-content-center mt-3 mb-2">
+                <nav aria-label="Pagination">
+                  <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item ${page === 1 ? 'disabled' : ''}">
+                      <button class="page-link" onclick="updateModalPage(1)" ${page === 1 ? 'disabled' : ''}>First</button>
+                    </li>
+                    <li class="page-item ${page === 1 ? 'disabled' : ''}">
+                      <button class="page-link" onclick="updateModalPage(${page - 1})" ${page === 1 ? 'disabled' : ''}>Previous</button>
+                    </li>`;
+              
+              // Show page numbers (show max 5 page numbers)
+              let startPage = Math.max(1, page - 2);
+              let endPage = Math.min(totalPages, page + 2);
+              
+              for (let p = startPage; p <= endPage; p++) {
+                html += `<li class="page-item ${p === page ? 'active' : ''}">
+                  <button class="page-link" onclick="updateModalPage(${p})">${p}</button>
+                </li>`;
+              }
+              
+              html += `<li class="page-item ${page === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="updateModalPage(${page + 1})" ${page === totalPages ? 'disabled' : ''}>Next</button>
+              </li>
+              <li class="page-item ${page === totalPages ? 'disabled' : ''}">
+                <button class="page-link" onclick="updateModalPage(${totalPages})" ${page === totalPages ? 'disabled' : ''}>Last</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="text-center text-muted small">
+          Showing ${startIndex + 1}-${endIndex} of ${patients.length} records (Page ${page} of ${totalPages})
+        </div>`;
+            }
+            
+            return html;
+          }
+          
+          // Store pagination state globally
+          window.statModalData = {
+            patients,
+            itemsPerPage,
+            totalPages,
+            statType,
+            contentDiv
+          };
+          
+          window.updateModalPage = function(page) {
+            if (page < 1 || page > window.statModalData.totalPages) return;
+            const html = renderPage(page);
+            window.statModalData.contentDiv.innerHTML = html;
+          };
+          
+          contentDiv.innerHTML = renderPage(currentPage);
+        } catch (error) {
+          console.error('Error loading stat details:', error);
+          contentDiv.innerHTML = '<p class="text-center text-danger">Error loading data</p>';
+        }
+      }
+
+      // View all patients from stat in main table
+      function viewAllInTable() {
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('statDetailModal'));
+        modal.hide();
+        
+        // Filter patients based on current stat filter
+        if (currentStatFilter) {
+          filterPatients('stat-type', currentStatFilter);
+        }
+      }
+
+      // ===== USER MANAGEMENT FUNCTIONS =====
+      
+      // Open user management modal
+      function openUserManagementModal() {
+        const modal = new bootstrap.Modal(document.getElementById('userManagementModal'));
+        loadUsers();
+        modal.show();
+      }
+
+      // Load and display users
+      async function loadUsers() {
+        try {
+          const usersTableBody = document.getElementById('usersTableBody');
+          usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4"><i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Loading users...</td></tr>';
+
+          // Get facility ID from session
+          const session = JSON.parse(localStorage.getItem('healthflow_session'));
+          const facilityId = session?.fid || null;
+
+          if (!facilityId) {
+            usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error: Facility ID not found</td></tr>';
+            return;
+          }
+
+          const { data: users, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('fid', facilityId)
+            .order('created_at', { ascending: false });
+
+          if (error) {
+            console.error('Error fetching users:', error);
+            usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading users</td></tr>';
+            return;
+          }
+
+          if (!users || users.length === 0) {
+            usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No users found</td></tr>';
+            return;
+          }
+
+          usersTableBody.innerHTML = '';
+          users.forEach(user => {
+            const row = document.createElement('tr');
+            const userRole = user.user_role || 'User';
+            const statusBadge = user.is_active 
+              ? '<span class="badge bg-success">Active</span>' 
+              : '<span class="badge bg-secondary">Inactive</span>';
+            
+            const createdDate = new Date(user.created_at).toLocaleDateString();
+            
+            row.innerHTML = `
+              <td>${user.fullname || 'N/A'}</td>
+              <td>${user.email || 'N/A'}</td>
+              <td>${user.username || 'N/A'}</td>
+              <td>${userRole}</td>
+              <td>${statusBadge}</td>
+              <td>${createdDate}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editUserAccount('${user.uid}')" title="Edit">
+                  <i class="ri-edit-line"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteUserAccount('${user.uid}')" title="Delete">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </td>
+            `;
+            usersTableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error('Error loading users:', error);
+        }
+      }
+
+      // Open create user modal
+      function openCreateUserModal() {
+        const form = document.getElementById('createUserForm');
+        if (form) {
+          form.reset();
+        }
+        const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        modal.show();
+      }
+
+      // Generate username from fullname
+      function generateUsernameFromFullname(fullname) {
+        const usernameInput = document.getElementById('newUserUsername');
+        if (!usernameInput) return;
+
+        if (!fullname.trim()) {
+          usernameInput.value = '';
+          return;
+        }
+
+        const names = fullname.trim().split(/\s+/);
+        const firstName = names[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+        const lastName = names.length > 1 ? names[names.length - 1].substring(0, 3).toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+        const randomNum = Math.floor(Math.random() * 1000);
+        
+        usernameInput.value = `@${firstName}${lastName}${randomNum}`.substring(0, 20);
+      }
+
+      // Auto-generate username on fullname input
+      document.addEventListener('DOMContentLoaded', function() {
+        const fullnameInput = document.getElementById('newUserFullname');
+        if (fullnameInput) {
+          fullnameInput.addEventListener('input', function() {
+            generateUsernameFromFullname(this.value);
+          });
+        }
+      });
+
+      // Handle create user submission
+      async function handleCreateUser(e) {
+        e.preventDefault();
+
+        const fullname = document.getElementById('newUserFullname').value.trim();
+        const email = document.getElementById('newUserEmail').value.trim();
+        const username = document.getElementById('newUserUsername').value.trim();
+        const password = document.getElementById('newUserPassword').value;
+        const confirmPassword = document.getElementById('newUserConfirmPassword').value;
+        const role = document.getElementById('newUserRole').value;
+        const messageDiv = document.getElementById('createUserMessage');
+
+        if (!fullname || !email || !username || !password || !confirmPassword) {
+          showUserMessage(messageDiv, 'All fields are required', 'danger');
+          return;
+        }
+
+        if (!isValidEmail(email)) {
+          showUserMessage(messageDiv, 'Invalid email format', 'danger');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          showUserMessage(messageDiv, 'Passwords do not match', 'danger');
+          return;
+        }
+
+        if (!validatePassword(password)) {
+          showUserMessage(messageDiv, 'Password must be at least 8 characters with uppercase, lowercase, and numbers', 'danger');
+          return;
+        }
+
+        await submitCreateUser({
+          fullname,
+          email,
+          username,
+          password,
+          user_role: role,
+          is_active: true
+        }, messageDiv);
+      }
+
+      // Submit create user
+      async function submitCreateUser(userData, messageDiv) {
+        try {
+          const submitBtn = document.getElementById('submitCreateUserBtn');
+          const originalText = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Creating...';
+
+          const { data: existingEmail } = await supabaseClient
+            .from('users')
+            .select('email')
+            .eq('email', userData.email)
+            .single();
+
+          if (existingEmail) {
+            showUserMessage(messageDiv, 'Email already registered', 'danger');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            return;
+          }
+
+          const session = JSON.parse(localStorage.getItem('healthflow_session'));
+          const facilityId = session?.fid || null;
+
+          const { error: insertError } = await supabaseClient
+            .from('users')
+            .insert([
+              {
+                fullname: userData.fullname,
+                email: userData.email,
+                username: userData.username,
+                password: userData.password,
+                user_role: userData.user_role,
+                fid: facilityId,
+                is_active: userData.is_active,
+                created_at: new Date().toISOString()
+              }
+            ]);
+
+          if (insertError) {
+            console.error('Insert error:', insertError);
+            showUserMessage(messageDiv, `Error: ${insertError.message}`, 'danger');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            return;
+          }
+
+          showUserMessage(messageDiv, 'User created successfully!', 'success');
+          
+          setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createUserModal'));
+            modal.hide();
+            loadUsers();
+          }, 1500);
+
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        } catch (error) {
+          console.error('Error creating user:', error);
+          showUserMessage(messageDiv, `Error: ${error.message}`, 'danger');
+          
+          const submitBtn = document.getElementById('submitCreateUserBtn');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Create User';
+        }
+      }
+
+      // Edit user account
+      async function editUserAccount(userId) {
+        try {
+          const { data: user, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('uid', userId)
+            .single();
+
+          if (error || !user) {
+            Swal.fire('Error', 'Could not load user details', 'error');
+            return;
+          }
+
+          // Hide the backdrop of User Management modal while SweetAlert2 is shown
+          const { value: formValues } = await Swal.fire({
+            title: 'Edit User',
+            html: `
+              <div style="text-align: left; width: 100%; pointer-events: auto;">
+                <div style="margin-bottom: 1rem; pointer-events: auto;">
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Full Name</label>
+                  <input type="text" id="editFullname" value="${user.fullname || ''}" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;" />
+                </div>
+                <div style="margin-bottom: 1rem; pointer-events: auto;">
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Email</label>
+                  <input type="email" id="editEmail" value="${user.email || ''}" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;" />
+                </div>
+                <div style="margin-bottom: 1rem; pointer-events: auto;">
+                  <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Role</label>
+                  <select id="editRole" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px;">
+                    <option value="Admin" ${user.user_role === 'Admin' ? 'selected' : ''}>Admin</option>
+                    <option value="Manager" ${user.user_role === 'Manager' ? 'selected' : ''}>Manager</option>
+                    <option value="Staff" ${user.user_role === 'Staff' ? 'selected' : ''}>Staff</option>
+                    <option value="User" ${user.user_role === 'User' ? 'selected' : ''}>User</option>
+                  </select>
+                </div>
+                <div style="margin-bottom: 1rem; pointer-events: auto;">
+                  <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="editActive" ${user.is_active ? 'checked' : ''} style="margin-right: 0.5rem; cursor: pointer; width: 18px; height: 18px;" />
+                    <span>Active Account</span>
+                  </label>
+                </div>
+              </div>
+            `,
+            confirmButtonText: 'Update',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            focusConfirm: false,
+            willOpen: () => {
+              // Try to remove SweetAlert's keyboard handling before it attaches
+              console.log('willOpen - attempting to prevent keyboard capture');
+            },
+            didOpen: (modal) => {
+              console.log('Edit modal opened');
+              
+              // Remove SweetAlert's keyboard event listeners by replacing them
+              window.removeEventListener = new Proxy(window.removeEventListener, {
+                apply: (target, thisArg, args) => {
+                  if (args[0]?.includes('key')) {
+                    console.log('Blocked SweetAlert keyboard removal prevention');
+                    return;
+                  }
+                  return Reflect.apply(target, thisArg, args);
+                }
+              });
+              
+              // Listen to ALL keyboard events at document level with CAPTURE phase (highest priority)
+              const globalKeyHandler = (e) => {
+                // Only log, don't preventDefault - let normal flow continue
+                if (e.target.matches('input, select, textarea')) {
+                  console.log('Keyboard event on form element:', e.type, e.target.id, 'key:', e.key);
+                }
+              };
+              
+              // Remove any existing handlers first
+              document.removeEventListener('keydown', globalKeyHandler, true);
+              document.removeEventListener('keypress', globalKeyHandler, true);
+              document.removeEventListener('keyup', globalKeyHandler, true);
+              
+              // Re-add with capture phase
+              document.addEventListener('keydown', globalKeyHandler, true);
+              document.addEventListener('keypress', globalKeyHandler, true);
+              document.addEventListener('keyup', globalKeyHandler, true);
+              console.log('Added global keyboard handlers with capture phase');
+              
+              // Hide User Management modal backdrop
+              const backdrop = document.querySelector('#userManagementModal + .modal-backdrop');
+              if (backdrop) backdrop.style.display = 'none';
+              
+              // Get all form elements
+              const fullnameInput = document.getElementById('editFullname');
+              const emailInput = document.getElementById('editEmail');
+              const roleSelect = document.getElementById('editRole');
+              const activeCheckbox = document.getElementById('editActive');
+              
+              console.log('Form elements:', { fullnameInput, emailInput, roleSelect, activeCheckbox });
+              
+              // Enable all inputs explicitly with multiple methods
+              const inputs = [fullnameInput, emailInput, roleSelect, activeCheckbox];
+              inputs.forEach(input => {
+                if (input) {
+                  input.style.pointerEvents = 'auto';
+                  input.style.visibility = 'visible';
+                  input.style.opacity = '1';
+                  input.style.cursor = input.type === 'checkbox' ? 'pointer' : 'text';
+                  input.disabled = false;
+                  input.readOnly = false;
+                  
+                  console.log('Input setup:', input.id, 'disabled:', input.disabled, 'readOnly:', input.readOnly);
+                  
+                  // Add direct click handler
+                  input.addEventListener('mousedown', function(e) {
+                    e.stopPropagation();
+                    console.log('Input mousedown:', input.id);
+                  });
+                  
+                  input.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    console.log('Input click:', input.id);
+                  });
+                  
+                  // Add keyboard event handlers - these MUST use capture phase
+                  input.addEventListener('keydown', function(e) {
+                    console.log('Input keydown (capture):', input.id, e.key);
+                  }, true);
+                  
+                  input.addEventListener('keypress', function(e) {
+                    console.log('Input keypress (capture):', input.id, e.key);
+                  }, true);
+                  
+                  input.addEventListener('keyup', function(e) {
+                    console.log('Input keyup (capture):', input.id, e.key);
+                  }, true);
+                  
+                  input.addEventListener('input', function(e) {
+                    console.log('Input event on:', input.id, 'value:', this.value);
+                  }, true);
+                }
+              });
+              
+              // Add click delegation to the entire html container
+              const htmlContainer = document.querySelector('.swal2-html-container');
+              if (htmlContainer) {
+                htmlContainer.addEventListener('click', function(e) {
+                  console.log('Container click detected on:', e.target.id || e.target.tagName);
+                  // Don't prevent default - let the input handle the click naturally
+                  
+                  // If clicking on an input, focus it
+                  if (e.target.matches('input, select, textarea')) {
+                    console.log('Focusing input after click');
+                    e.target.focus();
+                    // Only call select() on text inputs
+                    if (e.target.tagName === 'INPUT' && e.target.type !== 'checkbox' && e.target.type !== 'radio') {
+                      try {
+                        e.target.select();
+                      } catch(err) {
+                        console.log('Could not select input');
+                      }
+                    }
+                  }
+                }, true); // Use capture phase
+                
+                // Also handle mousedown
+                htmlContainer.addEventListener('mousedown', function(e) {
+                  if (e.target.matches('input, select, textarea')) {
+                    console.log('Container mousedown on:', e.target.id);
+                    // Don't prevent default
+                    e.target.focus();
+                  }
+                }, true);
+              }
+              
+              // Add global keyboard handler to the modal popup itself
+              const swalPopup = document.querySelector('.swal2-popup');
+              if (swalPopup) {
+                swalPopup.addEventListener('keydown', function(e) {
+                  console.log('Swal popup keydown:', e.key, 'target:', e.target.id);
+                  // Allow keyboard events on inputs
+                  if (e.target.matches('input, select, textarea')) {
+                    console.log('Allowing keyboard event on input');
+                  }
+                }, false);
+              }
+              
+              // Also prevent SweetAlert from capturing keyboard
+              Swal.getActions = function() {
+                const actions = document.querySelector('.swal2-actions');
+                return actions;
+              };
+              
+              // Focus on first input
+              setTimeout(() => {
+                if (fullnameInput) {
+                  console.log('Focusing fullname input');
+                  fullnameInput.style.pointerEvents = 'auto';
+                  fullnameInput.focus();
+                  // Try to select all text
+                  fullnameInput.select();
+                }
+              }, 100);
+            },
+            willClose: () => {
+              // Show User Management modal backdrop again
+              const backdrop = document.querySelector('#userManagementModal + .modal-backdrop');
+              if (backdrop) backdrop.style.display = 'block';
+            },
+            preConfirm: (modal) => {
+              const fullnameInput = document.getElementById('editFullname');
+              const emailInput = document.getElementById('editEmail');
+              const roleInput = document.getElementById('editRole');
+              const activeInput = document.getElementById('editActive');
+              
+              if (!fullnameInput || !emailInput) {
+                Swal.showValidationMessage('Form elements not found');
+                return false;
+              }
+              
+              const fullname = fullnameInput.value.trim();
+              const email = emailInput.value.trim();
+              
+              if (!fullname) {
+                Swal.showValidationMessage('Full name is required');
+                return false;
+              }
+              
+              if (!email) {
+                Swal.showValidationMessage('Email is required');
+                return false;
+              }
+              
+              return {
+                fullname: fullname,
+                email: email,
+                user_role: roleInput.value,
+                is_active: activeInput.checked
+              };
+            }
+          });
+
+          if (formValues) {
+            const { error: updateError } = await supabaseClient
+              .from('users')
+              .update({
+                fullname: formValues.fullname,
+                email: formValues.email,
+                user_role: formValues.user_role,
+                is_active: formValues.is_active,
+                updated_at: new Date().toISOString()
+              })
+              .eq('uid', userId);
+
+            if (updateError) {
+              Swal.fire('Error', updateError.message, 'error');
+              return;
+            }
+
+            Swal.fire('Success', 'User updated successfully', 'success');
+            loadUsers();
+          }
+        } catch (error) {
+          console.error('Error editing user:', error);
+          Swal.fire('Error', error.message, 'error');
+        }
+      }
+
+      // Delete user account
+      async function deleteUserAccount(userId) {
+        try {
+          const { isConfirmed } = await Swal.fire({
+            title: 'Delete User?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Delete'
+          });
+
+          if (!isConfirmed) return;
+
+          const { error } = await supabaseClient
+            .from('users')
+            .delete()
+            .eq('uid', userId);
+
+          if (error) {
+            Swal.fire('Error', error.message, 'error');
+            return;
+          }
+
+          Swal.fire('Deleted', 'User has been deleted', 'success');
+          loadUsers();
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          Swal.fire('Error', error.message, 'error');
+        }
+      }
+
+      // Validate email
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      // Validate password
+      function validatePassword(password) {
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const isLongEnough = password.length >= 8;
+
+        return hasUpperCase && hasLowerCase && hasNumbers && isLongEnough;
+      }
+
+      // Show message
+      function showUserMessage(messageDiv, message, type) {
+        messageDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        messageDiv.innerHTML = `
+          ${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        messageDiv.style.display = 'block';
+      }
+
+      // Make functions globally accessible
+      window.viewPatientDetails = viewPatientDetails;
+      window.displayPatientMedicalHistory = displayPatientMedicalHistory;
+      window.displayPatientAppointments = displayPatientAppointments;
+      window.displayPatientClinicalNotes = displayPatientClinicalNotes;
+      window.editAppointment = editAppointment;
+      window.openStatDetail = openStatDetail;
+      window.viewAllInTable = viewAllInTable;
+      window.exportStatToExcel = exportStatToExcel;
+      window.exportStatToPdf = exportStatToPdf;
+      window.openUserManagementModal = openUserManagementModal;
+      window.openCreateUserModal = openCreateUserModal;
+      window.loadUsers = loadUsers;
+      window.editUserAccount = editUserAccount;
+      window.deleteUserAccount = deleteUserAccount;
+      window.handleCreateUser = handleCreateUser;
+      window.generateUsernameFromFullname = generateUsernameFromFullname;
     </script>
   </body>
 

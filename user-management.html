@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>User Management - Lulla Admin Dashboard</title>
+
+  <!-- Meta -->
+  <meta name="description" content="User Account Management Dashboard">
+  <link rel="shortcut icon" href="assets/images/favicon.svg">
+
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="assets/css/remixicon.css">
+  <link rel="stylesheet" href="assets/css/main.min.css">
+  
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <!-- Theme Color Override -->
+  <style>
+    :root {
+      --logo-flow: #15696B;
+      --bs-primary: var(--logo-flow);
+      --bs-primary-rgb: 21, 105, 107;
+      --bs-link-color: var(--logo-flow);
+      --bs-link-hover-color: #0F4449;
+    }
+    
+    .app-header {
+      background-color: white !important;
+    }
+
+    .modal-header {
+      background-color: #15696B;
+      color: white;
+    }
+
+    .modal-header .btn-close {
+      filter: invert(1);
+    }
+
+    .table th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .btn-outline-primary {
+      color: #15696B;
+      border-color: #15696B;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: #15696B;
+      border-color: #15696B;
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Ensure modal inputs are interactive */
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea,
+    .modal-body .form-control,
+    .modal-body .form-select {
+      pointer-events: auto !important;
+      cursor: text !important;
+      position: relative !important;
+      z-index: 1050 !important;
+    }
+
+    .modal-body input[type="checkbox"],
+    .modal-body input[type="radio"] {
+      cursor: pointer !important;
+    }
+
+    /* Ensure modal is on top */
+    .modal {
+      z-index: 1040 !important;
+    }
+
+    .modal-backdrop {
+      z-index: 1039 !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Page wrapper starts -->
+  <div class="page-wrapper">
+
+    <!-- Sidebar wrapper starts -->
+    <nav id="sidebar" class="sidebar-wrapper">
+      <!-- Sidebar profile starts -->
+      <div class="sidebar-profile">
+        <img src="assets/images/logo.svg" alt="Logo" class="logo">
+        <h5 class="mb-1 profile-name text-nowrap text-truncate" id="sidebarUserName">Loading...</h5>
+        <p class="m-0 small profile-name text-nowrap text-truncate" id="sidebarUserRole">User</p>
+      </div>
+      <!-- Sidebar profile ends -->
+
+      <!-- Sidebar menu starts -->
+      <div class="sidebarMenuScroll">
+        <ul class="sidebar-menu">
+          <li>
+            <a href="dashboard.html">
+              <i class="ri-home-6-line"></i>
+              <span class="menu-text">Hospital Dashboard</span>
+            </a>
+          </li>
+          <li class="active">
+            <a href="user-management.html">
+              <i class="ri-user-settings-line"></i>
+              <span class="menu-text">User Management</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!-- Sidebar menu ends -->
+
+      <!-- Sidebar contact starts -->
+      <div class="sidebar-contact">
+        <p class="fw-light mb-1 text-nowrap text-truncate">Emergency Contact</p>
+        <h5 class="m-0 lh-1 text-nowrap text-truncate">0987654321</h5>
+        <i class="ri-phone-line"></i>
+      </div>
+      <!-- Sidebar contact ends -->
+    </nav>
+    <!-- Sidebar wrapper ends -->
+
+    <!-- App container starts -->
+    <div class="app-container">
+
+      <!-- App header starts -->
+      <div class="app-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <button class="toggle-sidebar btn btn-sm btn-light"><i class="ri-menu-line"></i></button>
+          <h4 class="mb-0">User Management</h4>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <button type="button" class="btn btn-sm btn-primary" id="createNewUserBtn">
+            <i class="ri-add-line"></i> Create New User
+          </button>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="ri-user-line"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" onclick="logoutUser()">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- App header ends -->
+
+      <!-- App body starts -->
+      <div class="app-body">
+        <div class="container-fluid">
+          
+          <!-- Users Table Card -->
+          <div class="card">
+            <div class="card-header">
+              <h6 class="card-title mb-0">System Users</h6>
+              <p class="text-muted small mb-0">Manage user accounts and permissions</p>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Full Name</th>
+                      <th>Email</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Created Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTableBody">
+                    <tr>
+                      <td colspan="7" class="text-center text-muted py-4">
+                        <i class="ri-loader-4-line animate-spin"></i> Loading users...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- App body ends -->
+
+      <!-- App footer starts -->
+      <div class="app-footer bg-white">
+        <span>© LULLA admin 2025</span>
+      </div>
+      <!-- App footer ends -->
+
+    </div>
+    <!-- App container ends -->
+
+  </div>
+  <!-- Page wrapper ends -->
+
+  <!-- Create User Modal -->
+  <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create New User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="createUserMessage" style="display: none;"></div>
+          <form id="createUserForm">
+            <div class="mb-3">
+              <label class="form-label">Full Name *</label>
+              <input type="text" class="form-control" id="newUserFullname" placeholder="John Doe" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email Address *</label>
+              <input type="email" class="form-control" id="newUserEmail" placeholder="john@example.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Username *</label>
+              <input type="text" class="form-control" id="newUserUsername" placeholder="@johndoe123" readonly>
+              <small class="text-muted">Auto-generated from full name</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Role *</label>
+              <select class="form-control" id="newUserRole" required>
+                <option value="">Select a role</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Staff">Staff</option>
+                <option value="User">User</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Password *</label>
+              <input type="password" class="form-control" id="newUserPassword" placeholder="Enter password" required>
+              <small class="text-muted">Min 8 chars, uppercase, lowercase, numbers</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Confirm Password *</label>
+              <input type="password" class="form-control" id="newUserConfirmPassword" placeholder="Confirm password" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="submitCreateUserBtn">Create User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal (Custom) -->
+  <div id="editUserModalCustom" style="display: none !important; position: fixed; top: 0; left: 0; width: 100% !important; height: 100% !important; background: rgba(0,0,0,0.7) !important; z-index: 99999 !important; justify-content: center; align-items: center; visibility: visible !important; pointer-events: auto !important;">
+    <div style="background: white; border-radius: 8px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; pointer-events: auto !important;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; pointer-events: auto !important;">
+        <h5 style="margin: 0; font-weight: bold; pointer-events: auto !important;">Edit User</h5>
+        <button onclick="closeEditModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666; pointer-events: auto !important;">×</button>
+      </div>
+
+      <div id="editUserMessage" style="display: none; margin-bottom: 15px; pointer-events: auto !important;"></div>
+
+      <form id="editUserForm" style="display: block; pointer-events: auto !important;">
+        <div style="margin-bottom: 15px; pointer-events: auto !important;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 500; pointer-events: auto !important;">Full Name *</label>
+          <input type="text" id="modalEditFullname" placeholder="Full Name" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; pointer-events: auto !important; cursor: text !important; -webkit-user-select: text !important; user-select: text !important;">
+        </div>
+
+        <div style="margin-bottom: 15px; pointer-events: auto !important;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 500; pointer-events: auto !important;">Email *</label>
+          <input type="email" id="modalEditEmail" placeholder="Email" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; pointer-events: auto !important; cursor: text !important; -webkit-user-select: text !important; user-select: text !important;">
+        </div>
+
+        <div style="margin-bottom: 15px; pointer-events: auto !important;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 500; pointer-events: auto !important;">Role *</label>
+          <select id="modalEditRole" required style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; pointer-events: auto !important; cursor: pointer !important;">
+            <option value="Admin">Admin</option>
+            <option value="Manager">Manager</option>
+            <option value="Staff">Staff</option>
+            <option value="User">User</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 20px; pointer-events: auto !important;">
+          <label style="display: flex; align-items: center; cursor: pointer; pointer-events: auto !important;">
+            <input type="checkbox" id="modalEditActive" style="margin-right: 8px; cursor: pointer !important; width: 18px; height: 18px; pointer-events: auto !important;">
+            <span style="pointer-events: auto !important;">Active Account</span>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: flex-end; pointer-events: auto !important;">
+          <button type="button" onclick="closeEditModal()" style="padding: 10px 20px; border: 1px solid #ccc; background: #f8f9fa; border-radius: 4px; cursor: pointer; font-size: 14px; pointer-events: auto !important;">Cancel</button>
+          <button type="button" id="submitEditUserBtn" onclick="handleEditUserSubmit()" style="padding: 10px 20px; border: none; background: #15696B; color: white; border-radius: 4px; cursor: pointer; font-size: 14px; pointer-events: auto !important;">Update User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Files -->
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/custom.js"></script>
+
+  <!-- Supabase Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="supabase-config.js"></script>
+
+  <!-- User Management Script -->
+  <script src="user-management.js"></script>
+
+  <!-- Debug Script -->
+  <script>
+    // Debug: Log when modal is shown
+    document.addEventListener('DOMContentLoaded', function() {
+      const editModal = document.getElementById('editUserModal');
+      if (editModal) {
+        editModal.addEventListener('shown.bs.modal', function() {
+          console.log('Edit modal shown');
+          const inputs = this.querySelectorAll('input, select');
+          console.log('Found inputs:', inputs.length);
+          inputs.forEach((input, i) => {
+            console.log(`Input ${i}:`, input.id, input.type, input.disabled);
+          });
+        });
+      }
+    });
+  </script>
+
+  <!-- Session & Logout -->
+  <script>
+    // Check session on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const sessionData = localStorage.getItem('healthflow_session');
+      
+      if (!sessionData) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const session = JSON.parse(sessionData);
+      document.getElementById('sidebarUserName').textContent = session.fullname || session.username || 'User';
+      document.getElementById('sidebarUserRole').textContent = session.userRole || 'User';
+    });
+
+    // Logout function
+    function logoutUser() {
+      Swal.fire({
+        title: 'Logout?',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        confirmButtonText: 'Logout'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem('healthflow_session');
+          window.location.href = 'login.html';
+        }
+      });
+    }
+
+    // Sidebar toggle
+    document.querySelector('.toggle-sidebar')?.addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('active');
+    });
+  </script>
+</body>
+</html>

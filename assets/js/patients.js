@@ -91,6 +91,6 @@ var options = {
   },
 };
 
-var chart = new ApexCharts(document.querySelector("#patients"), options);
-
-chart.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart = new ApexCharts(document.querySelector("#patients"), options);
+// chart.render();

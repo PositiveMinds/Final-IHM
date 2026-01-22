@@ -30,8 +30,9 @@ var options1 = {
   colors: ["#116aef", "#d5cdff"],
 };
 
-var chart1 = new ApexCharts(document.querySelector("#sparkline1"), options1);
-chart1.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart1 = new ApexCharts(document.querySelector("#sparkline1"), options1);
+// chart1.render();
 
 // Sparkline 2
 var options2 = {
@@ -65,8 +66,9 @@ var options2 = {
   colors: ["#0ebb13", "#d5cdff"],
 };
 
-var chart2 = new ApexCharts(document.querySelector("#sparkline2"), options2);
-chart2.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart2 = new ApexCharts(document.querySelector("#sparkline2"), options2);
+// chart2.render();
 
 // Sparkline 3
 var options3 = {
@@ -118,8 +120,9 @@ var options3 = {
   colors: ["#0ebb13", "#eaf1ff"],
 };
 
-var chart3 = new ApexCharts(document.querySelector("#sparkline3"), options3);
-chart3.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart3 = new ApexCharts(document.querySelector("#sparkline3"), options3);
+// chart3.render();
 
 // Sparkline 4
 var options4 = {
@@ -170,5 +173,6 @@ var options4 = {
   },
 };
 
-var chart4 = new ApexCharts(document.querySelector("#sparkline4"), options4);
-chart4.render();
+// Chart rendering disabled - charts removed from dashboard
+// var chart4 = new ApexCharts(document.querySelector("#sparkline4"), options4);
+// chart4.render();
