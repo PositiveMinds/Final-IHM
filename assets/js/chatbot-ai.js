@@ -82,10 +82,10 @@ class HealthFlowChatbot {
     if (/negative|hiv\-/i.test(queryLower)) filters.hiv_status = 'Negative';
 
     // Extract condition
-    if (/diabetes|diabetic/i.test(queryLower)) filters.major_condition = 'Diabetes';
-    if (/hypertension|high blood pressure/i.test(queryLower)) filters.major_condition = 'Hypertension';
-    if (/tuberculosis|tb/i.test(queryLower)) filters.major_condition = 'TB';
-    if (/cancer/i.test(queryLower)) filters.major_condition = 'Cancer';
+    if (/diabetes|diabetic/i.test(queryLower)) filters.condition = 'Diabetes';
+    if (/hypertension|high blood pressure/i.test(queryLower)) filters.condition = 'Hypertension';
+    if (/tuberculosis|tb/i.test(queryLower)) filters.condition = 'TB';
+    if (/cancer/i.test(queryLower)) filters.condition = 'Cancer';
 
     // Extract viral load status
     if (/detectable/i.test(queryLower)) filters.viral_load_status = 'Detectable';
@@ -123,8 +123,8 @@ class HealthFlowChatbot {
       if (filters.hiv_status) {
         query = query.eq('hiv_status', filters.hiv_status);
       }
-      if (filters.major_condition) {
-        query = query.eq('major_condition', filters.major_condition);
+      if (filters.condition) {
+        query = query.eq('condition', filters.condition);
       }
       if (filters.viral_load_status) {
         query = query.eq('viral_load_status', filters.viral_load_status);
@@ -163,7 +163,7 @@ class HealthFlowChatbot {
       // Apply filters for stats
       if (filters.status) query = query.eq('status', filters.status);
       if (filters.hiv_status) query = query.eq('hiv_status', filters.hiv_status);
-      if (filters.major_condition) query = query.eq('major_condition', filters.major_condition);
+      if (filters.condition) query = query.eq('condition', filters.condition);
 
       const { data, error } = await query;
       if (error) throw error;
@@ -172,7 +172,7 @@ class HealthFlowChatbot {
       return {
         total: patients.length,
         byStatus: this.countBy(patients, 'status'),
-        byCondition: this.countBy(patients, 'major_condition'),
+        byCondition: this.countBy(patients, 'condition'),
         byHIVStatus: this.countBy(patients, 'hiv_status'),
         avgAge: patients.length > 0 ? Math.round(patients.reduce((sum, p) => sum + (p.age || 0), 0) / patients.length) : 0
       };
@@ -208,7 +208,7 @@ class HealthFlowChatbot {
 <br/>ID: ${p.patient_no} | Name: ${p.first_name} ${p.last_name}
 <br/>Age: ${p.age} | Gender: ${p.gender}
 <br/>Status: <span class="badge bg-info">${p.status}</span>
-<br/>Condition: ${p.major_condition || 'N/A'}
+<br/>Condition: ${p.condition || 'N/A'}
 <br/>HIV Status: <span class="badge ${p.hiv_status === 'Positive' ? 'bg-danger' : 'bg-success'}">${p.hiv_status || 'Unknown'}</span>
 ${p.viral_load_status ? `<br/>Viral Load: <span class="badge bg-warning">${p.viral_load_status}</span>` : ''}
 ${p.next_appointment ? `<br/>Next Appointment: ${new Date(p.next_appointment).toLocaleDateString()}` : ''}
@@ -229,7 +229,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ''}
 <td>${p.first_name} ${p.last_name}</td>
 <td>${p.age}</td>
 <td><span class="badge bg-info">${p.status}</span></td>
-<td>${p.major_condition || '—'}</td>
+<td>${p.condition || '—'}</td>
 <td><span class="badge ${p.hiv_status === 'Positive' ? 'bg-danger' : 'bg-success'}">${p.hiv_status || '?'}</span></td>
 </tr>`;
     });
