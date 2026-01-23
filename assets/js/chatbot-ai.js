@@ -171,7 +171,8 @@ class HealthFlowChatbot {
             filters.hiv_status = "Negative";
 
         // Extract condition - check if any condition keywords are present
-        if (/hiv|aids/i.test(queryLower)) {
+        // NOTE: Don't set condition filter for HIV queries since hiv_status filter is more specific
+        if (/hiv|aids/i.test(queryLower) && !filters.hiv_status) {
             filters.condition = "HIV/AIDS";
             console.log("Matched HIV/AIDS");
         }
