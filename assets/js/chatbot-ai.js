@@ -443,11 +443,26 @@ class HealthFlowChatbot {
     }
 
     /**
+     * Get follow-up assistance suggestions
+     */
+    getFollowUpSuggestions() {
+        return `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #ddd;">
+            <small style="color: #666;"><strong>Need more assistance?</strong></small><br/>
+            <small style="color: #888; margin-top: 8px; display: block;">
+                • Try filtering by status, condition, or date range<br/>
+                • Ask about statistics or trends<br/>
+                • Export results for further analysis<br/>
+                • Type "help" or ask any question about your patients
+            </small>
+        </div>`;
+    }
+
+    /**
      * Format patient data for display
      */
     formatPatientResponse(patients) {
         if (patients.length === 0) {
-            return `<strong>No patients found matching your criteria.</strong><br/><small class="text-muted">Check your filters or try a different search.</small>`;
+            return `<strong>No patients found matching your criteria.</strong><br/><small class="text-muted">Check your filters or try a different search.</small>` + this.getFollowUpSuggestions();
         }
 
         if (patients.length === 1) {
@@ -474,7 +489,7 @@ ${
     : ""
 }
 ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
-      `;
+      ` + this.getFollowUpSuggestions();
         }
 
         // Multiple patients - show as table
@@ -498,7 +513,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
         });
 
         html += "</tbody></table>";
-        return html;
+        return html + this.getFollowUpSuggestions();
     }
 
     /**
@@ -584,7 +599,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
             html += `${status}: ${count} <br/>`;
         }
 
-        return html;
+        return html + this.getFollowUpSuggestions();
     }
 
     /**
@@ -714,6 +729,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                             });
                             botResponse += '</tbody></table>';
                         }
+                        botResponse += this.getFollowUpSuggestions();
                     }
                 } catch (error) {
                     console.error("Error fetching date range appointments:", error);
