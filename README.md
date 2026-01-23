@@ -64,7 +64,22 @@ IHM2 is a web-based healthcare information system that integrates patient manage
 - Responsive design for mobile and desktop
 
 ### 6. **Data Import & Export**
-- Bulk patient data import via CSV
+- **Professional CSV Import Modal**
+  - Multi-step import wizard with intuitive UI
+  - Auto-detection of CSV column headers to database fields
+  - Manual column matching with dropdown selectors for custom CSV formats
+  - Real-time data preview with first 3 rows
+  - Import statistics showing total records and mapped fields
+- **Intelligent Import Features**
+  - Insert new patients automatically
+  - Update existing patients by `patient_no` (prevents duplicates)
+  - Auto-populate facility ID from logged-in user session
+  - Validate required fields before import
+- **Import Progress Tracking**
+  - Animated progress bar with real-time updates
+  - Live statistics: Added, Updated, Failed counts
+  - Processing status messages
+  - Beautiful gradient animations during import
 - Appointment data import
 - Facility data management
 - SQL batch operations
@@ -178,10 +193,56 @@ IHM2/
 Comprehensive guides are included:
 - **CHATBOT_SETUP_GUIDE.md** - AI chatbot configuration
 - **DATA_IMPORT_GUIDE.md** - Bulk data import procedures
+- **PATIENT_IMPORT_WIZARD.md** - Professional CSV import with column matching
 - **CORS_FIX_GUIDE.md** - CORS configuration troubleshooting
 - **N8N_SUPABASE_QUICK_START.md** - Workflow automation setup
 - **DASHBOARD_ENHANCEMENTS_GUIDE.md** - UI customization
 - **APPOINTMENT_EXPORT_IMPLEMENTATION.md** - Appointment filtering and export features
+
+## Patient Import Wizard
+
+### Overview
+The Patient Import Wizard provides a user-friendly interface for bulk importing patient data from CSV files.
+
+### Workflow
+1. **File Selection** - Upload your CSV file with patient data
+2. **Column Matching** - Auto-detect or manually match CSV columns to database fields
+3. **Data Preview** - Review sample data with import statistics
+4. **Confirmation** - Execute import with real-time progress tracking
+
+### Supported Database Fields
+```
+patient_no, first_name, last_name, age, gender, phone_number, email,
+facility_id_code, status, notes, address, condition, viral_load_copies,
+viral_load_status, visit_date, next_appointment, appointment_time,
+health_worker_name, health_worker_role, patient_registration_date,
+art_start_date, patient_type, last_viral_load_date, hiv_status,
+appointment_type, systolic, diastolic, hiv_regimen, regimen_start_date,
+regimen_status, glucose_level
+```
+
+### CSV Format Example
+```csv
+PatientID,FirstName,LastName,Age,Gender,Phone,Email,Status
+PAT-KIT-001,John,Doe,35,Male,+256701234567,john@example.com,Active
+PAT-KIT-002,Jane,Smith,28,Female,+256702345678,jane@example.com,Active
+```
+
+### Key Features
+- **Auto-Detection** - Intelligently matches CSV headers to database columns
+- **Manual Override** - Adjust column mappings with dropdown selectors
+- **Skip Columns** - Choose to skip unmapped or unnecessary columns
+- **Duplicate Prevention** - Updates existing patients by `patient_no`
+- **Facility Assignment** - Auto-assigns user's facility to all imported records
+- **Progress Tracking** - Real-time progress bar with live statistics
+- **Error Handling** - Detailed error reporting and row-by-row validation
+
+### Import Statistics
+The progress window displays:
+- Total records processed
+- New records added
+- Existing records updated
+- Failed records with error details
 
 ## Security Considerations
 
@@ -290,3 +351,7 @@ For issues, questions, or contributions, please open an issue on GitHub or conta
 
 **Project Status:** Active Development
 **Last Updated:** January 2026
+**Recent Updates:** 
+- Professional CSV import wizard with column matching (v2.1)
+- Real-time import progress tracking with animated UI
+- Intelligent patient duplicate detection and update functionality
