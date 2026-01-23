@@ -615,17 +615,16 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
             // Process based on intent
             if (detectedIntent === "greeting") {
                 botResponse = this.generateGreetingResponse(userMessage);
-            }
-            // If specific_patient intent but no patient_no extracted, treat as patient_search
-            else if (detectedIntent === "specific_patient" && !filters.patient_no) {
-                detectedIntent = "patient_search";
-            }
-
-            if (
+            } else if (
                 detectedIntent === "patient_search" ||
                 detectedIntent === "hiv_positive_search" ||
                 detectedIntent === "specific_patient"
             ) {
+                // If specific_patient intent but no patient_no extracted, treat as patient_search
+                if (detectedIntent === "specific_patient" && !filters.patient_no) {
+                    detectedIntent = "patient_search";
+                }
+
                 try {
                     const patients = await this.queryPatients(filters);
                     console.log("Patients found:", patients);
