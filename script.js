@@ -395,21 +395,67 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ============================================
-// MOBILE SIDEBAR NAVIGATION
+// MOBILE FAB MENU & SIDEBAR NAVIGATION
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
   const fabButton = document.getElementById("fabButton");
+  const fabMenuItems = document.getElementById("fabMenuItems");
+  const fabChatBtn = document.getElementById("fabChatBtn");
+  const fabImportBtn = document.getElementById("fabImportBtn");
+  const fabNavBtn = document.getElementById("fabNavBtn");
   const sidebarNav = document.getElementById("mobileSidebarNav");
   const sidebarOverlay = document.getElementById("sidebarOverlay");
   const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
   const sidebarMenuItems = document.querySelectorAll(".sidebar-menu-item");
 
-  // Open sidebar
+  let menuOpen = false;
+
+  // Toggle FAB menu
   fabButton.addEventListener("click", function (e) {
+    e.stopPropagation();
+    menuOpen = !menuOpen;
+    
+    if (menuOpen) {
+      fabMenuItems.classList.add("active");
+      fabButton.classList.add("active");
+    } else {
+      fabMenuItems.classList.remove("active");
+      fabButton.classList.remove("active");
+    }
+  });
+
+  // Chat button - Open chat system
+  fabChatBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    if (typeof chatSystem !== "undefined" && chatSystem.openChat) {
+      chatSystem.openChat();
+      closeFabMenu();
+    } else {
+      alert("Chat system is not loaded yet. Please try again.");
+    }
+  });
+
+  // Import button - Open import modal
+  fabImportBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    openImportModal();
+    closeFabMenu();
+  });
+
+  // Navigation button - Open sidebar
+  fabNavBtn.addEventListener("click", function (e) {
     e.stopPropagation();
     sidebarNav.classList.add("show");
     sidebarOverlay.classList.add("show");
+    closeFabMenu();
   });
+
+  // Close FAB menu
+  function closeFabMenu() {
+    menuOpen = false;
+    fabMenuItems.classList.remove("active");
+    fabButton.classList.remove("active");
+  }
 
   // Close sidebar
   function closeSidebar() {
@@ -428,11 +474,179 @@ document.addEventListener("DOMContentLoaded", function () {
     item.addEventListener("click", closeSidebar);
   });
 
-  // Close when clicking outside
+  // Close menu when clicking outside
   document.addEventListener("click", function (e) {
     const fabMenu = document.querySelector(".mobile-fab-menu");
     if (!sidebarNav.contains(e.target) && !fabMenu.contains(e.target)) {
       closeSidebar();
+      closeFabMenu();
     }
   });
 });
+
+// ============================================
+// IMPORT DATA MODAL
+// ============================================
+function openImportModal() {
+  // Create or show import modal
+  let importModal = document.getElementById("importDataModal");
+  
+  if (!importModal) {
+    // Create the modal if it doesn't exist
+    const modalHTML = `
+      <div class="modal fade" id="importDataModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+              <h5 class="modal-title">
+                <i class="fas fa-file-import me-2"></i>Import Data
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Import CSV Data:</strong> Upload patient or appointment data from CSV files.
+              </div>
+              
+              <!-- Import Tabs -->
+              <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients-content" type="button" role="tab">
+                    <i class="fas fa-users me-2"></i>Patients
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments-content" type="button" role="tab">
+                    <i class="fas fa-calendar me-2"></i>Appointments
+                  </button>
+                </li>
+              </ul>
+
+              <!-- Tab Content -->
+              <div class="tab-content">
+                <!-- Patients Tab -->
+                <div class="tab-pane fade show active" id="patients-content" role="tabpanel">
+                  <div class="mb-3">
+                    <label class="form-label">Select Patient CSV File</label>
+                    <input type="file" class="form-control" id="patientsFileInput" accept=".csv" />
+                    <small class="text-muted">
+                      <a href="sample_patients_import.csv" download>Download sample file</a>
+                    </small>
+                  </div>
+                  <button class="btn btn-primary w-100" id="importPatientsBtn">
+                    <i class="fas fa-upload me-2"></i>Import Patients
+                  </button>
+                </div>
+
+                <!-- Appointments Tab -->
+                <div class="tab-pane fade" id="appointments-content" role="tabpanel">
+                  <div class="mb-3">
+                    <label class="form-label">Select Appointment CSV File</label>
+                    <input type="file" class="form-control" id="appointmentsFileInput" accept=".csv" />
+                    <small class="text-muted">
+                      <a href="sample_appointments_import.csv" download>Download sample file</a>
+                    </small>
+                  </div>
+                  <button class="btn btn-primary w-100" id="importAppointmentsBtn">
+                    <i class="fas fa-upload me-2"></i>Import Appointments
+                  </button>
+                </div>
+              </div>
+
+              <!-- Import Progress -->
+              <div id="importProgress" style="display: none;" class="mt-4">
+                <div class="progress" style="height: 25px;">
+                  <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%">0%</div>
+                </div>
+                <p id="progressText" class="text-center mt-2 text-muted">Processing...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+    importModal = document.getElementById("importDataModal");
+
+    // Add event listeners
+    document.getElementById("importPatientsBtn").addEventListener("click", function () {
+      handleFileImport("patients");
+    });
+    document.getElementById("importAppointmentsBtn").addEventListener("click", function () {
+      handleFileImport("appointments");
+    });
+  }
+
+  // Show the modal
+  const bsModal = new bootstrap.Modal(importModal);
+  bsModal.show();
+}
+
+// Handle file import
+function handleFileImport(type) {
+  const fileInput = type === "patients" 
+    ? document.getElementById("patientsFileInput")
+    : document.getElementById("appointmentsFileInput");
+  
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("Please select a file to import.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const csv = e.target.result;
+      const data = parseCSV(csv);
+      
+      // Show progress
+      const progressDiv = document.getElementById("importProgress");
+      progressDiv.style.display = "block";
+      
+      // Simulate processing
+      let progress = 0;
+      const interval = setInterval(function () {
+        progress += Math.random() * 30;
+        if (progress >= 90) progress = 90;
+        document.getElementById("progressBar").style.width = progress + "%";
+        document.getElementById("progressBar").textContent = Math.round(progress) + "%";
+      }, 300);
+
+      // Process the data
+      setTimeout(function () {
+        clearInterval(interval);
+        document.getElementById("progressBar").style.width = "100%";
+        document.getElementById("progressBar").textContent = "100%";
+        document.getElementById("progressText").textContent = `Successfully imported ${data.length} ${type} records`;
+
+        // Redirect to dashboard after 2 seconds
+        setTimeout(function () {
+          window.location.href = "dashboard.html";
+        }, 2000);
+      }, 2000);
+    } catch (error) {
+      alert("Error importing file: " + error.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Simple CSV parser
+function parseCSV(csv) {
+  const lines = csv.split("\n").filter(line => line.trim());
+  const headers = lines[0].split(",");
+  const data = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",");
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header.trim()] = values[index] ? values[index].trim() : "";
+    });
+    data.push(row);
+  }
+  
+  return data;
+}

@@ -23,14 +23,178 @@
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     
-    <!-- Air Datepicker CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/air-datepicker@3.4.0/air-datepicker.css" rel="stylesheet" />
+    <!-- jQuery -->
+    <script src="assets/js/jquery.min.js"></script>
+    
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     <!-- Chatbot CSS -->
     <link rel="stylesheet" href="assets/css/chatbot.css">
 
     <!-- Chat System CSS -->
     <link rel="stylesheet" href="chat-system.css">
+
+    <!-- FAB Button CSS -->
+    <style>
+      /* Hide the chatbot's default FAB button */
+      .chatbot-fab {
+        display: none !important;
+      }
+
+      /* FAB Button Styles */
+      .fab-container {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+        font-family: inherit;
+      }
+
+      .fab-menu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 12px;
+      }
+
+      .fab-menu-item {
+        transform: scale(0);
+        transform-origin: bottom right;
+        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+
+      .fab-container.active .fab-menu-item {
+        transform: scale(1);
+      }
+
+      .fab-menu-item:nth-child(1) {
+        transition-delay: 0.05s;
+      }
+
+      .fab-menu-item:nth-child(2) {
+        transition-delay: 0.1s;
+      }
+
+      .fab-menu-item:nth-child(3) {
+        transition-delay: 0.15s;
+      }
+
+      .fab-menu-item button {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: none;
+        background: white;
+        color: #15696B;
+        font-size: 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+      }
+
+      .fab-menu-item button:hover {
+        background: #f5f5f5;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .fab-menu-item button.chat-btn {
+        background: #15696B;
+        color: white;
+      }
+
+      .fab-menu-item button.chat-btn:hover {
+        background: #0F4449;
+      }
+
+      .fab-menu-item button.import-btn {
+        background: #15696B;
+        color: white;
+      }
+
+      .fab-menu-item button.import-btn:hover {
+        background: #0F4449;
+      }
+
+      .fab-button {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #15696B 0%, #0F4449 100%);
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 20px rgba(21, 105, 107, 0.4);
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .fab-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 28px rgba(21, 105, 107, 0.6);
+      }
+
+      .fab-button.active {
+        transform: rotate(45deg);
+      }
+
+      .fab-button i {
+        transition: transform 0.3s ease;
+      }
+
+      /* Tooltip styles */
+      .fab-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        right: 70px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .fab-menu-item button:hover .fab-tooltip {
+        opacity: 1;
+      }
+
+      /* Mobile responsiveness */
+      @media (max-width: 576px) {
+        .fab-container {
+          bottom: 20px;
+          right: 20px;
+        }
+
+        .fab-button {
+          width: 56px;
+          height: 56px;
+          font-size: 24px;
+        }
+
+        .fab-menu-item button {
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+        }
+      }
+    </style>
     
     <!-- Theme Color Override -->
     <style>
@@ -1805,8 +1969,7 @@
     <!-- *************
 			************ JavaScript Files *************
 		************* -->
-    <!-- Required jQuery first, then Bootstrap Bundle JS -->
-    <script src="assets/js/jquery.min.js"></script>
+    <!-- Required Bootstrap Bundle JS (jQuery already loaded in head) -->
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/moment.min.js"></script>
 
@@ -1845,6 +2008,313 @@
     
     <!-- Dashboard Data Script -->
     <script src="dashboard-data.js"></script>
+
+    <!-- Chat System Script -->
+    <script src="chat-system.js"></script>
+
+    <!-- FAB Button Script -->
+    <script>
+      // FAB Button Functionality
+      document.addEventListener('DOMContentLoaded', function() {
+        const fabContainer = document.getElementById('fabContainer');
+        const fabButton = document.getElementById('fabButton');
+        const fabChatBtn = document.getElementById('fabChatBtn');
+        const fabChatbotBtn = document.getElementById('fabChatbotBtn');
+        const fabImportBtn = document.getElementById('fabImportBtn');
+
+        // Ensure FAB is visible
+        if (fabContainer) {
+          fabContainer.style.display = 'block';
+          fabContainer.style.visibility = 'visible';
+          console.log('FAB Container initialized');
+        }
+
+        // Toggle FAB menu on main button click
+        if (fabButton) {
+          fabButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            fabContainer.classList.toggle('active');
+            fabButton.classList.toggle('active');
+          });
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(e) {
+          if (fabContainer && !fabContainer.contains(e.target)) {
+            fabContainer.classList.remove('active');
+            if (fabButton) {
+              fabButton.classList.remove('active');
+            }
+          }
+        });
+
+        // Chat button functionality
+        if (fabChatBtn) {
+          fabChatBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close FAB menu
+            fabContainer.classList.remove('active');
+            fabButton.classList.remove('active');
+            
+            // Open chat system
+            if (typeof chatSystem !== 'undefined' && chatSystem.openChat) {
+              chatSystem.openChat();
+            }
+          });
+        }
+
+        // Chatbot button functionality
+        if (fabChatbotBtn) {
+          fabChatbotBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close FAB menu
+            fabContainer.classList.remove('active');
+            fabButton.classList.remove('active');
+            
+            // Open chatbot
+            if (typeof chatbotUI !== 'undefined' && chatbotUI.open) {
+              chatbotUI.open();
+            }
+          });
+        }
+
+        // Import button functionality
+        if (fabImportBtn) {
+          fabImportBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close FAB menu
+            fabContainer.classList.remove('active');
+            fabButton.classList.remove('active');
+            
+            // Show import dialog
+            showImportDialog();
+          });
+        }
+
+        // Import Dialog Function
+        function showImportDialog() {
+          Swal.fire({
+            title: 'Import Patient Data',
+            html: `
+              <div class="text-start">
+                <p class="mb-3">Import patient data from CSV file</p>
+                <div class="mb-3">
+                  <label for="fileInput" class="form-label">Select CSV File</label>
+                  <input type="file" id="fileInput" class="form-control" accept=".csv" />
+                </div>
+                <div class="alert alert-info">
+                  <small><strong>CSV Format:</strong> ID, FirstName, LastName, Age, Gender, Phone, Email, etc.</small>
+                </div>
+              </div>
+            `,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Import',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#15696B',
+            didOpen: () => {
+              const fileInput = document.getElementById('fileInput');
+              fileInput.focus();
+            },
+            preConfirm: () => {
+              const fileInput = document.getElementById('fileInput');
+              if (!fileInput.files[0]) {
+                Swal.showValidationMessage('Please select a file');
+                return false;
+              }
+              return fileInput.files[0];
+            }
+          }).then((result) => {
+            if (result.isConfirmed && result.value) {
+              handleFileUpload(result.value);
+            }
+          });
+        }
+
+        // Handle file upload and import
+        function handleFileUpload(file) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            try {
+              const csv = e.target.result;
+              const lines = csv.trim().split('\n');
+              
+              if (lines.length < 2) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Invalid File',
+                  text: 'CSV file must contain at least a header row and one data row'
+                });
+                return;
+              }
+
+              // Parse CSV
+              const headers = lines[0].split(',').map(h => h.trim());
+              const data = lines.slice(1).map(line => {
+                const values = line.split(',').map(v => v.trim());
+                const row = {};
+                headers.forEach((header, index) => {
+                  row[header] = values[index] || '';
+                });
+                return row;
+              });
+
+              // Show preview and confirmation
+              Swal.fire({
+                title: 'Import Preview',
+                html: `
+                  <div class="text-start">
+                    <p><strong>Rows to import:</strong> ${data.length}</p>
+                    <p><strong>Columns:</strong> ${headers.join(', ')}</p>
+                    <div class="alert alert-warning">
+                      <small>This will add new patient records to your database. This action cannot be undone.</small>
+                    </div>
+                  </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Proceed with Import',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#15696B',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  importPatientData(data);
+                }
+              });
+            } catch (error) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error parsing CSV file: ' + error.message
+              });
+            }
+          };
+
+          reader.onerror = function() {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error reading file'
+            });
+          };
+
+          reader.readAsText(file);
+        }
+
+        // Import patient data to database
+        async function importPatientData(data) {
+          Swal.fire({
+            title: 'Importing...',
+            html: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
+          try {
+            // Check if Supabase is available
+            if (typeof supabaseClient === 'undefined') {
+              throw new Error('Database connection not available');
+            }
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const patient of data) {
+              try {
+                // Map CSV columns to database columns
+                const patientRecord = {
+                  patient_no: patient['patient_no'] || patient['Patient ID'] || patient['ID'] || '',
+                  first_name: patient['first_name'] || patient['First Name'] || patient['FirstName'] || '',
+                  last_name: patient['last_name'] || patient['Last Name'] || patient['LastName'] || '',
+                  age: patient['age'] ? parseInt(patient['age']) : null,
+                  gender: patient['gender'] || patient['Gender'] || '',
+                  phone_number: patient['phone_number'] || patient['Phone'] || '',
+                  email: patient['email'] || patient['Email'] || '',
+                  facility_id_code: patient['facility_id_code'] || patient['Facility ID'] || patient['FacilityID'] || '',
+                  fid: patient['fid'] ? parseInt(patient['fid']) : 1,
+                  status: patient['status'] || patient['Status'] || 'Active',
+                  address: patient['address'] || null,
+                  condition: patient['condition'] || null,
+                  viral_load_copies: patient['viral_load_copies'] ? parseInt(patient['viral_load_copies']) : null,
+                  viral_load_status: patient['viral_load_status'] || null,
+                  visit_date: patient['visit_date'] || null,
+                  next_appointment: patient['next_appointment'] || null,
+                  patient_registration_date: patient['patient_registration_date'] || null,
+                  art_start_date: patient['art_start_date'] || null,
+                  last_viral_load_date: patient['last_viral_load_date'] || null,
+                  systolic: patient['systolic'] ? parseInt(patient['systolic']) : null,
+                  diastolic: patient['diastolic'] ? parseInt(patient['diastolic']) : null,
+                  hiv_regimen: patient['hiv_regimen'] || null,
+                  regimen_start_date: patient['regimen_start_date'] || null,
+                  regimen_status: patient['regimen_status'] || null,
+                  glucose_level: patient['glucose_level'] ? parseInt(patient['glucose_level']) : null,
+                  notes: patient['notes'] || null,
+                  health_worker_name: patient['health_worker_name'] || null,
+                  health_worker_role: patient['health_worker_role'] || null,
+                  appointment_time: patient['appointment_time'] || null,
+                  patient_type: patient['patient_type'] || null,
+                  hiv_status: patient['hiv_status'] || null,
+                  appointment_type: patient['appointment_type'] || null,
+                };
+
+                // Insert into database
+                const { error } = await supabaseClient
+                  .from('patients')
+                  .insert([patientRecord]);
+
+                if (!error) {
+                  successCount++;
+                } else {
+                  errorCount++;
+                  console.error('Row error:', error);
+                }
+              } catch (rowError) {
+                errorCount++;
+                console.error('Row processing error:', rowError);
+              }
+            }
+
+            // Close loading dialog and show results
+            Swal.close();
+            
+            Swal.fire({
+              icon: successCount > 0 ? 'success' : 'warning',
+              title: 'Import Complete',
+              html: `
+                <div class="text-start">
+                  <p><strong style="color: #28a745;">Successfully imported:</strong> ${successCount} records</p>
+                  ${errorCount > 0 ? `<p><strong style="color: #dc3545;">Failed:</strong> ${errorCount} records</p>` : ''}
+                  <p class="mt-3 mb-0"><small>The patient data has been added to your system.</small></p>
+                </div>
+              `,
+              confirmButtonColor: '#15696B'
+            }).then(() => {
+              // Refresh the page or table
+              if (typeof location !== 'undefined' && window.location) {
+                location.reload();
+              }
+            });
+          } catch (error) {
+            Swal.close();
+            Swal.fire({
+              icon: 'error',
+              title: 'Import Failed',
+              text: error.message || 'An error occurred during import'
+            });
+          }
+        }
+      });
+    </script>
 
     <!-- Authentication Check & Session Management -->
     <script>
@@ -3001,6 +3471,38 @@
           }, 50);
         }
 
+        // Auto-fill Blood Pressure from Systolic and Diastolic
+        function setupBloodPressureAutoFill() {
+          const systolicInputs = document.querySelectorAll('input[id*="systolic"]');
+          const diastolicInputs = document.querySelectorAll('input[id*="diastolic"]');
+          const bpInputs = document.querySelectorAll('input[id*="blood_pressure"]');
+          
+          const updateBloodPressure = () => {
+            systolicInputs.forEach((systolicInput) => {
+              const prefix = systolicInput.id.replace('systolic', '');
+              const diastolicInput = document.getElementById(prefix + 'diastolic');
+              const bpInput = document.getElementById(prefix + 'blood_pressure');
+              
+              if (diastolicInput && bpInput) {
+                const systolic = systolicInput.value;
+                const diastolic = diastolicInput.value;
+                
+                if (systolic && diastolic) {
+                  bpInput.value = systolic + '/' + diastolic + ' mmHg';
+                }
+              }
+            });
+          };
+          
+          systolicInputs.forEach(input => {
+            input.addEventListener('input', updateBloodPressure);
+          });
+          
+          diastolicInputs.forEach(input => {
+            input.addEventListener('input', updateBloodPressure);
+          });
+        }
+        
         // Initialize all date pickers once at modal open
         function initAllDatePickers() {
           setTimeout(() => {
@@ -3008,53 +3510,36 @@
               const dateInputs = document.querySelectorAll('.swal2-html-container input[type="date"]');
               console.log('Found date inputs to initialize:', dateInputs.length);
               
-              if (typeof window.AirDatepicker === 'undefined') {
-                console.log('AirDatepicker not available');
+              if (typeof window.flatpickr === 'undefined') {
+                console.log('Flatpickr not available');
                 return;
-              }
-              
-              // Get or create global container for AirDatepicker
-              let globalContainer = document.getElementById('air-datepicker-global-container');
-              if (!globalContainer) {
-                globalContainer = document.createElement('div');
-                globalContainer.id = 'air-datepicker-global-container';
-                globalContainer.style.position = 'fixed';
-                globalContainer.style.zIndex = '9999';
-                globalContainer.style.pointerEvents = 'none';
-                document.body.appendChild(globalContainer);
               }
               
               dateInputs.forEach(function(dateEl) {
                 try {
-                  // Create text input for AirDatepicker
-                  const textInput = document.createElement('input');
-                  textInput.type = 'text';
-                  textInput.className = dateEl.className;
-                  textInput.id = dateEl.id;
-                  textInput.value = dateEl.value;
-                  textInput.placeholder = 'YYYY-MM-DD';
-                  textInput.style.pointerEvents = 'auto';
+                  if (dateEl.classList.contains('flatpickr-initialized')) {
+                    return;
+                  }
                   
-                  // Replace the date input
-                  dateEl.parentNode.replaceChild(textInput, dateEl);
+                  console.log('Initializing Flatpickr for:', dateEl.id);
                   
-                  console.log('Initializing AirDatepicker for:', textInput.id);
-                  
-                  // Initialize AirDatepicker with global container
-                  new AirDatepicker(textInput, {
-                    isMobile: false,
-                    autoClose: true,
-                    position: 'bottom center',
-                    dateFormat: 'yyyy-MM-dd',
-                    container: globalContainer
+                  // Initialize Flatpickr
+                  flatpickr(dateEl, {
+                    mode: 'single',
+                    dateFormat: 'Y-m-d',
+                    enableTime: false,
+                    closeOnSelect: true,
+                    allowInput: true
                   });
                   
-                  console.log('AirDatepicker created for:', textInput.id);
+                  dateEl.classList.add('flatpickr-initialized');
+                  console.log('Flatpickr initialized for:', dateEl.id);
                   
                 } catch(e) {
-                  console.error('AirDatepicker error:', e.message);
+                  console.error('Flatpickr error for ' + dateEl.id + ':', e.message);
                 }
               });
+              
             } catch(e) {
               console.error('Date picker init error:', e);
             }
@@ -3111,14 +3596,14 @@
                   </div>
                   <div class="col-md-6">
                     <div class="mb-3">
-                      <label class="form-label">Gender *</label>
-                      <select class="form-control" id="add_gender" required>
-                        <option value="">Select gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
+                       <label class="form-label">Gender *</label>
+                       <select class="form-control" id="add_gender" required>
+                         <option value="">Select gender</option>
+                         <option value="Male">Male</option>
+                         <option value="Female">Female</option>
+                         <option value="Other">Other</option>
+                       </select>
+                     </div>
                   </div>
                 </div>
                 <div class="mb-3">
@@ -3322,6 +3807,10 @@
             } else {
               console.log('initAllDatePickers is not a function');
             }
+            // Setup blood pressure auto-fill
+            if (typeof setupBloodPressureAutoFill === 'function') {
+              setupBloodPressureAutoFill();
+            }
           },
           showCancelButton: true,
           confirmButtonText: 'Next',
@@ -3391,6 +3880,9 @@
                 last_viral_load_date: document.getElementById('add_last_viral_load_date').value || null,
                 viral_load_copies: parseInt(document.getElementById('add_viral_load_copies').value) || null,
                 viral_load_status: document.getElementById('add_viral_load_status').value || null,
+                systolic: parseInt(document.getElementById('add_systolic').value) || null,
+                diastolic: parseInt(document.getElementById('add_diastolic').value) || null,
+                blood_pressure: document.getElementById('add_blood_pressure').value || null,
                 glucose_level: document.getElementById('add_glucose_level').value ? parseFloat(document.getElementById('add_glucose_level').value) : null,
                 patient_registration_date: document.getElementById('add_patient_registration_date').value || null,
                 art_start_date: document.getElementById('add_art_start_date').value || null,
@@ -5458,15 +5950,33 @@
       }
     </style>
 
-    <button 
-      class="chat-fab" 
-      id="chatFabBtn"
-      onclick="chatSystem.openChat()" 
-      title="Open Chat"
-      aria-label="Open Chat">
-      <i class="ri-chat-3-line"></i>
-      <div class="chat-fab-badge" id="chatFabBadge" style="display: none;">0</div>
-    </button>
+    <!-- FAB Button Container -->
+    <div class="fab-container" id="fabContainer">
+      <ul class="fab-menu">
+        <li class="fab-menu-item">
+          <button type="button" class="import-btn" id="fabImportBtn" title="Import Patient Data">
+            <span class="fab-tooltip">Import Data</span>
+            <i class="ri-upload-cloud-line"></i>
+          </button>
+        </li>
+        <li class="fab-menu-item">
+          <button type="button" class="chat-btn" id="fabChatBtn" title="Open Chat">
+            <span class="fab-tooltip">Chat Messages</span>
+            <i class="ri-message-2-line"></i>
+          </button>
+        </li>
+        <li class="fab-menu-item">
+          <button type="button" class="chat-btn" id="fabChatbotBtn" title="Open AI Chatbot">
+            <span class="fab-tooltip">AI Assistant</span>
+            <i class="ri-robot-line"></i>
+          </button>
+        </li>
+      </ul>
+      <button type="button" class="fab-button" id="fabButton">
+        <i class="ri-add-line"></i>
+      </button>
+    </div>
+    <!-- FAB Button Container Ends -->
   </body>
 
 </html>

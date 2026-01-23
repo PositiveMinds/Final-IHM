@@ -63,11 +63,26 @@
         </div>
     </nav>
 
-    <!-- Mobile FAB Button -->
+    <!-- Mobile FAB Button with Chat & Import Menu -->
     <div class="mobile-fab-menu d-lg-none">
-        <button class="fab-button" id="fabButton" aria-label="Open navigation menu">
-            <i class="fas fa-bars"></i>
+        <button class="fab-button fab-main" id="fabButton" aria-label="Open menu">
+            <i class="fas fa-plus"></i>
         </button>
+        <!-- FAB Menu Items -->
+        <div class="fab-menu-items" id="fabMenuItems">
+            <button class="fab-menu-item fab-chat" id="fabChatBtn" title="Open Chat">
+                <i class="fas fa-comments"></i>
+                <span class="fab-label">Chat</span>
+            </button>
+            <button class="fab-menu-item fab-import" id="fabImportBtn" title="Import Data">
+                <i class="fas fa-file-import"></i>
+                <span class="fab-label">Import</span>
+            </button>
+            <button class="fab-menu-item fab-nav" id="fabNavBtn" title="Navigation">
+                <i class="fas fa-bars"></i>
+                <span class="fab-label">Menu</span>
+            </button>
+        </div>
     </div>
 
     <!-- Mobile Sidebar Navbar -->
@@ -98,15 +113,30 @@
 
     <!-- Hero Section -->
     <section id="home" class="hf-hero">
-        <div class="container-fluid px-3 px-md-4 px-lg-5">
+        <div class="hero-background">
+            <div class="hero-gradient-blur hero-blur-1"></div>
+            <div class="hero-gradient-blur hero-blur-2"></div>
+            <div class="hero-grid"></div>
+        </div>
+        
+        <div class="container-fluid px-3 px-md-4 px-lg-5 hero-content-wrapper">
             <div class="row align-items-center min-vh-100 py-5">
-                <div class="col-12 col-lg-6 mb-5 mb-lg-0">
+                <div class="col-12 col-lg-6 mb-5 mb-lg-0 d-flex flex-column justify-content-center">
                     <div class="hf-hero-content">
-                        <span class="hf-badge">Your Healthcare Challenge</span>
-                        <h1 class="hf-hero-title">Stop Drowning in Paperwork. Start Saving Lives.</h1>
-                        <p class="hf-hero-subtitle">Healthcare workers spend hours on data entry instead of patient care. HealthFlow automates the boring stuff so you focus on what matters—your patients.</p>
+                        <div class="hero-badge-group mb-4">
+                            <span class="hf-badge animate-fade-in">Trusted by 50+ African Facilities</span>
+                        </div>
                         
-                        <div class="hf-pain-points mb-5">
+                        <h1 class="hf-hero-title animate-fade-in-delayed">
+                            <span class="highlight">Automate</span> Healthcare,
+                            <span class="highlight">Save</span> Lives
+                        </h1>
+                        
+                        <p class="hf-hero-subtitle animate-fade-in-delayed-2">
+                            Healthcare workers spend hours on paperwork. HealthFlow handles the boring stuff—data entry, patient monitoring, compliance reports. You focus on patients.
+                        </p>
+                        
+                        <div class="hf-pain-points mb-5 animate-fade-in-delayed-3">
                             <div class="hf-pain-point">
                                 <i class="fas fa-check-circle"></i>
                                 <span>No more manual data entry</span>
@@ -125,33 +155,57 @@
                             </div>
                         </div>
                         
-                        <div class="d-flex gap-3 flex-column flex-sm-row">
-                            <a href="#contact" class="btn btn-primary btn-lg">Request Free Demo</a>
-                            <a href="#how-it-works" class="btn btn-outline-primary btn-lg">See How It Works</a>
+                        <div class="hero-cta-buttons d-flex gap-3 flex-column flex-sm-row animate-fade-in-delayed-4">
+                            <a href="#contact" class="btn btn-primary btn-lg btn-cta-primary">
+                                <span>Get Free Demo</span>
+                                <i class="fas fa-arrow-right ms-2"></i>
+                            </a>
+                            <a href="#how-it-works" class="btn btn-outline-primary btn-lg btn-cta-outline">
+                                <span>See How It Works</span>
+                                <i class="fas fa-play-circle ms-2"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="hero-trust-metrics mt-5 pt-3">
+                            <div class="metric">
+                                <div class="metric-value">50+</div>
+                                <div class="metric-label">Active Facilities</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">10K+</div>
+                                <div class="metric-label">Patients Monitored</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">98%</div>
+                                <div class="metric-label">Satisfaction Rate</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-lg-6 d-none d-lg-block">
+                
+                <div class="col-12 col-lg-6 d-none d-lg-flex align-items-center justify-content-center">
                     <div class="hf-hero-visual">
-                        <div class="hf-hero-card card-1">
-                            <div class="card-icon">📊</div>
-                            <div class="card-text">
-                                <strong>Instant Reports</strong>
-                                <small>In seconds, not hours</small>
+                        <div class="hero-visual-container">
+                            <div class="hf-hero-card card-1">
+                                <div class="card-icon">📊</div>
+                                <div class="card-text">
+                                    <strong>Instant Reports</strong>
+                                    <small>In seconds, not hours</small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="hf-hero-card card-2">
-                            <div class="card-icon">🔔</div>
-                            <div class="card-text">
-                                <strong>Smart Alerts</strong>
-                                <small>Never miss at-risk patients</small>
+                            <div class="hf-hero-card card-2">
+                                <div class="card-icon">🔔</div>
+                                <div class="card-text">
+                                    <strong>Smart Alerts</strong>
+                                    <small>Never miss at-risk patients</small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="hf-hero-card card-3">
-                            <div class="card-icon">📱</div>
-                            <div class="card-text">
-                                <strong>Works Offline</strong>
-                                <small>Sync when online</small>
+                            <div class="hf-hero-card card-3">
+                                <div class="card-icon">📱</div>
+                                <div class="card-text">
+                                    <strong>Works Offline</strong>
+                                    <small>Sync when online</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -234,51 +288,31 @@
                 <h2 class="hf-section-title">Real Benefits for Your Facility</h2>
             </div>
 
-            <div class="row g-4">
-                <div class="col-12 col-md-6">
-                    <div class="hf-benefit-card">
-                        <div class="benefit-icon">⏱️</div>
-                        <h5>Save 20+ Hours Weekly</h5>
-                        <p>Your staff spends less time on data entry and more time with patients. That's 80+ hours per month your team gets back.</p>
-                    </div>
+            <div class="benefits-grid">
+                <div class="hf-benefit-card">
+                    <div class="benefit-icon">⏱️</div>
+                    <h5>Save 20+ Hours Weekly</h5>
+                    <p>Your staff spends less time on data entry and more time with patients. That's 80+ hours per month your team gets back.</p>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="hf-benefit-card">
-                        <div class="benefit-icon">💰</div>
-                        <h5>Cut Costs by 70%</h5>
-                        <p>HealthFlow costs a fraction of traditional EHR systems. Start at UGX 250,000/month. No setup fees. No surprises.</p>
-                    </div>
+                <div class="hf-benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h5>Cut Costs by 70%</h5>
+                    <p>HealthFlow costs a fraction of traditional EHR systems. Start at UGX 250,000/month. No setup fees. No surprises.</p>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="hf-benefit-card">
-                        <div class="benefit-icon">🎯</div>
-                        <h5>Reduce No-Shows by 40%</h5>
-                        <p>Smart SMS and WhatsApp reminders mean patients don't forget appointments. More revenue. Better care.</p>
-                    </div>
+                <div class="hf-benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h5>Reduce No-Shows by 40%</h5>
+                    <p>Smart SMS and WhatsApp reminders mean patients don't forget appointments. More revenue. Better care.</p>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5 class="card-title">Treatment Type</h5>
-                        </div>
-                        <div class="card-body">
-                            <div id="treatment" style="min-height: 315px;"></div>
-                        </div>
-                    </div>
+                <div class="hf-benefit-card">
+                    <div class="benefit-icon">🔐</div>
+                    <h5>Your Data is Safe</h5>
+                    <p>Enterprise-grade encryption, HIPAA-compliant, daily backups. Your patient data is protected like it's our own.</p>
                 </div>
-                <div class="col-12 col-md-6">
-                    <div class="hf-benefit-card">
-                        <div class="benefit-icon">🔐</div>
-                        <h5>Your Data is Safe</h5>
-                        <p>Enterprise-grade encryption, HIPAA-compliant, daily backups. Your patient data is protected like it's our own.</p>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="hf-benefit-card">
-                        <div class="benefit-icon">⚡</div>
-                        <h5>Works Offline</h5>
-                        <p>Unreliable internet? No problem. HealthFlow works offline and syncs automatically when connection returns.</p>
-                    </div>
+                <div class="hf-benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h5>Works Offline</h5>
+                    <p>Unreliable internet? No problem. HealthFlow works offline and syncs automatically when connection returns.</p>
                 </div>
             </div>
         </div>
