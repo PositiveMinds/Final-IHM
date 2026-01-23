@@ -2643,21 +2643,45 @@
                   continue;
                 }
 
+                // Validate and clean date fields
+                const dateFields = ['visit_date', 'next_appointment', 'patient_registration_date', 'art_start_date', 'last_viral_load_date', 'regimen_start_date'];
+                for (const dateField of dateFields) {
+                  if (patientRecord[dateField]) {
+                    const value = String(patientRecord[dateField]).trim();
+                    // Check if it looks like a date (YYYY-MM-DD or MM/DD/YYYY)
+                    const dateRegex = /^\d{4}-\d{2}-\d{2}$|^\d{1,2}\/\d{1,2}\/\d{4}$/;
+                    if (!dateRegex.test(value)) {
+                      // Not a valid date format, set to null
+                      patientRecord[dateField] = null;
+                    }
+                  }
+                }
+
+                // Validate numeric fields
+                const numericFields = ['age', 'viral_load_copies', 'systolic', 'diastolic', 'glucose_level'];
+                for (const numField of numericFields) {
+                  if (patientRecord[numField]) {
+                    const numValue = parseFloat(patientRecord[numField]);
+                    if (isNaN(numValue)) {
+                      patientRecord[numField] = null;
+                    }
+                  }
+                }
+
                 // Check if patient already exists by patient_no
                 const { data: existingPatient, error: fetchError } = await supabaseClient
                   .from('patients')
-                  .select('pid')
-                  .eq('patient_no', patientRecord.patient_no)
-                  .single();
+                  .select('pid', { count: 'exact' })
+                  .eq('patient_no', patientRecord.patient_no);
 
-                if (fetchError && fetchError.code !== 'PGRST116') {
-                  // Error other than "no rows found"
-                  errorCount++;
-                  console.error('Error checking patient:', fetchError);
-                  continue;
-                }
+                if (fetchError) {
+                   // Error checking patient
+                   errorCount++;
+                   console.error('Error checking patient:', fetchError);
+                   continue;
+                 }
 
-                if (existingPatient && existingPatient.pid) {
+                 if (existingPatient && existingPatient.length > 0) {
                    // Patient exists - update their information
                    const { error: updateError } = await supabaseClient
                      .from('patients')
