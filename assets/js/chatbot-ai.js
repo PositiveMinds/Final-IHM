@@ -178,14 +178,15 @@ class HealthFlowChatbot {
             filters.hiv_status = "Negative";
 
         // Extract condition - check if any condition keywords are present
-        // NOTE: Don't set condition filter for HIV queries since hiv_status filter is more specific
-        if (/hiv|aids/i.test(queryLower) && !filters.hiv_status) {
-            filters.condition = "HIV/AIDS";
-            console.log("Matched HIV/AIDS");
-        }
-        if (/hypertension|high blood pressure|hbp/i.test(queryLower)) {
+        // Check for HTN (Hypertension) BEFORE checking for HIV to avoid false matches
+        if (/\bhtn\b|hypertension|high blood pressure|hbp/i.test(queryLower)) {
             filters.condition = "Hypertension";
             console.log("Matched Hypertension");
+        }
+        // NOTE: Don't set condition filter for HIV queries since hiv_status filter is more specific
+        else if (/\bhiv\b|aids/i.test(queryLower) && !filters.hiv_status) {
+            filters.condition = "HIV/AIDS";
+            console.log("Matched HIV/AIDS");
         }
         if (/diabetes|diabetic|type 2|t2dm/i.test(queryLower)) {
             filters.condition = "Diabetes";
