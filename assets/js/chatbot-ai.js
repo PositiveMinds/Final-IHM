@@ -13,6 +13,12 @@ class HealthFlowChatbot {
 
         // Intent patterns for NLP
         this.intents = {
+            greeting: {
+                patterns: [
+                    "hello|hi|hey|greetings|how are you|how's your day|how is your|what's up|good morning|good afternoon|good evening",
+                ],
+                keywords: [""],
+            },
             date_range_query: {
                 patterns: [
                     "appointment|visit|between|from|during|last|past",
@@ -93,6 +99,7 @@ class HealthFlowChatbot {
 
         // Define intent priority order (most specific first)
         const intentOrder = [
+            "greeting",
             "date_range_query",
             "hiv_positive_search",
             "patient_stats",
@@ -495,6 +502,31 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
     }
 
     /**
+     * Generate smart greeting response
+     */
+    generateGreetingResponse(userMessage) {
+        const greetingResponses = [
+            `👋 Hello! I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. How can I help you with patient data today?`,
+            `👋 Hi there! I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>, an AI-driven healthcare company. What would you like to know about your patients?`,
+            `👋 Welcome! I'm <strong>Charlie</strong>, powered by HealthFlow. We're dedicated to making healthcare automation simple and effective. How can I assist you?`,
+            `👋 Hey! I'm <strong>Charlie</strong>, your intelligent health companion developed by HealthFlow Company. What patient information do you need?`,
+            `👋 Hello! I'm <strong>Charlie</strong>, HealthFlow's AI assistant. I'm here to help you search, analyze, and manage patient data efficiently.`,
+        ];
+
+        // Get random response
+        const response = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
+        
+        // Add company info
+        const companyInfo = `<br/><br/><small style="color: #666; font-size: 12px;">
+            <strong>HealthFlow</strong> - AI-Driven Healthcare Company<br/>
+            Co-founded by <strong>Bwoye Charles</strong> in 2026<br/>
+            Automating healthcare for African facilities
+        </small>`;
+        
+        return response + companyInfo;
+    }
+
+    /**
      * Format statistics response
      */
     formatStatsResponse(stats) {
@@ -546,8 +578,11 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
             let botResponse = "";
 
             // Process based on intent
+            if (detectedIntent === "greeting") {
+                botResponse = this.generateGreetingResponse(userMessage);
+            }
             // If specific_patient intent but no patient_no extracted, treat as patient_search
-            if (detectedIntent === "specific_patient" && !filters.patient_no) {
+            else if (detectedIntent === "specific_patient" && !filters.patient_no) {
                 detectedIntent = "patient_search";
             }
 
