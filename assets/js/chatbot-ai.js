@@ -13,6 +13,12 @@ class HealthFlowChatbot {
 
         // Intent patterns for NLP
         this.intents = {
+            date_range_query: {
+                patterns: [
+                    "appointment|visit|between|from|during|last|past",
+                ],
+                keywords: ["day|days|week|weeks|month|months|appointment|visit"],
+            },
             hiv_positive_search: {
                 patterns: [
                     "show|list|find|get|search|display|give me|tell me",
@@ -87,6 +93,7 @@ class HealthFlowChatbot {
 
         // Define intent priority order (most specific first)
         const intentOrder = [
+            "date_range_query",
             "hiv_positive_search",
             "patient_stats",
             "viral_load",
