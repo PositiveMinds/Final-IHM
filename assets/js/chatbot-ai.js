@@ -13,6 +13,12 @@ class HealthFlowChatbot {
 
         // Intent patterns for NLP
         this.intents = {
+            hiv_positive_search: {
+                patterns: [
+                    "show|list|find|get|search|display|give me|tell me",
+                ],
+                keywords: ["hiv positive|hiv\\s*\\+|positive|hiv"],
+            },
             patient_search: {
                 patterns: [
                     "show|list|find|get|search|display|give me|find me|tell me|what|which",
@@ -81,6 +87,7 @@ class HealthFlowChatbot {
 
         // Define intent priority order (most specific first)
         const intentOrder = [
+            "hiv_positive_search",
             "patient_stats",
             "viral_load",
             "high_risk",
@@ -99,7 +106,13 @@ class HealthFlowChatbot {
 
             const keywordMatch =
                 intentData.keywords.length === 0 ||
-                intentData.keywords.some((kw) => queryLower.includes(kw));
+                intentData.keywords.some((kw) => {
+                    try {
+                        return new RegExp(kw).test(queryLower);
+                    } catch {
+                        return queryLower.includes(kw);
+                    }
+                });
 
             console.log(
                 `Intent check - ${intentName}: pattern=${patternMatch}, keyword=${keywordMatch}`
@@ -516,6 +529,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
 
             if (
                 detectedIntent === "patient_search" ||
+                detectedIntent === "hiv_positive_search" ||
                 detectedIntent === "specific_patient"
             ) {
                 try {
