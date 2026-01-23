@@ -317,7 +317,8 @@ class HealthFlowChatbot {
                 query = query.eq("hiv_status", filters.hiv_status);
             }
             if (filters.condition) {
-                query = query.eq("condition", filters.condition);
+                // Use ilike for partial matching since conditions can be combined (e.g., "HIV Hypertension")
+                query = query.ilike("condition", `%${filters.condition}%`);
             }
             if (filters.viral_load_status) {
                 query = query.eq("viral_load_status", filters.viral_load_status);
