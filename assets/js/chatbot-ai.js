@@ -281,6 +281,7 @@ class HealthFlowChatbot {
                 "Supabase client available, querying patients with filters:",
                 filters
             );
+            console.log("Filter details - hiv_status:", filters.hiv_status, "condition:", filters.condition);
 
             let query = window.supabaseClient.from("patients").select("*");
 
@@ -416,7 +417,7 @@ class HealthFlowChatbot {
      */
     formatPatientResponse(patients) {
         if (patients.length === 0) {
-            return "No patients found matching your criteria.";
+            return `<strong>No patients found matching your criteria.</strong><br/><small class="text-muted">Check your filters or try a different search.</small>`;
         }
 
         if (patients.length === 1) {
@@ -535,6 +536,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 try {
                     const patients = await this.queryPatients(filters);
                     console.log("Patients found:", patients);
+                    console.log("Applied filters:", filters);
                     // Store results for export
                     this.lastQueryResults = patients;
                     if (patients.length === 0 && Object.keys(filters).length === 0) {
@@ -547,7 +549,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                     }
                 } catch (error) {
                     console.error("Error fetching patients:", error);
-                    botResponse = `Error retrieving patient data: ${error.message}. Please check the database connection.`;
+                    botResponse = `<strong>Error retrieving patient data:</strong> ${error.message}<br/><small>Please check the database connection and try again.</small>`;
                     this.lastQueryResults = [];
                 }
             } else if (detectedIntent === "patient_stats") {

@@ -233,8 +233,8 @@ class ChatbotUI {
             // Add bot response
             this.addMessage(response, 'bot', true);
 
-            // Add quick actions if results were found
-            if (!response.includes('Error') && !response.includes('No')) {
+            // Add quick actions if results were found (but not for error/no results messages)
+            if (!response.includes('Error') && !response.includes('No patients found')) {
                 this.addQuickActions(userMessage);
             }
         } catch (error) {
