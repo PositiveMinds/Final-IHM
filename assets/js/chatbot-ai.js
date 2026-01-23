@@ -605,19 +605,24 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                     
                     // Determine which appointment field to use
                     const appointmentField = filters.is_past_appointments ? 'visit_date' : 'next_appointment';
+                    console.log("Date range query - Using field:", appointmentField, "is_past_appointments:", filters.is_past_appointments);
+                    
                     const withAppointments = patients.filter((p) => p[appointmentField]);
+                    console.log("Patients with appointment field:", withAppointments.length, "out of", patients.length);
                     
                     if (filters.date_range_query && filters.date_from && filters.date_to) {
                         const dateFrom = new Date(filters.date_from);
                         const dateTo = new Date(filters.date_to);
                         // Set end date to end of day
                         dateTo.setHours(23, 59, 59, 999);
+                        console.log("Date range:", dateFrom, "to", dateTo);
                         
                         const inRangeAppointments = withAppointments.filter(p => {
                             const appointDate = new Date(p[appointmentField]);
                             return appointDate >= dateFrom && appointDate <= dateTo;
                         });
                         
+                        console.log("Appointments in range:", inRangeAppointments.length);
                         this.lastQueryResults = inRangeAppointments;
                         const rangeLabel = filters.is_past_appointments ? 'Past Appointments' : 'Future Appointments';
                         botResponse = `<strong>${rangeLabel} between ${dateFrom.toLocaleDateString()} and ${dateTo.toLocaleDateString()}:</strong><br/>
@@ -634,7 +639,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                     }
                 } catch (error) {
                     console.error("Error fetching date range appointments:", error);
-                    botResponse = `Error retrieving appointments: ${error.message}`;
+                    botResponse = `<strong>Error retrieving appointments:</strong> ${error.message}`;
                     this.lastQueryResults = [];
                 }
             } else if (detectedIntent === "pregnancy") {
