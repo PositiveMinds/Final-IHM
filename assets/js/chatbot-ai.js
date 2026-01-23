@@ -257,6 +257,19 @@ class HealthFlowChatbot {
             console.log("Looking for appointments today");
         }
 
+        // Check for past appointments (last X days)
+        const pastDaysMatch = queryLower.match(/(?:last|past)\s+(\d+)\s+days?/i);
+        if (pastDaysMatch) {
+            const days = parseInt(pastDaysMatch[1]);
+            const today = new Date();
+            const pastDate = new Date(today.getTime() - days * 24 * 60 * 60 * 1000);
+            filters.date_from = pastDate.toISOString().split('T')[0];
+            filters.date_to = today.toISOString().split('T')[0];
+            filters.date_range_query = true;
+            filters.is_past_appointments = true;
+            console.log(`Looking for appointments from last ${days} days`);
+        }
+
         // Check for upcoming appointments
         if (/upcoming|next|coming/i.test(queryLower)) {
             filters.is_upcoming = true;
@@ -589,25 +602,32 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
             } else if (detectedIntent === "date_range_query") {
                 try {
                     const patients = await this.queryPatients(filters);
-                    const withAppointments = patients.filter((p) => p.next_appointment);
+                    
+                    // Determine which appointment field to use
+                    const appointmentField = filters.is_past_appointments ? 'visit_date' : 'next_appointment';
+                    const withAppointments = patients.filter((p) => p[appointmentField]);
                     
                     if (filters.date_range_query && filters.date_from && filters.date_to) {
                         const dateFrom = new Date(filters.date_from);
                         const dateTo = new Date(filters.date_to);
+                        // Set end date to end of day
+                        dateTo.setHours(23, 59, 59, 999);
                         
                         const inRangeAppointments = withAppointments.filter(p => {
-                            const appointDate = new Date(p.next_appointment);
+                            const appointDate = new Date(p[appointmentField]);
                             return appointDate >= dateFrom && appointDate <= dateTo;
                         });
                         
                         this.lastQueryResults = inRangeAppointments;
-                        botResponse = `<strong>Appointments between ${dateFrom.toLocaleDateString()} and ${dateTo.toLocaleDateString()}:</strong><br/>
+                        const rangeLabel = filters.is_past_appointments ? 'Past Appointments' : 'Future Appointments';
+                        botResponse = `<strong>${rangeLabel} between ${dateFrom.toLocaleDateString()} and ${dateTo.toLocaleDateString()}:</strong><br/>
                         Total: <strong>${inRangeAppointments.length}</strong><br/>`;
                         
                         if (inRangeAppointments.length > 0) {
                             botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Appointment Date</th></tr></thead><tbody>';
                             inRangeAppointments.forEach((p) => {
-                                botResponse += `<tr><td>${p.first_name} ${p.last_name}</td><td>${new Date(p.next_appointment).toLocaleDateString()}</td></tr>`;
+                                const appointmentDate = new Date(p[appointmentField]).toLocaleDateString();
+                                botResponse += `<tr><td>${p.first_name} ${p.last_name}</td><td>${appointmentDate}</td></tr>`;
                             });
                             botResponse += '</tbody></table>';
                         }
