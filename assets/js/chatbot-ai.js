@@ -502,19 +502,54 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
     }
 
     /**
+     * Get current time of day period
+     */
+    getTimeOfDay() {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) {
+            return { period: 'morning', greeting: 'Good morning' };
+        } else if (hour >= 12 && hour < 17) {
+            return { period: 'afternoon', greeting: 'Good afternoon' };
+        } else if (hour >= 17 && hour < 21) {
+            return { period: 'evening', greeting: 'Good evening' };
+        } else {
+            return { period: 'night', greeting: 'Good night' };
+        }
+    }
+
+    /**
      * Generate smart greeting response
      */
     generateGreetingResponse(userMessage) {
-        const greetingResponses = [
-            `👋 Hello! I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. How can I help you with patient data today?`,
-            `👋 Hi there! I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>, an AI-driven healthcare company. What would you like to know about your patients?`,
-            `👋 Welcome! I'm <strong>Charlie</strong>, powered by HealthFlow. We're dedicated to making healthcare automation simple and effective. How can I assist you?`,
-            `👋 Hey! I'm <strong>Charlie</strong>, your intelligent health companion developed by HealthFlow Company. What patient information do you need?`,
-            `👋 Hello! I'm <strong>Charlie</strong>, HealthFlow's AI assistant. I'm here to help you search, analyze, and manage patient data efficiently.`,
-        ];
+        const timeInfo = this.getTimeOfDay();
+        const timeGreeting = timeInfo.greeting;
+        
+        const greetingResponses = {
+            morning: [
+                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Ready to help you with patient data today?`,
+                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Great to see you this morning! How can I assist with your patients?`,
+                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong>, powered by HealthFlow. Let's make it a productive morning—what patient information do you need?`,
+            ],
+            afternoon: [
+                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. How's your afternoon going? What can I help with?`,
+                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. I hope you're having a great day! What patient data can I assist with?`,
+                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Ready to help you manage patient information efficiently.`,
+            ],
+            evening: [
+                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. How can I help you wrap up the day?`,
+                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Still here to help with your patient needs!`,
+                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Let's make this evening productive—what do you need?`,
+            ],
+            night: [
+                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Still working hard? How can I help?`,
+                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Always available to assist with patient data!`,
+                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Ready to help with your patient queries anytime.`,
+            ],
+        };
 
-        // Get random response
-        const response = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
+        // Get responses for current time period
+        const periodResponses = greetingResponses[timeInfo.period];
+        const response = periodResponses[Math.floor(Math.random() * periodResponses.length)];
         
         // Add company info
         const companyInfo = `<br/><br/><small style="color: #666; font-size: 12px;">
