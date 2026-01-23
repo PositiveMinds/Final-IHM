@@ -257,14 +257,17 @@ class ChatbotUI {
         contentDiv.className = 'chatbot-message-content';
         contentDiv.innerHTML = `
       <div class="chatbot-quick-actions">
-        <button class="chatbot-action-btn" onclick="chatbotUI.promptSaveSearch('${lastQuery.replace(/'/g, "\\'")}')">
-          💾 Save Search
+        <button class="chatbot-action-btn chatbot-action-save" onclick="chatbotUI.promptSaveSearch('${lastQuery.replace(/'/g, "\\'")}')">
+          <span class="action-icon">💾</span>
+          <span class="action-text">Save Search</span>
         </button>
-        <button class="chatbot-action-btn" onclick="chatbotUI.showSavedSearches()">
-          📋 My Searches
+        <button class="chatbot-action-btn chatbot-action-history" onclick="chatbotUI.showSavedSearches()">
+          <span class="action-icon">📋</span>
+          <span class="action-text">My Searches</span>
         </button>
-        <button class="chatbot-action-btn" onclick="chatbotUI.exportResults()">
-          📥 Export
+        <button class="chatbot-action-btn chatbot-action-export" onclick="chatbotUI.exportResults()">
+          <span class="action-icon">📥</span>
+          <span class="action-text">Export</span>
         </button>
       </div>
     `;
@@ -279,9 +282,13 @@ class ChatbotUI {
      */
     promptSaveSearch(query) {
         const searchName = prompt('Save this search as:', '');
-        if (searchName) {
-            healthFlowChatbot.saveSearch(searchName, this.lastFilters);
-            this.addMessage(`✓ Saved as "${searchName}"`, 'bot', false);
+        if (searchName && searchName.trim()) {
+            const result = healthFlowChatbot.saveSearch(searchName.trim(), this.lastFilters);
+            if (result.success) {
+                this.addMessage(`✅ Saved as "${searchName.trim()}"`, 'bot', false);
+            } else {
+                this.addMessage(`❌ ${result.message}`, 'bot', false);
+            }
         }
     }
 
@@ -294,10 +301,269 @@ class ChatbotUI {
     }
 
     /**
-     * Export results (placeholder for future CSV/PDF export)
+     * Export results as Excel or PDF
      */
     exportResults() {
-        this.addMessage('📥 Export feature coming soon! You will be able to download results as CSV or PDF.', 'bot', false);
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message bot';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'chatbot-message-content';
+        contentDiv.innerHTML = `
+      <div style="margin-bottom: 10px;">
+        <p style="margin-bottom: 14px; font-weight: 600; color: #333;">Choose export format:</p>
+        <div class="chatbot-export-buttons">
+          <button onclick="chatbotUI.exportToExcel()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <span>📊</span>
+            <span>Download Excel</span>
+          </button>
+          <button onclick="chatbotUI.exportToPDF()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+            <span>📄</span>
+            <span>Download PDF</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+        messageDiv.appendChild(contentDiv);
+        this.messagesContainer.appendChild(messageDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    /**
+     * Export results to Excel with formatting
+     */
+    async exportToExcel() {
+        try {
+            this.addMessage('⏳ Preparing Excel file...', 'bot', false);
+            
+            const results = healthFlowChatbot.lastQueryResults || [];
+            if (!results || results.length === 0) {
+                this.addMessage('❌ No data to export', 'bot', false);
+                return;
+            }
+
+            // Dynamically load ExcelJS library
+            if (typeof ExcelJS === 'undefined') {
+                await this.loadExcelJS();
+            }
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data Export');
+
+            // Get headers from first row
+            const headers = Object.keys(results[0]);
+            
+            // Add headers with styling
+            const headerRow = worksheet.addRow(headers);
+            headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+            headerRow.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF15696B' }
+            };
+            headerRow.alignment = { horizontal: 'center', vertical: 'center', wrapText: false };
+            
+            // Set column widths and disable text wrapping
+            headers.forEach((header, index) => {
+                const column = worksheet.getColumn(index + 1);
+                column.width = Math.min(25, Math.max(12, header.length + 2));
+                column.alignment = { wrapText: false };
+            });
+
+            // Add data rows with alternating colors
+            results.forEach((row, rowIndex) => {
+                const excelRow = worksheet.addRow(headers.map(h => row[h] || ''));
+                
+                // Alternate row colors
+                const bgColor = rowIndex % 2 === 0 ? 'FFF8F9FA' : 'FFFFFFFF';
+                excelRow.eachCell((cell) => {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: bgColor }
+                    };
+                    cell.alignment = { wrapText: false, vertical: 'center' };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFC0C0C0' } },
+                        left: { style: 'thin', color: { argb: 'FFC0C0C0' } },
+                        bottom: { style: 'thin', color: { argb: 'FFC0C0C0' } },
+                        right: { style: 'thin', color: { argb: 'FFC0C0C0' } }
+                    };
+                });
+            });
+
+            // Generate file
+            const buffer = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `HealthFlow_Export_${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            this.addMessage('✅ Excel file downloaded successfully!', 'bot', false);
+        } catch (error) {
+            console.error('Excel export error:', error);
+            this.addMessage(`❌ Error exporting to Excel: ${error.message}`, 'bot', false);
+        }
+    }
+
+    /**
+     * Export results to PDF
+     */
+    async exportToPDF() {
+        try {
+            this.addMessage('⏳ Preparing PDF file...', 'bot', false);
+            
+            const results = healthFlowChatbot.lastQueryResults || [];
+            if (!results || results.length === 0) {
+                this.addMessage('❌ No data to export', 'bot', false);
+                return;
+            }
+
+            // Dynamically load jsPDF and autoTable libraries
+            if (typeof window.jspdf === 'undefined') {
+                await this.loadPDFLibraries();
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4'); // landscape mode
+
+            // Add title and metadata
+            doc.setFontSize(16);
+            doc.setTextColor(21, 105, 107);
+            doc.text('HealthFlow Data Export', 14, 15);
+            
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 22);
+            doc.text(`Total Records: ${results.length}`, 14, 27);
+
+            // Prepare table data with proper formatting
+            const headers = Object.keys(results[0]);
+            const rows = results.map(item => 
+                headers.map(header => {
+                    const value = item[header];
+                    // Format dates
+                    if (value instanceof Date) {
+                        return value.toLocaleDateString();
+                    }
+                    // Format numbers
+                    if (typeof value === 'number') {
+                        return value.toLocaleString();
+                    }
+                    // Convert to string and truncate if too long
+                    return String(value || '').substring(0, 100);
+                })
+            );
+
+            // Add table with autoTable
+            doc.autoTable({
+                head: [headers.map(h => h.charAt(0).toUpperCase() + h.slice(1).replace(/_/g, ' '))],
+                body: rows,
+                startY: 35,
+                margin: { top: 35, right: 10, bottom: 10, left: 10 },
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 4,
+                    overflow: 'linebreak',
+                    halign: 'left',
+                    valign: 'middle',
+                    lineColor: [200, 200, 200],
+                    lineWidth: 0.1
+                },
+                headStyles: {
+                    fillColor: [21, 105, 107],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    fontSize: 8,
+                    halign: 'center',
+                    valign: 'middle',
+                    overflow: 'ellipsis', // Truncate long header text
+                    lineColor: [21, 105, 107],
+                    lineWidth: 0.5
+                },
+                bodyStyles: {
+                    overflow: 'linebreak', // Body text wraps normally
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.1
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 250, 252]
+                },
+                columnStyles: {
+                    // Auto-adjust column widths based on content
+                },
+                willDrawCell: (data) => {
+                    // Ensure header row has minimum height
+                    if (data.section === 'head') {
+                        data.cell.minHeight = 15;
+                    }
+                },
+                didDrawPage: (data) => {
+                    // Footer
+                    const pageSize = doc.internal.pageSize;
+                    const pageHeight = pageSize.getHeight();
+                    const pageWidth = pageSize.getWidth();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(
+                        `Page ${doc.internal.pages.length - 1}`,
+                        pageWidth / 2,
+                        pageHeight - 5,
+                        { align: 'center' }
+                    );
+                }
+            });
+
+            // Save PDF
+            doc.save(`HealthFlow_Export_${new Date().toISOString().split('T')[0]}.pdf`);
+            this.addMessage('✅ PDF file downloaded successfully!', 'bot', false);
+        } catch (error) {
+            console.error('PDF export error:', error);
+            this.addMessage(`❌ Error exporting to PDF: ${error.message}`, 'bot', false);
+        }
+    }
+
+    /**
+     * Load ExcelJS library dynamically
+     */
+    loadExcelJS() {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js';
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load ExcelJS library'));
+            document.head.appendChild(script);
+        });
+    }
+
+    /**
+     * Load jsPDF and autoTable libraries dynamically
+     */
+    loadPDFLibraries() {
+        return new Promise((resolve, reject) => {
+            // Load jsPDF first
+            const jsPdfScript = document.createElement('script');
+            jsPdfScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            jsPdfScript.onload = () => {
+                // Load autoTable after jsPDF is ready
+                const autoTableScript = document.createElement('script');
+                autoTableScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js';
+                autoTableScript.onload = () => {
+                    // Wait a moment for plugin to attach, then resolve
+                    setTimeout(() => resolve(), 100);
+                };
+                autoTableScript.onerror = () => reject(new Error('Failed to load autoTable library'));
+                document.head.appendChild(autoTableScript);
+            };
+            jsPdfScript.onerror = () => reject(new Error('Failed to load jsPDF library'));
+            document.head.appendChild(jsPdfScript);
+        });
     }
 
     /**

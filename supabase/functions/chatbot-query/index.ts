@@ -44,7 +44,14 @@ const HANDLERS: Record<string, (facilityId: string, query: string, params?: any)
   // Appointments
   getAppointments: getAppointments,
   getAppointmentsToday: getAppointmentsToday,
+  getAppointmentsThisWeek: getAppointmentsThisWeek,
+  getAppointmentsLastWeek: getAppointmentsLastWeek,
   getAppointmentsNextWeek: getAppointmentsNextWeek,
+  getAppointmentsThisMonth: getAppointmentsThisMonth,
+  getAppointmentsLastMonth: getAppointmentsLastMonth,
+  getAppointmentsNextMonth: getAppointmentsNextMonth,
+  getAppointmentsPast30Days: getAppointmentsPast30Days,
+  getAppointmentsNext30Days: getAppointmentsNext30Days,
   getMissedAppointments: getMissedAppointments,
   getDueAppointments: getDueAppointments,
 
@@ -80,6 +87,9 @@ const HANDLERS: Record<string, (facilityId: string, query: string, params?: any)
   getOverdueRefillPatients: getOverdueRefillPatients,
   getPatientProfile: getPatientProfile,
   getHighRiskPatients: getHighRiskPatients,
+  getCriticalPatients: getCriticalPatients,
+  getIACPatients: getIACPatients,
+  getDueForBleedingTest: getDueForBleedingTest,
 };
 
 // ============================================================
@@ -207,9 +217,13 @@ function parseTimePeriod(query: string): { startDate?: string; endDate?: string 
   else if (lowerQuery.includes("30 day") || lowerQuery.includes("last month") || lowerQuery.includes("this month")) {
     startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
   }
-  // Last week / 7 days
+  // Last week / 7 days (Monday to Sunday)
   else if (lowerQuery.includes("week") || lowerQuery.includes("7 day")) {
-    startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    // Calculate current week's Monday
+    const dayOfWeek = today.getDay();
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday is 6 days from Monday
+    const lastMonday = new Date(today.getTime() - daysFromMonday * 24 * 60 * 60 * 1000);
+    startDate = lastMonday.toISOString().split("T")[0];
   }
   // Last year
   else if (lowerQuery.includes("year")) {
@@ -376,23 +390,286 @@ async function getAppointmentsToday(facilityId: string, query: string, params?: 
   };
 }
 
+async function getAppointmentsThisWeek(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  
+  // Calculate week boundaries (Monday to Sunday)
+  const dayOfWeek = today.getDay();
+  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday is 6 days from Monday
+  const weekMonday = new Date(today.getTime() - daysFromMonday * 24 * 60 * 60 * 1000);
+  const weekSunday = new Date(weekMonday.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+  const weekMondayStr = weekMonday.toISOString().split("T")[0];
+  const weekSundayStr = weekSunday.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", weekMondayStr)
+    .lte("appointment_date", weekSundayStr)
+    .order("appointment_date", { ascending: true });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments scheduled for this week." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
+async function getAppointmentsLastWeek(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  
+  // Calculate last week boundaries (Monday to Sunday)
+  const dayOfWeek = today.getDay();
+  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const thisWeekMonday = new Date(today.getTime() - daysFromMonday * 24 * 60 * 60 * 1000);
+  const lastWeekSunday = new Date(thisWeekMonday.getTime() - 24 * 60 * 60 * 1000);
+  const lastWeekMonday = new Date(lastWeekSunday.getTime() - 6 * 24 * 60 * 60 * 1000);
+
+  const lastWeekMondayStr = lastWeekMonday.toISOString().split("T")[0];
+  const lastWeekSundayStr = lastWeekSunday.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", lastWeekMondayStr)
+    .lte("appointment_date", lastWeekSundayStr)
+    .order("appointment_date", { ascending: true });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments scheduled for last week." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
 async function getAppointmentsNextWeek(facilityId: string, query: string, params?: any) {
   const today = new Date();
-  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  // Calculate week boundaries (Monday to Sunday)
+  // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  const dayOfWeek = today.getDay();
+  
+  // Calculate Monday of the next week
+  // If today is Monday (1), next Monday is 7 days away
+  // If today is Sunday (0), next Monday is 1 day away
+  const daysUntilNextMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+  const nextMonday = new Date(today.getTime() + daysUntilNextMonday * 24 * 60 * 60 * 1000);
+  
+  // Sunday of next week is 6 days after Monday
+  const nextSunday = new Date(nextMonday.getTime() + 6 * 24 * 60 * 60 * 1000);
+
+  const nextMondayStr = nextMonday.toISOString().split("T")[0];
+  const nextSundayStr = nextSunday.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", nextMondayStr)
+    .lte("appointment_date", nextSundayStr)
+    .order("appointment_date", { ascending: true });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments scheduled for next week." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
+async function getAppointmentsThisMonth(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  
+  // Calculate the first and last day of current month
+  const thisMonthStart = new Date(currentYear, currentMonth, 1);
+  const thisMonthEnd = new Date(currentYear, currentMonth + 1, 0);
+
+  const thisMonthStartStr = thisMonthStart.toISOString().split("T")[0];
+  const thisMonthEndStr = thisMonthEnd.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", thisMonthStartStr)
+    .lte("appointment_date", thisMonthEndStr)
+    .order("appointment_date", { ascending: true });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments scheduled for this month." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
+async function getAppointmentsLastMonth(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  
+  // Calculate the first and last day of last month
+  const lastMonthStart = new Date(currentYear, currentMonth - 1, 1);
+  const lastMonthEnd = new Date(currentYear, currentMonth, 0);
+
+  const lastMonthStartStr = lastMonthStart.toISOString().split("T")[0];
+  const lastMonthEndStr = lastMonthEnd.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", lastMonthStartStr)
+    .lte("appointment_date", lastMonthEndStr)
+    .order("appointment_date", { ascending: true });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments scheduled for last month." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
+async function getAppointmentsNextMonth(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+  
+  // Calculate the first day of next month
+  const nextMonthStart = new Date(currentYear, currentMonth + 1, 1);
+  // Calculate the last day of next month
+  const nextMonthEnd = new Date(currentYear, currentMonth + 2, 0);
+
+  const nextMonthStartStr = nextMonthStart.toISOString().split("T")[0];
+  const nextMonthEndStr = nextMonthEnd.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", nextMonthStartStr)
+    .lte("appointment_date", nextMonthEndStr)
+    .order("appointment_date", { ascending: true });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments scheduled for next month." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
+async function getAppointmentsPast30Days(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split("T")[0];
+  const todayStr = today.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("apid, pid, appointment_date, appointment_type, status")
+    .eq("fid", facilityId)
+    .gte("appointment_date", thirtyDaysAgoStr)
+    .lte("appointment_date", todayStr)
+    .order("appointment_date", { ascending: false });
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No appointments found in the last 30 days." };
+  }
+
+  return {
+    type: "table",
+    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+    data: data.map((a: any) => ({
+      "Appointment ID": a.apid,
+      "Patient ID": a.pid,
+      Date: formatDate(a.appointment_date),
+      Type: a.appointment_type || "Follow-up",
+      Status: a.status || "Scheduled",
+    })),
+  };
+}
+
+async function getAppointmentsNext30Days(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  const in30Days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
 
   const todayStr = today.toISOString().split("T")[0];
-  const nextWeekStr = nextWeek.toISOString().split("T")[0];
+  const in30DaysStr = in30Days.toISOString().split("T")[0];
 
   const { data, error } = await supabase
     .from("appointments")
     .select("apid, pid, appointment_date, appointment_type, status")
     .eq("fid", facilityId)
     .gte("appointment_date", todayStr)
-    .lte("appointment_date", nextWeekStr)
+    .lte("appointment_date", in30DaysStr)
     .order("appointment_date", { ascending: true });
 
   if (error || !data?.length) {
-    return { type: "text", message: "No appointments scheduled for next week." };
+    return { type: "text", message: "No appointments scheduled for the next 30 days." };
   }
 
   return {
@@ -653,17 +930,34 @@ async function getHighViralLoadPatients(facilityId: string, query: string, param
     return { type: "text", message: "No patients with high viral load found." };
   }
 
+  // Fetch next appointments for all patients
+  const pids = data.map((p: any) => p.pid);
+  const { data: appointmentData } = await supabase
+    .from("appointments")
+    .select("patient_id, appointment_date")
+    .in("patient_id", pids)
+    .gte("appointment_date", new Date().toISOString())
+    .order("appointment_date", { ascending: true });
+
+  const appointmentMap: Record<string, string> = {};
+  appointmentData?.forEach((apt: any) => {
+    if (!appointmentMap[apt.patient_id]) {
+      appointmentMap[apt.patient_id] = formatDate(apt.appointment_date);
+    }
+  });
+
   const { data: paginatedData, pagination } = paginateData(data, params?.page, params?.limit);
   const alerts = generateAlerts(data);
 
   return {
     type: "table",
-    columns: ["Patient ID", "Name", "Viral Load", "Last Test", "Regimen"],
+    columns: ["Patient ID", "Name", "Viral Load", "Last Test", "Next Appointment", "Regimen"],
     data: paginatedData.map((p: any) => ({
       "Patient ID": p.pid,
       Name: p.patient_name || "N/A",
       "Viral Load": p.last_viral_load ? p.last_viral_load.toLocaleString() + " copies/mL" : "Unknown",
       "Last Test": formatDate(p.last_viral_load_date),
+      "Next Appointment": appointmentMap[p.pid] || "None scheduled",
       Regimen: p.medication_regimen || "Not specified",
     })),
     pagination,
@@ -685,16 +979,33 @@ async function getUndetectablePatients(facilityId: string, query: string, params
     return { type: "text", message: "No patients with undetectable viral load found." };
   }
 
+  // Fetch next appointments for all patients
+  const pids = data.map((p: any) => p.pid);
+  const { data: appointmentData } = await supabase
+    .from("appointments")
+    .select("patient_id, appointment_date")
+    .in("patient_id", pids)
+    .gte("appointment_date", new Date().toISOString())
+    .order("appointment_date", { ascending: true });
+
+  const appointmentMap: Record<string, string> = {};
+  appointmentData?.forEach((apt: any) => {
+    if (!appointmentMap[apt.patient_id]) {
+      appointmentMap[apt.patient_id] = formatDate(apt.appointment_date);
+    }
+  });
+
   const { data: paginatedData, pagination } = paginateData(data, params?.page, params?.limit);
 
   return {
     type: "table",
-    columns: ["Patient ID", "Name", "Viral Load", "Last Test"],
+    columns: ["Patient ID", "Name", "Viral Load", "Last Test", "Next Appointment"],
     data: paginatedData.map((p: any) => ({
       "Patient ID": p.pid,
       Name: p.patient_name || "N/A",
       "Viral Load": "Undetectable (<50 copies/mL)",
       "Last Test": formatDate(p.last_viral_load_date),
+      "Next Appointment": appointmentMap[p.pid] || "None scheduled",
     })),
     pagination,
     summary: `💊 ${data.length} patient(s) with undetectable viral load (U=U)`,
@@ -1159,6 +1470,209 @@ async function getHighRiskPatients(facilityId: string, query: string, params?: a
 }
 
 // ============================================================
+// HANDLER: CRITICAL PATIENTS
+// ============================================================
+
+async function getCriticalPatients(facilityId: string, query: string, params?: any) {
+  // Fetch all patients with potential risk factors
+  const { data, error } = await supabase
+    .from("patients")
+    .select("pid, patient_name, hiv_status, last_viral_load, last_cd4_count, conditions")
+    .eq("fid", facilityId)
+    .limit(500);
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No patients found." };
+  }
+
+  // Filter for critical patients based on clinical criteria:
+  // - High viral load (>=1000 copies/mL)
+  // - Low CD4 (<50)
+  // - Has hypertension in conditions
+  // - Has diabetes in conditions
+  const criticalPatients = data.filter((p: any) => {
+    const vl = p.last_viral_load || 0;
+    const cd4 = p.last_cd4_count || 0;
+    const cond = (p.conditions || "").toLowerCase();
+
+    return (
+      vl >= 1000 ||
+      cd4 < 50 ||
+      cond.includes("hypertension") ||
+      cond.includes("diabetes")
+    );
+  });
+
+  if (!criticalPatients.length) {
+    return { type: "text", message: "No critical patients at this time." };
+  }
+
+  // Fetch next appointments for all critical patients
+  const pids = criticalPatients.map((p: any) => p.pid);
+  const { data: appointmentData } = await supabase
+    .from("appointments")
+    .select("patient_id, appointment_date")
+    .in("patient_id", pids)
+    .gte("appointment_date", new Date().toISOString())
+    .order("appointment_date", { ascending: true });
+
+  const appointmentMap: Record<string, string> = {};
+  appointmentData?.forEach((apt: any) => {
+    if (!appointmentMap[apt.patient_id]) {
+      appointmentMap[apt.patient_id] = formatDate(apt.appointment_date);
+    }
+  });
+
+  const { data: paginatedData, pagination } = paginateData(criticalPatients, params?.page, params?.limit);
+
+  return {
+    type: "table",
+    columns: ["Patient ID", "Name", "Viral Load", "CD4", "Conditions", "Next Appointment"],
+    data: paginatedData.map((p: any) => ({
+      "Patient ID": p.pid,
+      Name: p.patient_name || "N/A",
+      "Viral Load": p.last_viral_load ? (p.last_viral_load >= 1000 ? `${p.last_viral_load.toLocaleString()} 🔴` : (p.last_viral_load <= 50 ? "Suppressed" : p.last_viral_load.toLocaleString())) : "Unknown",
+      CD4: p.last_cd4_count ? (p.last_cd4_count < 50 ? `${p.last_cd4_count} 🔴` : p.last_cd4_count) : "Unknown",
+      Conditions: p.conditions || "N/A",
+      "Next Appointment": appointmentMap[p.pid] || "None scheduled",
+    })),
+    pagination,
+    alerts: [
+      {
+        severity: "critical",
+        icon: "🚨",
+        message: `${criticalPatients.length} critical patient(s) require immediate attention (VL≥1000 or CD4<50 or HTN/DM)`,
+      },
+    ],
+  };
+}
+
+// ============================================================
+// HANDLER: IAC PATIENTS (Integrated Antiretroviral Clinic)
+// ============================================================
+
+async function getIACPatients(facilityId: string, query: string, params?: any) {
+  const { data, error } = await supabase
+    .from("patients")
+    .select("pid, patient_name, hiv_status, medication_regimen, last_viral_load, status")
+    .eq("fid", facilityId)
+    .eq("hiv_status", "Positive")
+    .order("patient_name", { ascending: true })
+    .limit(500);
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No IAC patients found." };
+  }
+
+  // Filter for patients on ART (medication regimen indicates they're enrolled in IAC)
+  const iacPatients = data.filter((p: any) => p.medication_regimen);
+
+  if (!iacPatients.length) {
+    return { type: "text", message: "No patients on ART/IAC found." };
+  }
+
+  // Fetch next appointments for all IAC patients
+  const pids = iacPatients.map((p: any) => p.pid);
+  const { data: appointmentData } = await supabase
+    .from("appointments")
+    .select("patient_id, appointment_date")
+    .in("patient_id", pids)
+    .gte("appointment_date", new Date().toISOString())
+    .order("appointment_date", { ascending: true });
+
+  const appointmentMap: Record<string, string> = {};
+  appointmentData?.forEach((apt: any) => {
+    if (!appointmentMap[apt.patient_id]) {
+      appointmentMap[apt.patient_id] = formatDate(apt.appointment_date);
+    }
+  });
+
+  const { data: paginatedData, pagination } = paginateData(iacPatients, params?.page, params?.limit);
+
+  return {
+    type: "table",
+    columns: ["Patient ID", "Name", "Medication Regimen", "Viral Load", "Next Appointment", "Status"],
+    data: paginatedData.map((p: any) => ({
+      "Patient ID": p.pid,
+      Name: p.patient_name || "N/A",
+      "Medication Regimen": p.medication_regimen || "Not specified",
+      "Viral Load": p.last_viral_load ? (p.last_viral_load <= 50 ? "Suppressed ✓" : p.last_viral_load.toLocaleString()) : "Unknown",
+      "Next Appointment": appointmentMap[p.pid] || "None scheduled",
+      Status: p.status || "Active",
+    })),
+    pagination,
+    summary: `📋 ${iacPatients.length} patient(s) enrolled in IAC program`,
+  };
+}
+
+// ============================================================
+// HANDLER: DUE FOR VIRAL LOAD TEST (Bleeding/Lab)
+// ============================================================
+
+async function getDueForBleedingTest(facilityId: string, query: string, params?: any) {
+  const today = new Date();
+  const ninetyDaysAgo = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
+  const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split("T")[0];
+
+  const { data, error } = await supabase
+    .from("patients")
+    .select("pid, patient_name, last_viral_load_date, last_viral_load, hiv_status, status")
+    .eq("fid", facilityId)
+    .eq("hiv_status", "Positive")
+    .lte("last_viral_load_date", ninetyDaysAgoStr)
+    .order("last_viral_load_date", { ascending: true })
+    .limit(500);
+
+  if (error || !data?.length) {
+    return { type: "text", message: "No patients due for viral load test." };
+  }
+
+  // Fetch next appointments for all patients
+  const pids = data.map((p: any) => p.pid);
+  const { data: appointmentData } = await supabase
+    .from("appointments")
+    .select("patient_id, appointment_date")
+    .in("patient_id", pids)
+    .gte("appointment_date", new Date().toISOString())
+    .order("appointment_date", { ascending: true });
+
+  const appointmentMap: Record<string, string> = {};
+  appointmentData?.forEach((apt: any) => {
+    if (!appointmentMap[apt.patient_id]) {
+      appointmentMap[apt.patient_id] = formatDate(apt.appointment_date);
+    }
+  });
+
+  const { data: paginatedData, pagination } = paginateData(data, params?.page, params?.limit);
+
+  return {
+    type: "table",
+    columns: ["Patient ID", "Name", "Last VL Date", "Last VL Result", "Days Overdue", "Next Appointment", "Status"],
+    data: paginatedData.map((p: any) => {
+      const lastVLDate = p.last_viral_load_date ? new Date(p.last_viral_load_date) : null;
+      const daysOverdue = lastVLDate ? Math.floor((today.getTime() - lastVLDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+      return {
+        "Patient ID": p.pid,
+        Name: p.patient_name || "N/A",
+        "Last VL Date": lastVLDate ? formatDate(p.last_viral_load_date) : "Never",
+        "Last VL Result": p.last_viral_load ? p.last_viral_load.toLocaleString() : "N/A",
+        "Days Overdue": `${daysOverdue} days 🔴`,
+        "Next Appointment": appointmentMap[p.pid] || "None scheduled",
+        Status: p.status || "Active",
+      };
+    }),
+    pagination,
+    alerts: [
+      {
+        severity: "warning",
+        icon: "⚠️",
+        message: `${data.length} patient(s) overdue for viral load testing (90+ days since last test)`,
+      },
+    ],
+  };
+}
+
+// ============================================================
 // HANDLER: ADDITIONAL HANDLERS
 // ============================================================
 
@@ -1312,14 +1826,40 @@ function findBestHandler(query: string): { handler: ((facilityId: string, query:
   }
 
   // ============================================================
-  // HIGH-RISK PATIENTS PATTERN
+  // CRITICAL & HIGH-RISK PATIENTS PATTERN
   // ============================================================
   if (
+    lowerQuery.includes("critical") ||
     (lowerQuery.includes("high") && lowerQuery.includes("risk")) ||
     lowerQuery.includes("at risk") ||
     lowerQuery.includes("vulnerable")
   ) {
+    if (lowerQuery.includes("critical")) {
+      return { handler: HANDLERS["getCriticalPatients"], name: "getCriticalPatients" };
+    }
     return { handler: HANDLERS["getHighRiskPatients"], name: "getHighRiskPatients" };
+  }
+
+  // ============================================================
+  // IAC & ART PATIENTS PATTERN
+  // ============================================================
+  if (
+    lowerQuery.includes("iac") ||
+    (lowerQuery.includes("art") && lowerQuery.includes("clinic")) ||
+    (lowerQuery.includes("antiretroviral") && lowerQuery.includes("clinic"))
+  ) {
+    return { handler: HANDLERS["getIACPatients"], name: "getIACPatients" };
+  }
+
+  // ============================================================
+  // VIRAL LOAD TEST / BLEEDING TEST PATTERN
+  // ============================================================
+  if (
+    (lowerQuery.includes("due") && (lowerQuery.includes("viral") || lowerQuery.includes("bleeding") || lowerQuery.includes("vl") || lowerQuery.includes("test"))) ||
+    (lowerQuery.includes("overdue") && (lowerQuery.includes("viral") || lowerQuery.includes("bleeding"))) ||
+    (lowerQuery.includes("viral") && lowerQuery.includes("test") && lowerQuery.includes("due"))
+  ) {
+    return { handler: HANDLERS["getDueForBleedingTest"], name: "getDueForBleedingTest" };
   }
 
   // ============================================================
@@ -1331,10 +1871,16 @@ function findBestHandler(query: string): { handler: ((facilityId: string, query:
     lowerQuery.includes("visit") ||
     lowerQuery.includes("scheduled")
   ) {
-    // Time-specific appointments
+    // Time-specific appointments (ordered by specificity)
     if (lowerQuery.includes("today")) return { handler: HANDLERS["getAppointmentsToday"], name: "getAppointmentsToday" };
+    if (lowerQuery.includes("this week")) return { handler: HANDLERS["getAppointmentsThisWeek"], name: "getAppointmentsThisWeek" };
+    if (lowerQuery.includes("last week")) return { handler: HANDLERS["getAppointmentsLastWeek"], name: "getAppointmentsLastWeek" };
     if (lowerQuery.includes("next week") || lowerQuery.includes("upcoming")) return { handler: HANDLERS["getAppointmentsNextWeek"], name: "getAppointmentsNextWeek" };
-    if (lowerQuery.includes("next month")) return { handler: HANDLERS["getAppointmentsNextWeek"], name: "getAppointmentsNextWeek" };
+    if (lowerQuery.includes("this month")) return { handler: HANDLERS["getAppointmentsThisMonth"], name: "getAppointmentsThisMonth" };
+    if (lowerQuery.includes("last month")) return { handler: HANDLERS["getAppointmentsLastMonth"], name: "getAppointmentsLastMonth" };
+    if (lowerQuery.includes("next month")) return { handler: HANDLERS["getAppointmentsNextMonth"], name: "getAppointmentsNextMonth" };
+    if ((lowerQuery.includes("30 day") || lowerQuery.includes("past 30")) && (lowerQuery.includes("last") || lowerQuery.includes("past") || lowerQuery.includes("previous"))) return { handler: HANDLERS["getAppointmentsPast30Days"], name: "getAppointmentsPast30Days" };
+    if (lowerQuery.includes("30 day") || lowerQuery.includes("next 30")) return { handler: HANDLERS["getAppointmentsNext30Days"], name: "getAppointmentsNext30Days" };
 
     // Missed appointments - with time ranges
     if (lowerQuery.includes("miss") || lowerQuery.includes("missed")) {
@@ -1354,9 +1900,7 @@ function findBestHandler(query: string): { handler: ((facilityId: string, query:
   // PATIENT DEMOGRAPHICS & COUNTS
   // ============================================================
   if (lowerQuery.includes("patient") || lowerQuery.includes("total") || lowerQuery.includes("count")) {
-    if (lowerQuery.includes("total") || lowerQuery.includes("how many") || lowerQuery.includes("count")) {
-      return { handler: HANDLERS["getTotalPatients"], name: "getTotalPatients" };
-    }
+    // Check for specific demographics before generic total
     if (lowerQuery.includes("female") || lowerQuery.includes("women") || lowerQuery.includes("girls")) {
       return { handler: HANDLERS["getFemalePatients"], name: "getFemalePatients" };
     }
@@ -1365,6 +1909,10 @@ function findBestHandler(query: string): { handler: ((facilityId: string, query:
     }
     if (lowerQuery.includes("new")) {
       return { handler: HANDLERS["getNewPatients"], name: "getNewPatients" };
+    }
+    // Default to total if no specific demographic
+    if (lowerQuery.includes("total") || lowerQuery.includes("how many") || lowerQuery.includes("count")) {
+      return { handler: HANDLERS["getTotalPatients"], name: "getTotalPatients" };
     }
   }
 

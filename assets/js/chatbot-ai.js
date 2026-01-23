@@ -8,6 +8,8 @@ class HealthFlowChatbot {
         this.conversationHistory = [];
         this.isLoading = false;
         this.maxMessages = 50; // Limit conversation history
+        this.savedSearches = this.loadSavedSearches(); // Load saved searches from localStorage
+        this.lastQueryResults = []; // Store results for export
 
         // Intent patterns for NLP
         this.intents = {
@@ -21,21 +23,41 @@ class HealthFlowChatbot {
                 patterns: [
                     "how many|count|total|statistics|stats|summary|overview|number of",
                 ],
-                keywords: ["patient|patients"],
+                keywords: ["patient|patients|coming|appointment"],
+            },
+            appointment_stats: {
+                patterns: [
+                    "how many|count|total|number of",
+                ],
+                keywords: ["appointment|visit|coming|scheduled|today"],
+            },
+            date_range_query: {
+                patterns: [
+                    "between|from|during|date|today|tomorrow|day|period|range",
+                ],
+                keywords: ["appointment|visit|coming|scheduled"],
             },
             specific_patient: {
                 patterns: ["patient|show|details|info|information"],
                 keywords: [], // Only match if we can extract an actual patient ID
             },
             appointments: {
-                patterns: ["appointment|scheduled|visit|next|upcoming|missed|when"],
+                patterns: ["appointment|scheduled|visit|next|upcoming|missed|when|coming|today"],
                 keywords: [
-                    "appointment|scheduled|visit|next|upcoming|missed|appointment",
+                    "appointment|scheduled|visit|next|upcoming|missed|appointment|coming",
                 ],
             },
+            viral_suppression: {
+                patterns: ["suppressing|suppressed|suppression|undetectable|not suppressing"],
+                keywords: ["suppress|detectable|viral"],
+            },
             viral_load: {
-                patterns: ["viral|load|detectable|undetectable|hiv copies|vl"],
+                patterns: ["viral|load|detectable|undetectable|hiv copies|vl|copies"],
                 keywords: ["viral|detectable|undetectable|load|copies"],
+            },
+            pregnancy: {
+                patterns: ["pregnant|pregnancy|mother|expecting|expecting mothers"],
+                keywords: ["pregnant|pregnancy|mother|pregnant mothers"],
             },
             high_risk: {
                 patterns: ["risk|alert|critical|urgent|concern|monitor|danger"],
@@ -156,12 +178,28 @@ class HealthFlowChatbot {
             filters.condition = "Cancer";
             console.log("Matched Cancer");
         }
+        if (/pregnancy|pregnant|expecting mother/i.test(queryLower)) {
+            filters.is_pregnant = true;
+            console.log("Matched Pregnant");
+        }
 
         // Extract viral load status
         if (/detectable/i.test(queryLower))
             filters.viral_load_status = "Detectable";
         if (/undetectable/i.test(queryLower))
             filters.viral_load_status = "Undetectable";
+
+        // Extract viral suppression status (inverse of detectable)
+        if (/not suppressing|suppression failure|unsuppressed|not suppressed/i.test(queryLower)) {
+            filters.viral_load_status = "Detectable";
+            filters.search_type = "not_suppressing";
+            console.log("Matched Not Suppressing");
+        }
+        if (/suppressing|suppressed|well suppressed|adequately suppressed/i.test(queryLower)) {
+            filters.viral_load_status = "Undetectable";
+            filters.search_type = "suppressing";
+            console.log("Matched Suppressing");
+        }
 
         // Extract gender
         if (/\bmale\b|\bmen\b|\bboys\b/i.test(queryLower)) filters.gender = "M";
@@ -173,6 +211,43 @@ class HealthFlowChatbot {
             /(?:age|aged|over|above|older than)\s*(\d+)/
         );
         if (ageMatch) filters.min_age = parseInt(ageMatch[1]);
+
+        // Extract date range for appointments
+        // Pattern: "between 15 february and 31 february", "from 15 to 31 february", etc.
+        const dateRangeMatch = query.match(
+            /(?:between|from)\s+(\d{1,2})\s+([a-z]+)\s+(?:and|to)\s+(\d{1,2})\s+([a-z]+)(?:\s+(\d{4}))?/i
+        );
+        if (dateRangeMatch) {
+            const monthMap = {
+                january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+                july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+                jan: 1, feb: 2, mar: 3, apr: 4, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+            };
+            const monthFrom = monthMap[dateRangeMatch[2].toLowerCase()];
+            const monthTo = monthMap[dateRangeMatch[4].toLowerCase()];
+            const year = parseInt(dateRangeMatch[5]) || new Date().getFullYear();
+            
+            if (monthFrom && monthTo) {
+                filters.date_from = new Date(year, monthFrom - 1, parseInt(dateRangeMatch[1])).toISOString();
+                filters.date_to = new Date(year, monthTo - 1, parseInt(dateRangeMatch[3])).toISOString();
+                filters.date_range_query = true;
+                console.log("Extracted date range:", filters.date_from, "-", filters.date_to);
+            }
+        }
+
+        // Check for "today" appointments
+        if (/today|this\s+day|same\s+day/i.test(queryLower)) {
+            const today = new Date();
+            filters.appointment_date = today.toISOString().split('T')[0];
+            filters.is_today = true;
+            console.log("Looking for appointments today");
+        }
+
+        // Check for upcoming appointments
+        if (/upcoming|next|coming/i.test(queryLower)) {
+            filters.is_upcoming = true;
+            console.log("Looking for upcoming appointments");
+        }
 
         return filters;
     }
@@ -446,9 +521,12 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 try {
                     const patients = await this.queryPatients(filters);
                     console.log("Patients found:", patients);
+                    // Store results for export
+                    this.lastQueryResults = patients;
                     if (patients.length === 0 && Object.keys(filters).length === 0) {
                         // No filters applied and no results, try to fetch all patients
                         const allPatients = await this.queryPatients({});
+                        this.lastQueryResults = allPatients;
                         botResponse = this.formatPatientResponse(allPatients);
                     } else {
                         botResponse = this.formatPatientResponse(patients);
@@ -456,14 +534,131 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 } catch (error) {
                     console.error("Error fetching patients:", error);
                     botResponse = `Error retrieving patient data: ${error.message}. Please check the database connection.`;
+                    this.lastQueryResults = [];
                 }
             } else if (detectedIntent === "patient_stats") {
                 try {
                     const stats = await this.getStatistics(filters);
                     botResponse = this.formatStatsResponse(stats);
+                    // Store stats results for export
+                    this.lastQueryResults = [];
                 } catch (error) {
                     console.error("Error fetching statistics:", error);
                     botResponse = `Error retrieving statistics: ${error.message}. Please check the database connection.`;
+                    this.lastQueryResults = [];
+                }
+            } else if (detectedIntent === "appointment_stats") {
+                try {
+                    const patients = await this.queryPatients(filters);
+                    const withAppointments = patients.filter((p) => p.next_appointment);
+                    this.lastQueryResults = withAppointments;
+                    
+                    botResponse = `<strong>Appointment Statistics:</strong><br/>
+                    Total patients with appointments: <strong>${withAppointments.length}</strong>`;
+                    
+                    if (filters.is_today) {
+                        const todayAppointments = withAppointments.filter(p => {
+                            const appointDate = new Date(p.next_appointment).toDateString();
+                            return appointDate === new Date().toDateString();
+                        });
+                        botResponse = `<strong>Appointments Today:</strong><br/>
+                        Total: <strong>${todayAppointments.length}</strong><br/>`;
+                    }
+                } catch (error) {
+                    console.error("Error fetching appointments:", error);
+                    botResponse = `Error retrieving appointments: ${error.message}`;
+                    this.lastQueryResults = [];
+                }
+            } else if (detectedIntent === "date_range_query") {
+                try {
+                    const patients = await this.queryPatients(filters);
+                    const withAppointments = patients.filter((p) => p.next_appointment);
+                    
+                    if (filters.date_range_query && filters.date_from && filters.date_to) {
+                        const dateFrom = new Date(filters.date_from);
+                        const dateTo = new Date(filters.date_to);
+                        
+                        const inRangeAppointments = withAppointments.filter(p => {
+                            const appointDate = new Date(p.next_appointment);
+                            return appointDate >= dateFrom && appointDate <= dateTo;
+                        });
+                        
+                        this.lastQueryResults = inRangeAppointments;
+                        botResponse = `<strong>Appointments between ${dateFrom.toLocaleDateString()} and ${dateTo.toLocaleDateString()}:</strong><br/>
+                        Total: <strong>${inRangeAppointments.length}</strong><br/>`;
+                        
+                        if (inRangeAppointments.length > 0) {
+                            botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Appointment Date</th></tr></thead><tbody>';
+                            inRangeAppointments.forEach((p) => {
+                                botResponse += `<tr><td>${p.first_name} ${p.last_name}</td><td>${new Date(p.next_appointment).toLocaleDateString()}</td></tr>`;
+                            });
+                            botResponse += '</tbody></table>';
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching date range appointments:", error);
+                    botResponse = `Error retrieving appointments: ${error.message}`;
+                    this.lastQueryResults = [];
+                }
+            } else if (detectedIntent === "pregnancy") {
+                try {
+                    const patients = await this.queryPatients(filters);
+                    // Filter for pregnant patients (assuming there's a pregnancy field in DB)
+                    const pregnant = patients.filter((p) => p.is_pregnant || p.pregnancy_status === "Pregnant");
+                    this.lastQueryResults = pregnant;
+                    
+                    botResponse = `<strong>Pregnant Mothers:</strong><br/>
+                    Total: <strong>${pregnant.length}</strong><br/>`;
+                    
+                    if (pregnant.length > 0) {
+                        botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Name</th><th>Age</th><th>Status</th></tr></thead><tbody>';
+                        pregnant.forEach((p) => {
+                            botResponse += `<tr><td>${p.first_name} ${p.last_name}</td><td>${p.age}</td><td>${p.status}</td></tr>`;
+                        });
+                        botResponse += '</tbody></table>';
+                    }
+                } catch (error) {
+                    console.error("Error fetching pregnant patients:", error);
+                    botResponse = `Error retrieving data: ${error.message}`;
+                    this.lastQueryResults = [];
+                }
+            } else if (detectedIntent === "viral_suppression") {
+                try {
+                    const patients = await this.queryPatients(filters);
+                    const withViralStatus = patients.filter((p) => p.viral_load_status);
+                    this.lastQueryResults = withViralStatus;
+                    
+                    if (filters.search_type === "not_suppressing") {
+                        const notSuppressing = withViralStatus.filter((p) => p.viral_load_status === "Detectable");
+                        this.lastQueryResults = notSuppressing;
+                        botResponse = `<strong>Patients Not Suppressing Virus (Detectable Viral Load):</strong><br/>
+                        Total: <strong>${notSuppressing.length}</strong><br/>`;
+                        
+                        if (notSuppressing.length > 0) {
+                            botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Viral Load</th><th>Copies</th></tr></thead><tbody>';
+                            notSuppressing.forEach((p) => {
+                                botResponse += `<tr><td>${p.first_name} ${p.last_name}</td><td>${p.viral_load_status}</td><td>${p.viral_load_copies || "N/A"}</td></tr>`;
+                            });
+                            botResponse += '</tbody></table>';
+                        }
+                    } else if (filters.search_type === "suppressing") {
+                        const suppressing = withViralStatus.filter((p) => p.viral_load_status === "Undetectable");
+                        this.lastQueryResults = suppressing;
+                        botResponse = `<strong>Patients With Viral Suppression (Undetectable Viral Load):</strong><br/>
+                        Total: <strong>${suppressing.length}</strong><br/>`;
+                        
+                        if (suppressing.length > 0) {
+                            botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Viral Load</th></tr></thead><tbody>';
+                            suppressing.forEach((p) => {
+                                botResponse += `<tr><td>${p.first_name} ${p.last_name}</td><td>${p.viral_load_status}</td></tr>`;
+                            });
+                            botResponse += '</tbody></table>';
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching viral suppression data:", error);
+                    botResponse = `Error retrieving data: ${error.message}`;
+                    this.lastQueryResults = [];
                 }
             } else if (detectedIntent === "appointments") {
                 try {
@@ -471,6 +666,8 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                         ...filters
                     });
                     const withAppointments = patients.filter((p) => p.next_appointment);
+                    // Store appointment results for export
+                    this.lastQueryResults = withAppointments;
                     if (withAppointments.length > 0) {
                         botResponse = `<strong>Upcoming Appointments (${withAppointments.length}):</strong><br/>`;
                         withAppointments.forEach((p) => {
@@ -484,6 +681,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 } catch (error) {
                     console.error("Error fetching appointments:", error);
                     botResponse = `Error retrieving appointments: ${error.message}`;
+                    this.lastQueryResults = [];
                 }
             } else if (detectedIntent === "viral_load") {
                 try {
@@ -491,6 +689,8 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                         ...filters
                     });
                     const withViralLoad = patients.filter((p) => p.viral_load_status);
+                    // Store viral load results for export
+                    this.lastQueryResults = withViralLoad;
                     if (withViralLoad.length > 0) {
                         botResponse = `<strong>Viral Load Status (${withViralLoad.length} patients):</strong><br/>`;
                         withViralLoad.forEach((p) => {
@@ -505,6 +705,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 } catch (error) {
                     console.error("Error fetching viral load data:", error);
                     botResponse = `Error retrieving viral load data: ${error.message}`;
+                    this.lastQueryResults = [];
                 }
             } else if (detectedIntent === "high_risk") {
                 try {
@@ -512,6 +713,8 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                         status: "Critical",
                         ...filters,
                     });
+                    // Store high-risk results for export
+                    this.lastQueryResults = patients;
                     if (patients.length > 0) {
                         botResponse = `<strong>High-Risk Patients (${patients.length}):</strong><br/>`;
                         botResponse += this.formatPatientResponse(patients);
@@ -521,10 +724,12 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 } catch (error) {
                     console.error("Error fetching high-risk patients:", error);
                     botResponse = `Error retrieving high-risk patients: ${error.message}`;
+                    this.lastQueryResults = [];
                 }
             } else {
                 botResponse =
                     'I can help you search for patients. Try asking things like:<br/>- "Show me all HIV positive patients"<br/>- "List patients with diabetes"<br/>- "How many active patients do we have?"<br/>- "Show critical patients"';
+                this.lastQueryResults = [];
             }
 
             // Add bot response to history
@@ -567,6 +772,163 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
      */
     clearHistory() {
         this.conversationHistory = [];
+    }
+
+    /**
+     * Save a search to localStorage
+     */
+    saveSearch(searchName, filters) {
+        if (!searchName || !filters) {
+            return { success: false, message: 'Search name and filters are required' };
+        }
+
+        const search = {
+            id: Date.now(),
+            name: searchName,
+            filters: filters,
+            savedAt: new Date().toLocaleString(),
+        };
+
+        this.savedSearches.push(search);
+        localStorage.setItem('healthFlowSavedSearches', JSON.stringify(this.savedSearches));
+        
+        return { 
+            success: true, 
+            message: `Search "${searchName}" saved successfully`,
+            search: search 
+        };
+    }
+
+    /**
+     * Load saved searches from localStorage
+     */
+    loadSavedSearches() {
+        try {
+            const saved = localStorage.getItem('healthFlowSavedSearches');
+            return saved ? JSON.parse(saved) : [];
+        } catch (error) {
+            console.error('Error loading saved searches:', error);
+            return [];
+        }
+    }
+
+    /**
+     * List all saved searches as HTML
+     */
+    listSavedSearches() {
+        if (this.savedSearches.length === 0) {
+            return '<p style="color: #999; margin: 0;">No saved searches yet. Save a search to see it here!</p>';
+        }
+
+        let html = '<div class="saved-searches-list">';
+        html += `<p style="font-weight: 600; margin-bottom: 12px;">Saved Searches (${this.savedSearches.length})</p>`;
+
+        this.savedSearches.forEach(search => {
+            const filterStr = Object.entries(search.filters)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
+
+            html += `
+                <div class="saved-search-item" style="
+                    background: #f8f9fa;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 6px;
+                    padding: 10px;
+                    margin-bottom: 8px;
+                    font-size: 12px;
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 8px;">
+                        <div style="flex: 1;">
+                            <strong style="color: #15696b; display: block; margin-bottom: 4px;">${this.escapeHtml(search.name)}</strong>
+                            <small style="color: #666; display: block; margin-bottom: 4px;">${filterStr || 'No filters'}</small>
+                            <small style="color: #999;">Saved: ${search.savedAt}</small>
+                        </div>
+                        <div style="display: flex; gap: 4px;">
+                            <button onclick="healthFlowChatbot.loadSearch(${search.id})" style="
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                border: none;
+                                padding: 6px 10px;
+                                border-radius: 4px;
+                                font-size: 11px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                transition: all 0.2s;
+                            " title="Load this search">
+                                Load
+                            </button>
+                            <button onclick="healthFlowChatbot.deleteSearch(${search.id})" style="
+                                background: #ff6b6b;
+                                color: white;
+                                border: none;
+                                padding: 6px 10px;
+                                border-radius: 4px;
+                                font-size: 11px;
+                                cursor: pointer;
+                                font-weight: 600;
+                                transition: all 0.2s;
+                            " title="Delete this search">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        return html;
+    }
+
+    /**
+     * Load a saved search and execute it
+     */
+    async loadSearch(searchId) {
+        const search = this.savedSearches.find(s => s.id === searchId);
+        if (!search) {
+            alert('Search not found');
+            return;
+        }
+
+        // Build a natural language query from filters
+        let query = 'Show me ';
+        const { filters } = search;
+
+        if (filters.patient_no) query += `patient ${filters.patient_no} `;
+        if (filters.status) query += `${filters.status.toLowerCase()} patients `;
+        if (filters.hiv_status) query += `with HIV ${filters.hiv_status.toLowerCase()} status `;
+        if (filters.condition) query += `with ${filters.condition} `;
+        if (filters.viral_load_status) query += `with ${filters.viral_load_status} viral load `;
+
+        if (typeof chatbotUI !== 'undefined') {
+            chatbotUI.sendMessage(query);
+        }
+    }
+
+    /**
+     * Delete a saved search
+     */
+    deleteSearch(searchId) {
+        if (!confirm('Are you sure you want to delete this search?')) {
+            return;
+        }
+
+        this.savedSearches = this.savedSearches.filter(s => s.id !== searchId);
+        localStorage.setItem('healthFlowSavedSearches', JSON.stringify(this.savedSearches));
+        
+        if (typeof chatbotUI !== 'undefined') {
+            // Refresh the saved searches display
+            chatbotUI.showSavedSearches();
+        }
+    }
+
+    /**
+     * Utility: Escape HTML
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 }
 
