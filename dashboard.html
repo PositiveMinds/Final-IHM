@@ -3172,7 +3172,7 @@
             const session = JSON.parse(localStorage.getItem('userSession'));
             const facilityEl = document.getElementById('add_facility_id_code');
             if (facilityEl && session) {
-              facilityEl.value = session.facility_id_code || 'N/A';
+              facilityEl.value = session.facilityIdCode || 'N/A';
             }
             // Initialize Select2 and Air Datepicker
             setTimeout(() => {
