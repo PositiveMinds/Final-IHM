@@ -4,16 +4,16 @@
 document.getElementById("loginForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 
-  const email = document.getElementById("facilityEmail").value;
+  const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
   const rememberMe = document.getElementById("rememberMe").checked;
 
   // Validate inputs
-  if (!email || !password) {
+  if (!username || !password) {
     Swal.fire({
       icon: "warning",
       title: "Missing Credentials",
-      text: "Please enter both email and password.",
+      text: "Please enter both username and password.",
       confirmButtonColor: "#0052CC",
     });
     return;
@@ -30,19 +30,23 @@ document.getElementById("loginForm").addEventListener("submit", async function (
   });
 
   try {
-    // Query users table to find the user
+    // Query users table to find the user by username
     const { data: users, error: searchError } = await supabaseClient
       .from("users")
       .select("*")
-      .eq("email", email)
-      .single();
+      .eq("username", username)
+      .maybeSingle();
 
-    if (searchError || !users) {
+    if (searchError) {
       console.error("User search error:", searchError);
+    }
+    
+    if (!users) {
+      console.warn("User not found with username:", username);
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: "Invalid email or password.",
+        text: "Invalid username or password.",
         confirmButtonColor: "#dc3545",
       });
       return;
@@ -115,8 +119,8 @@ document.getElementById("loginForm").addEventListener("submit", async function (
          localStorage.setItem("userSession", JSON.stringify(sessionData));
 
        if (rememberMe) {
-         localStorage.setItem("healthflow_email", email);
-       }
+          localStorage.setItem("healthflow_username", username);
+        }
 
        // Success message
        const displayName = users.fullname || users.facility_name || 'User';
@@ -128,10 +132,28 @@ document.getElementById("loginForm").addEventListener("submit", async function (
          confirmButtonText: "Continue",
        }).then((result) => {
          if (result.isConfirmed) {
-           console.log("Redirecting to dashboard...");
+           console.log("Redirecting based on user role...");
            // Add delay to ensure localStorage is written, then redirect
            setTimeout(() => {
-             window.location.href = "dashboard.html";
+             // Route based on user role
+             const userRole = users.user_role;
+             console.log("User role:", userRole);
+             
+             let redirectUrl = "dashboard.html"; // default for Admin
+             
+             if (userRole === 'patient') {
+               redirectUrl = "patient-portal.html";
+             } else if (userRole === 'Staff') {
+               redirectUrl = "staff.html";
+             } else if (userRole === 'Admin' || userRole === 'Administrator') {
+               redirectUrl = "dashboard.html";
+             } else {
+               // For other roles (Nurse, Doctor, etc.) use dashboard
+               redirectUrl = "dashboard.html";
+             }
+             
+             console.log("Redirecting to:", redirectUrl);
+             window.location.href = redirectUrl;
            }, 500);
          }
        });
@@ -180,11 +202,11 @@ async function comparePassword(plainPassword, hashedPassword) {
   }
 }
 
-// Load remembered email if exists
+// Load remembered username if exists
 window.addEventListener("load", function () {
-  const rememberedEmail = localStorage.getItem("healthflow_email");
-  if (rememberedEmail) {
-    document.getElementById("facilityEmail").value = rememberedEmail;
+  const rememberedUsername = localStorage.getItem("healthflow_username");
+  if (rememberedUsername) {
+    document.getElementById("username").value = rememberedUsername;
     document.getElementById("rememberMe").checked = true;
   }
 });
