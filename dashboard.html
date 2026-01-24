@@ -39,6 +39,65 @@
     <!-- Chat System CSS -->
     <link rel="stylesheet" href="chat-system.css">
 
+    <!-- Demo Data Initialization - BEFORE chat-system.js -->
+    <script>
+        function initializeDemoData() {
+            // Use demo user for testing
+            const currentUser = {
+                id: 'user_001',
+                full_name: 'Dr. Sarah Johnson',
+                email: 'sarah.johnson@healthflow.com',
+                role: 'health_worker',
+                facility_id: 'facility_001'
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            const allUsers = [
+                { id: 'user_001', full_name: 'Dr. Sarah Johnson', email: 'sarah.johnson@healthflow.com', role: 'health_worker', facility_id: 'facility_001' },
+                { id: 'user_002', full_name: 'James Mwale', email: 'james.mwale@healthflow.com', role: 'patient', facility_id: 'facility_001' },
+                { id: 'user_003', full_name: 'Dr. Emmanuel Kato', email: 'emmanuel.kato@healthflow.com', role: 'health_worker', facility_id: 'facility_001' },
+                { id: 'user_004', full_name: 'Grace Nakato', email: 'grace.nakato@healthflow.com', role: 'patient', facility_id: 'facility_001' },
+                { id: 'user_005', full_name: 'Dr. Robert Okot', email: 'robert.okot@healthflow.com', role: 'health_worker', facility_id: 'facility_001' }
+            ];
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+
+            const demoChats = [
+                { id: 'chat_001', name: 'James Mwale', type: 'private', participants: ['user_001', 'user_002'], avatar: 'JM', lastMessage: 'Thanks for the appointment reminder', lastMessageTime: new Date(Date.now() - 3600000).toISOString() },
+                { id: 'chat_002', name: 'Medical Team', type: 'group', participants: ['user_001', 'user_003', 'user_005'], avatar: 'MT', lastMessage: 'Next team meeting is tomorrow at 2 PM', lastMessageTime: new Date(Date.now() - 7200000).toISOString() },
+                { id: 'chat_003', name: 'Grace Nakato', type: 'private', participants: ['user_001', 'user_004'], avatar: 'GN', lastMessage: 'Can I schedule an appointment for next week?', lastMessageTime: new Date(Date.now() - 86400000).toISOString() }
+            ];
+            localStorage.setItem('chats_user_001', JSON.stringify(demoChats));
+
+            const demoMessages = {
+                chat_001: [
+                    { id: 'msg_001', chatId: 'chat_001', senderId: 'user_002', senderName: 'James Mwale', type: 'text', content: 'Hi Dr. Sarah, I received the appointment reminder', timestamp: new Date(Date.now() - 7200000).toISOString(), attachments: [] },
+                    { id: 'msg_002', chatId: 'chat_001', senderId: 'user_001', senderName: 'Dr. Sarah Johnson', type: 'text', content: 'Great! Please confirm if you can make it tomorrow at 10 AM', timestamp: new Date(Date.now() - 3600000).toISOString(), attachments: [] }
+                ],
+                chat_002: [
+                    { id: 'msg_003', chatId: 'chat_002', senderId: 'user_003', senderName: 'Dr. Emmanuel Kato', type: 'text', content: 'Hi everyone, we have important updates to discuss', timestamp: new Date(Date.now() - 14400000).toISOString(), attachments: [] },
+                    { id: 'msg_004', chatId: 'chat_002', senderId: 'user_005', senderName: 'Dr. Robert Okot', type: 'text', content: 'I will be there', timestamp: new Date(Date.now() - 10800000).toISOString(), attachments: [] },
+                    { id: 'msg_005', chatId: 'chat_002', senderId: 'user_001', senderName: 'Dr. Sarah Johnson', type: 'text', content: 'Next team meeting is tomorrow at 2 PM', timestamp: new Date(Date.now() - 7200000).toISOString(), attachments: [] }
+                ],
+                chat_003: [
+                    { id: 'msg_006', chatId: 'chat_003', senderId: 'user_004', senderName: 'Grace Nakato', type: 'text', content: 'Can I schedule an appointment for next week?', timestamp: new Date(Date.now() - 86400000).toISOString(), attachments: [] }
+                ]
+            };
+
+            Object.keys(demoMessages).forEach(chatId => {
+                localStorage.setItem(`messages_${chatId}`, JSON.stringify(demoMessages[chatId]));
+            });
+
+            console.log('Demo data initialized successfully');
+        }
+        
+        // Initialize immediately
+        initializeDemoData();
+    </script>
+
+    <!-- Chat System JS -->
+    <script src="chat-system.js" defer></script>
+
     <!-- FAB Button CSS -->
     <style>
         /* Hide the chatbot's default FAB button */
@@ -2052,13 +2111,20 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Role *</label>
-                            <select class="form-control" id="newUserRole" required>
+                            <select class="form-control" id="newUserRole" required onchange="handleRoleChange()">
                                 <option value="">Select a role</option>
-                                <option value="Admin">Admin</option>
-                                <option value="Manager">Manager</option>
-                                <option value="Staff">Staff</option>
-                                <option value="User">User</option>
+                                <option value="patient">Patient</option>
+                                <option value="admin">Admin</option>
+                                <option value="staff">Staff</option>
                             </select>
+                        </div>
+                        <!-- Patient Selection Field (shown only when Patient role is selected) -->
+                        <div class="mb-3" id="patientSelectionGroup" style="display: none;">
+                            <label class="form-label">Select Patient *</label>
+                            <select class="form-control" id="newUserPatient" onchange="handlePatientSelection()">
+                                <option value="">Search and select a patient...</option>
+                            </select>
+                            <small class="text-muted">Link this user account to an existing patient record</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password *</label>
@@ -6380,8 +6446,109 @@
             if (form) {
                 form.reset();
             }
+            // Load patients when modal opens
+            loadPatientsForSelection();
             const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
             modal.show();
+        }
+
+        // Handle role selection change
+        function handleRoleChange() {
+            const role = document.getElementById('newUserRole').value;
+            const patientSelectionGroup = document.getElementById('patientSelectionGroup');
+            const newUserPatient = document.getElementById('newUserPatient');
+
+            if (role === 'patient') {
+                patientSelectionGroup.style.display = 'block';
+                newUserPatient.setAttribute('required', 'required');
+            } else {
+                patientSelectionGroup.style.display = 'none';
+                newUserPatient.removeAttribute('required');
+                newUserPatient.value = '';
+            }
+        }
+
+        // Store patients data globally for easy access
+        let patientsDataMap = {};
+
+        // Load patients from database for selection
+        async function loadPatientsForSelection() {
+            try {
+                const patientSelect = document.getElementById('newUserPatient');
+                const session = JSON.parse(localStorage.getItem('userSession'));
+                const facilityId = session?.fid;
+
+                const { data: patients, error } = await supabaseClient
+                    .from('patients')
+                    .select('pid, patient_no, health_worker_name, first_name, last_name, age, phone_number, email')
+                    .eq('fid', facilityId)
+                    .order('health_worker_name', { ascending: true });
+
+                if (error) {
+                    console.error('Error loading patients:', error);
+                    return;
+                }
+
+                // Clear existing options and map
+                patientSelect.innerHTML = '<option value="">Search and select a patient...</option>';
+                patientsDataMap = {};
+
+                if (patients && patients.length > 0) {
+                    patients.forEach(patient => {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify({ pid: patient.pid, patient_no: patient.patient_no });
+                        option.textContent = `${patient.patient_no} - ${patient.health_worker_name} (Age: ${patient.age}) - ${patient.phone_number || 'N/A'}`;
+                        patientSelect.appendChild(option);
+                        
+                        // Store patient data for quick access
+                        patientsDataMap[patient.pid] = patient;
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.disabled = true;
+                    option.textContent = 'No patients found in your facility';
+                    patientSelect.appendChild(option);
+                }
+            } catch (error) {
+                console.error('Error in loadPatientsForSelection:', error);
+            }
+        }
+
+        // Handle patient selection and auto-populate fields
+        function handlePatientSelection() {
+            const patientSelect = document.getElementById('newUserPatient');
+            const selectedValue = patientSelect.value;
+
+            if (!selectedValue) {
+                // Clear fields if no patient selected
+                document.getElementById('newUserFullname').value = '';
+                document.getElementById('newUserEmail').value = '';
+                return;
+            }
+
+            try {
+                const patientData = JSON.parse(selectedValue);
+                const patient = patientsDataMap[patientData.pid];
+
+                if (patient) {
+                    // Auto-populate Full Name field using only first and last name
+                    const fullName = `${patient.first_name || ''} ${patient.last_name || ''}`.trim();
+                    document.getElementById('newUserFullname').value = fullName;
+
+                    // Auto-populate Email field
+                    if (patient.email) {
+                        document.getElementById('newUserEmail').value = patient.email;
+                    } else {
+                        document.getElementById('newUserEmail').value = '';
+                    }
+
+                    // Auto-generate username based on the populated full name
+                    generateUsernameFromFullname(fullName);
+                }
+            } catch (err) {
+                console.error('Error processing patient selection:', err);
+            }
         }
 
         // Generate username from fullname
@@ -6423,10 +6590,17 @@
             const password = document.getElementById('newUserPassword').value;
             const confirmPassword = document.getElementById('newUserConfirmPassword').value;
             const role = document.getElementById('newUserRole').value;
+            const patientSelection = document.getElementById('newUserPatient').value;
             const messageDiv = document.getElementById('createUserMessage');
 
-            if (!fullname || !email || !username || !password || !confirmPassword) {
+            if (!fullname || !email || !username || !password || !confirmPassword || !role) {
                 showUserMessage(messageDiv, 'All fields are required', 'danger');
+                return;
+            }
+
+            // Validate patient selection for patient role
+            if (role === 'patient' && !patientSelection) {
+                showUserMessage(messageDiv, 'Please select a patient', 'danger');
                 return;
             }
 
@@ -6446,12 +6620,25 @@
                 return;
             }
 
+            // Parse patient data if patient role selected
+            let patientData = { pid: null, patient_no: null };
+            if (role === 'patient' && patientSelection) {
+                try {
+                    patientData = JSON.parse(patientSelection);
+                } catch (err) {
+                    showUserMessage(messageDiv, 'Error processing patient selection', 'danger');
+                    return;
+                }
+            }
+
             await submitCreateUser({
                 fullname,
                 email,
                 username,
                 password,
                 user_role: role,
+                pid: patientData.pid,
+                patient_no: patientData.patient_no,
                 is_active: true
             }, messageDiv);
         }
@@ -6483,20 +6670,30 @@
                 const session = JSON.parse(localStorage.getItem('userSession'));
                 const facilityId = session?.fid || null;
 
+                const userInsertData = {
+                    fullname: userData.fullname,
+                    email: userData.email,
+                    username: userData.username,
+                    password: userData.password,
+                    user_role: userData.user_role,
+                    fid: facilityId,
+                    is_active: userData.is_active,
+                    created_at: new Date().toISOString()
+                };
+
+                // Add pid and patient_no if provided (for patient users)
+                if (userData.pid) {
+                    userInsertData.pid = userData.pid;
+                }
+                if (userData.patient_no) {
+                    userInsertData.patient_no = userData.patient_no;
+                }
+
                 const {
                     error: insertError
                 } = await supabaseClient
                     .from('users')
-                    .insert([{
-                        fullname: userData.fullname,
-                        email: userData.email,
-                        username: userData.username,
-                        password: userData.password,
-                        user_role: userData.user_role,
-                        fid: facilityId,
-                        is_active: userData.is_active,
-                        created_at: new Date().toISOString()
-                    }]);
+                    .insert([userInsertData]);
 
                 if (insertError) {
                     console.error('Insert error:', insertError);
@@ -6896,6 +7093,9 @@
         window.deleteUserAccount = deleteUserAccount;
         window.handleCreateUser = handleCreateUser;
         window.generateUsernameFromFullname = generateUsernameFromFullname;
+        window.handleRoleChange = handleRoleChange;
+        window.loadPatientsForSelection = loadPatientsForSelection;
+        window.handlePatientSelection = handlePatientSelection;
     </script>
 
     <!-- Supabase -->

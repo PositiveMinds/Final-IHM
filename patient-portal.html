@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patient Portal - HealthFlow</title>
+
+    <meta name="description" content="HealthFlow Patient Portal - Access your health information and communicate with healthcare providers">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="assets/css/remixicon.css">
+    <link rel="stylesheet" href="assets/css/main.min.css">
+
+    <!-- Chat System CSS -->
+    <link rel="stylesheet" href="chat-system.css">
+
+    <style>
+        :root {
+            --primary-color: #15696B;
+            --secondary-color: #0F4449;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .login-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .login-card .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(21, 105, 107, 0.25);
+        }
+
+        .btn-login {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 6px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(21, 105, 107, 0.4);
+        }
+
+        .alert-message {
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Portal Styles */
+        .patient-navbar {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .patient-navbar .navbar-brand {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .patient-sidebar {
+            background: white;
+            height: calc(100vh - 70px);
+            border-right: 1px solid #e0e0e0;
+            padding: 20px 0;
+            position: sticky;
+            top: 70px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin: 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(21, 105, 107, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .sidebar-menu i {
+            font-size: 1.2rem;
+        }
+
+        .patient-main {
+            background: #f5f5f5;
+            min-height: calc(100vh - 70px);
+            padding: 30px 20px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .chat-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+
+        .message.own {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            background: #e8f4f8;
+            padding: 10px 15px;
+            border-radius: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.own .message-bubble {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chat-input-group {
+            border-top: 1px solid #e0e0e0;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-group input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+
+        .chat-input-group button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input-group button:hover {
+            background: var(--secondary-color);
+        }
+
+        .user-profile-dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu-custom {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .dropdown-menu-custom.show {
+            display: block;
+        }
+
+        .dropdown-menu-custom a {
+            display: block;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-menu-custom a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu-custom a:hover {
+            background: #f5f5f5;
+            color: var(--primary-color);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .patient-sidebar {
+                position: absolute;
+                left: -100%;
+                width: 250px;
+                transition: left 0.3s ease;
+                z-index: 50;
+            }
+
+            .patient-sidebar.show {
+                left: 0;
+            }
+
+            .message-bubble {
+                max-width: 90%;
+            }
+
+            .login-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <h2>Patient Portal</h2>
+            <p class="subtitle">Login to access your health information</p>
+            <div id="loginMessage"></div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="loginUsername" placeholder="@username" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn-login">
+                    <i class="ri-login-circle-line"></i> Login
+                </button>
+            </form>
+            <hr>
+            <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
+                If you don't have an account, please contact your healthcare facility to register.
+            </p>
+        </div>
+    </div>
+
+    <!-- Patient Portal -->
+    <div id="portalPage" style="display: none;">
+        <!-- Navbar -->
+        <nav class="patient-navbar">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="navbar-brand">
+                        <i class="ri-hospital-line"></i> HealthFlow Patient Portal
+                    </div>
+                    <div class="user-profile-dropdown">
+                        <button class="btn btn-light" id="userMenuBtn">
+                            <i class="ri-user-circle-line"></i> <span id="userNameDisplay">Patient</span>
+                        </button>
+                        <div class="dropdown-menu-custom" id="userDropdown">
+                            <a href="#" onclick="viewProfile()"><i class="ri-user-line"></i> My Profile</a>
+                            <a href="#" onclick="logoutPatient()"><i class="ri-logout-circle-line"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row g-0" style="min-height: calc(100vh - 70px);">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="patient-sidebar">
+                    <ul class="sidebar-menu">
+                        <li><a href="#" onclick="showSection('dashboard')" class="active" data-section="dashboard">
+                            <i class="ri-dashboard-line"></i> Dashboard
+                        </a></li>
+                        <li><a href="#" onclick="showSection('profile')" data-section="profile">
+                            <i class="ri-user-line"></i> My Information
+                        </a></li>
+                        <li><a href="#" onclick="showSection('appointments')" data-section="appointments">
+                            <i class="ri-calendar-todo-line"></i> Appointments
+                        </a></li>
+                        <li><a href="#" onclick="showSection('chat')" data-section="chat">
+                            <i class="ri-chat-1-line"></i> Messages
+                        </a></li>
+                        <li><a href="#" onclick="logoutPatient()">
+                            <i class="ri-logout-circle-line"></i> Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div class="patient-main">
+
+                    <!-- Dashboard Section -->
+                    <div id="dashboardSection" class="content-section">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px;">
+                            <i class="ri-dashboard-line"></i> Welcome, <span id="patientWelcomeName">Patient</span>
+                        </h3>
+
+                        <!-- Quick Stats -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="info-card">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div>
+                                            <h5 style="margin: 0; color: #666;">Next Appointment</h5>
+                                            <h3 style="margin: 10px 0; color: var(--primary-color);" id="nextAppointmentDate">-</h3>
+                                        </div>
+                                        <i class="ri-calendar-check-line" style="font-size: 3rem; color: var(--primary-color); opacity: 0.3;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-card">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div>
+                                            <h5 style="margin: 0; color: #666;">Total Appointments</h5>
+                                            <h3 style="margin: 10px 0; color: var(--primary-color);" id="totalAppointments">0</h3>
+                                        </div>
+                                        <i class="ri-file-list-3-line" style="font-size: 3rem; color: var(--primary-color); opacity: 0.3;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Links -->
+                        <div class="info-card">
+                            <h4>Quick Actions</h4>
+                            <button class="btn btn-outline-primary me-2" onclick="showSection('appointments')">
+                                <i class="ri-calendar-line"></i> View Appointments
+                            </button>
+                            <button class="btn btn-outline-primary me-2" onclick="showSection('chat')">
+                                <i class="ri-chat-line"></i> Send Message
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="showSection('profile')">
+                                <i class="ri-user-line"></i> View Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Section -->
+                    <div id="profileSection" class="content-section" style="display: none;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px;">
+                            <i class="ri-user-line"></i> My Information
+                        </h3>
+
+                        <div class="info-card">
+                            <h4>Personal Information</h4>
+                            <div class="info-row">
+                                <span class="info-label">Name:</span>
+                                <span class="info-value" id="profileName">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value" id="profileEmail">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value" id="profilePhone">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Age:</span>
+                                <span class="info-value" id="profileAge">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Gender:</span>
+                                <span class="info-value" id="profileGender">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Patient Number:</span>
+                                <span class="info-value" id="profilePatientNo">-</span>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h4>Medical Information</h4>
+                            <div class="info-row">
+                                <span class="info-label">Blood Type:</span>
+                                <span class="info-value" id="profileBloodType">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Active Conditions:</span>
+                                <span class="info-value" id="profileConditions">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Allergies:</span>
+                                <span class="info-value" id="profileAllergies">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Current Medications:</span>
+                                <span class="info-value" id="profileMedications">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appointments Section -->
+                    <div id="appointmentsSection" class="content-section" style="display: none;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px;">
+                            <i class="ri-calendar-todo-line"></i> My Appointments
+                        </h3>
+
+                        <div id="appointmentsList"></div>
+                    </div>
+
+                    <!-- Chat Section -->
+                    <div id="chatSection" class="content-section" style="display: none;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 20px;">
+                            <i class="ri-chat-1-line"></i> Messages
+                        </h3>
+
+                        <div class="chat-section">
+                            <div class="chat-container">
+                                <div class="chat-messages" id="chatMessages">
+                                    <div class="no-data">No messages yet. Start a conversation with your healthcare provider.</div>
+                                </div>
+                                <div class="chat-input-group">
+                                    <input type="text" id="chatInput" placeholder="Type your message..." />
+                                    <button onclick="sendMessage()">
+                                        <i class="ri-send-plane-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Configuration (keep in separate file for security) -->
+    <script src="supabase-patient-config.js"></script>
+
+    <script>
+        // Initialize Supabase Client using config from supabase-patient-config.js
+        const supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.KEY);
+
+        let currentPatient = null;
+        let currentChat = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            checkPatientSession();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('loginForm').addEventListener('submit', handlePatientLogin);
+            document.getElementById('userMenuBtn').addEventListener('click', toggleUserMenu);
+            document.getElementById('chatInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        function checkPatientSession() {
+            const session = localStorage.getItem('patientSession');
+            if (session) {
+                currentPatient = JSON.parse(session);
+                if (currentPatient && currentPatient.user_role === 'patient') {
+                    showPortal();
+                } else {
+                    showLogin();
+                }
+            } else {
+                showLogin();
+            }
+        }
+
+        async function handlePatientLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+
+            try {
+                messageDiv.innerHTML = '';
+
+                // Fetch user by username
+                const { data: users, error: userError } = await supabaseClient
+                    .from('users')
+                    .select('uid, fullname, email, username, user_role, pid, patient_no, fid')
+                    .eq('username', username)
+                    .single();
+
+                if (userError || !users) {
+                    showLoginMessage('Invalid username or password', 'danger', messageDiv);
+                    return;
+                }
+
+                // Verify it's a patient
+                if (users.user_role !== 'patient') {
+                    showLoginMessage('Access denied. This portal is for patients only.', 'danger', messageDiv);
+                    return;
+                }
+
+                // Verify password (in production, use proper authentication)
+                if (users.password !== password) {
+                    showLoginMessage('Invalid username or password', 'danger', messageDiv);
+                    return;
+                }
+
+                // Login successful
+                currentPatient = {
+                    uid: users.uid,
+                    fullname: users.fullname,
+                    email: users.email,
+                    username: users.username,
+                    user_role: users.user_role,
+                    pid: users.pid,
+                    patient_no: users.patient_no,
+                    fid: users.fid
+                };
+
+                localStorage.setItem('patientSession', JSON.stringify(currentPatient));
+                showPortal();
+                loadPatientData();
+
+                showLoginMessage('Login successful! Redirecting...', 'success', messageDiv);
+            } catch (error) {
+                console.error('Login error:', error);
+                showLoginMessage('An error occurred during login', 'danger', messageDiv);
+            }
+        }
+
+        function showLoginMessage(message, type, element) {
+            element.innerHTML = `<div class="alert alert-message alert-${type}">${message}</div>`;
+        }
+
+        function showLogin() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('portalPage').style.display = 'none';
+        }
+
+        function showPortal() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('portalPage').style.display = 'block';
+            if (currentPatient) {
+                document.getElementById('userNameDisplay').textContent = currentPatient.fullname;
+                document.getElementById('patientWelcomeName').textContent = currentPatient.fullname;
+            }
+        }
+
+        async function loadPatientData() {
+            if (!currentPatient || !currentPatient.pid) return;
+
+            try {
+                // Load patient information
+                const { data: patientData, error } = await supabaseClient
+                    .from('patients')
+                    .select('*')
+                    .eq('pid', currentPatient.pid)
+                    .single();
+
+                if (patientData) {
+                    displayPatientProfile(patientData);
+                    loadPatientAppointments(patientData);
+                    loadPatientChat();
+                }
+            } catch (error) {
+                console.error('Error loading patient data:', error);
+            }
+        }
+
+        function displayPatientProfile(patient) {
+            document.getElementById('profileName').textContent = `${patient.first_name || ''} ${patient.last_name || ''}`.trim();
+            document.getElementById('profileEmail').textContent = patient.email || '-';
+            document.getElementById('profilePhone').textContent = patient.phone_number || '-';
+            document.getElementById('profileAge').textContent = patient.age || '-';
+            document.getElementById('profileGender').textContent = patient.gender || '-';
+            document.getElementById('profilePatientNo').textContent = patient.patient_no || '-';
+            document.getElementById('profileBloodType').textContent = patient.blood_type || '-';
+            document.getElementById('profileConditions').textContent = patient.active_conditions ? patient.active_conditions.join(', ') : '-';
+            document.getElementById('profileAllergies').textContent = patient.allergies ? patient.allergies.join(', ') : '-';
+            document.getElementById('profileMedications').textContent = patient.current_medications ? JSON.stringify(patient.current_medications) : '-';
+        }
+
+        async function loadPatientAppointments(patient) {
+            try {
+                const { data: appointments, error } = await supabaseClient
+                    .from('appointments')
+                    .select('*')
+                    .eq('pid', patient.pid)
+                    .order('appointment_date', { ascending: true });
+
+                if (appointments && appointments.length > 0) {
+                    document.getElementById('totalAppointments').textContent = appointments.length;
+                    
+                    // Find next appointment
+                    const now = new Date();
+                    const nextApp = appointments.find(app => new Date(app.appointment_date) > now);
+                    if (nextApp) {
+                        document.getElementById('nextAppointmentDate').textContent = new Date(nextApp.appointment_date).toLocaleDateString();
+                    }
+
+                    // Display appointments list
+                    let html = '';
+                    appointments.forEach(app => {
+                        html += `
+                            <div class="info-card">
+                                <div class="info-row">
+                                    <span class="info-label">Date:</span>
+                                    <span class="info-value">${new Date(app.appointment_date).toLocaleDateString()}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Time:</span>
+                                    <span class="info-value">${app.appointment_time || '-'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Type:</span>
+                                    <span class="info-value">${app.appointment_type || '-'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Status:</span>
+                                    <span class="info-value"><span class="badge bg-info">${app.status || 'Pending'}</span></span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('appointmentsList').innerHTML = html;
+                } else {
+                    document.getElementById('appointmentsList').innerHTML = '<div class="no-data">No appointments scheduled</div>';
+                }
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+            }
+        }
+
+        async function loadPatientChat() {
+            if (!currentPatient || !currentPatient.pid) return;
+
+            try {
+                const { data: chats, error } = await supabaseClient
+                    .from('chats')
+                    .select('*')
+                    .eq('patient_pid', currentPatient.pid)
+                    .limit(1)
+                    .single();
+
+                if (chats) {
+                    currentChat = chats;
+                    loadChatMessages();
+                } else {
+                    document.getElementById('chatMessages').innerHTML = '<div class="no-data">Start a conversation by sending a message</div>';
+                }
+            } catch (error) {
+                console.error('Error loading chat:', error);
+            }
+        }
+
+        async function loadChatMessages() {
+            if (!currentChat) return;
+
+            try {
+                const { data: messages, error } = await supabaseClient
+                    .from('messages')
+                    .select('*')
+                    .eq('chat_id', currentChat.chat_id)
+                    .order('created_at', { ascending: true });
+
+                if (messages && messages.length > 0) {
+                    let html = '';
+                    messages.forEach(msg => {
+                        const isOwn = msg.sender_id === currentPatient.uid;
+                        html += `
+                            <div class="message ${isOwn ? 'own' : ''}">
+                                <div class="message-bubble">${escapeHtml(msg.content)}</div>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('chatMessages').innerHTML = html;
+                    // Scroll to bottom
+                    const chatMessages = document.getElementById('chatMessages');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    document.getElementById('chatMessages').innerHTML = '<div class="no-data">No messages yet</div>';
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message || !currentChat) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('messages')
+                    .insert([{
+                        chat_id: currentChat.chat_id,
+                        sender_id: currentPatient.uid,
+                        content: message,
+                        message_type: 'text',
+                        created_at: new Date().toISOString(),
+                        is_deleted: false
+                    }]);
+
+                if (!error) {
+                    input.value = '';
+                    loadChatMessages();
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Remove active class from menu
+            document.querySelectorAll('.sidebar-menu a').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected section
+            const sectionId = section + 'Section';
+            const sectionEl = document.getElementById(sectionId);
+            if (sectionEl) {
+                sectionEl.style.display = 'block';
+            }
+
+            // Add active class to menu item
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+        }
+
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
+
+        function viewProfile() {
+            toggleUserMenu();
+            showSection('profile');
+        }
+
+        function logoutPatient() {
+            localStorage.removeItem('patientSession');
+            currentPatient = null;
+            currentChat = null;
+            document.getElementById('loginForm').reset();
+            showLogin();
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const userMenu = document.getElementById('userMenuBtn');
+            const dropdown = document.getElementById('userDropdown');
+            if (!userMenu.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

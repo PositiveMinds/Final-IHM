@@ -4,7 +4,9 @@
  * Supports document sharing (PDF, PNG, JPEG, JPG only)
  */
 
-class ChatSystem {
+// Only define if not already defined
+if (typeof ChatSystem === 'undefined') {
+  class ChatSystem {
   constructor() {
     this.currentUser = null;
     this.currentChat = null;
@@ -18,10 +20,10 @@ class ChatSystem {
 
   init() {
     this.loadCurrentUser();
+    this.createChatPanel();  // Create DOM elements FIRST
     this.setupEventListeners();
     this.loadChats();
     this.loadContacts();
-    this.createChatPanel();
   }
 
   /**
@@ -267,10 +269,16 @@ class ChatSystem {
    * Load chats from localStorage or database
    */
   loadChats() {
-    if (!this.currentUser) return;
+    if (!this.currentUser) {
+      console.log('No current user in loadChats');
+      return;
+    }
 
+    console.log('Loading chats for user:', this.currentUser.id);
     const chatsStr = localStorage.getItem(`chats_${this.currentUser.id}`);
+    console.log('Chats string from localStorage:', chatsStr);
     this.chats = chatsStr ? JSON.parse(chatsStr) : [];
+    console.log('Parsed chats:', this.chats);
 
     // Load messages for each chat
     this.chats.forEach(chat => {
@@ -278,6 +286,7 @@ class ChatSystem {
       this.messages[chat.id] = messagesStr ? JSON.parse(messagesStr) : [];
     });
 
+    console.log('Final chats and messages:', this.chats, this.messages);
     this.renderChatList();
   }
 
@@ -561,6 +570,21 @@ class ChatSystem {
     this.currentChat = chat;
     this.renderChatView();
     this.renderMessages();
+    
+    // Show input area
+    const inputArea = document.getElementById('chatInputArea');
+    if (inputArea) {
+      inputArea.style.display = 'block';
+    }
+    
+    // Update active state in chat list
+    document.querySelectorAll('.chat-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    const activeItem = document.querySelector(`[onclick*="selectChat('${chatId}')"]`);
+    if (activeItem) {
+      activeItem.classList.add('active');
+    }
   }
 
   /**
@@ -568,7 +592,11 @@ class ChatSystem {
    */
   renderChatList() {
     const container = document.getElementById('chatList');
-    if (!container) return;
+    console.log('renderChatList - container found:', !!container);
+    if (!container) {
+      console.log('No chatList container found in DOM');
+      return;
+    }
 
     if (this.chats.length === 0) {
       container.innerHTML = '<p class="text-muted text-center py-4">No chats yet. Start a conversation.</p>';
@@ -671,19 +699,21 @@ class ChatSystem {
       }
 
       return `
-        <div class="message-group mb-3 ${isOwn ? 'text-end' : ''}">
+        <div class="message-group ${isOwn ? 'text-end' : ''}">
           <div class="message-item ${isOwn ? 'own' : 'other'}" style="
-            background: ${isOwn ? '#15696B' : '#e9ecef'};
-            color: ${isOwn ? 'white' : 'black'};
-            padding: 10px 12px;
-            border-radius: 12px;
-            max-width: 70%;
+            background: ${isOwn ? '#e7f3ff' : '#e4e6eb'};
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 18px;
             margin-left: ${isOwn ? 'auto' : '0'};
             word-wrap: break-word;
+            display: inline-block;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            ${isOwn ? 'margin-right: 0;' : 'margin-left: 0;'}
           ">
-            ${!isOwn ? `<small class="d-block fw-500 mb-1">${msg.senderName}</small>` : ''}
+            ${!isOwn && this.currentChat.type === 'group' ? `<small class="d-block fw-500 mb-1" style="color: #0084ff; font-size: 0.8rem;">${msg.senderName}</small>` : ''}
             ${contentHtml}
-            <small class="d-block mt-1" style="opacity: 0.7; font-size: 0.85rem;">${timeStr}</small>
+            <small class="d-block mt-1" style="opacity: 0.6; font-size: 0.75rem;">${timeStr}</small>
           </div>
         </div>
       `;
@@ -826,12 +856,29 @@ class ChatSystem {
   }
 }
 
-// Initialize chat system when DOM is ready
-let chatSystem;
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    chatSystem = new ChatSystem();
-  });
-} else {
-  chatSystem = new ChatSystem();
+  // Initialize chat system when DOM is ready
+  if (typeof chatSystem === 'undefined' || !chatSystem) {
+    let chatSystem;
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        if (!window.chatSystem) {
+          window.chatSystem = new ChatSystem();
+        }
+      });
+    } else {
+      if (!window.chatSystem) {
+        window.chatSystem = new ChatSystem();
+      }
+    }
+  }
+}
+// Make chatSystem available globally if it was created
+if (typeof window.chatSystem === 'undefined' && typeof ChatSystem !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.chatSystem = new ChatSystem();
+    });
+  } else {
+    window.chatSystem = new ChatSystem();
+  }
 }

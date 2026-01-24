@@ -64,23 +64,23 @@
 .chat-sidebar {
   width: 35%;
   min-width: 300px;
-  border-right: 1px solid #e9ecef;
+  border-right: 1px solid #e5e5ea;
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
+  background: #fff;
 }
 
 .chat-sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
-  background: white;
+  padding: 18px 20px;
+  border-bottom: 1px solid #e5e5ea;
+  background: #fff;
 }
 
 .chat-sidebar-header h5 {
   margin: 0 0 15px 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #15696B;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #000;
 }
 
 .chat-actions {
@@ -115,19 +115,28 @@
 }
 
 .chat-item {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #e5e5ea;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease;
   background: transparent;
+  margin: 0;
+  padding: 12px 16px !important;
+  border-radius: 0;
+  border: none;
 }
 
 .chat-item:hover {
-  background: #e9ecef;
+  background: #f2f2f2;
 }
 
 .chat-item.active {
-  background: #dbeef0;
-  border-left: 4px solid #15696B;
+  background: #e7f3ff;
+  color: #000;
+}
+
+.chat-item.active .fw-500,
+.chat-item.active .text-muted {
+  color: #000 !important;
 }
 
 /* Main Chat Area */
@@ -140,9 +149,9 @@
 }
 
 .chat-header {
-  padding: 20px;
-  border-bottom: 1px solid #e9ecef;
-  background: white;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e5ea;
+  background: #fff;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -150,20 +159,29 @@
 
 .chat-messages {
   flex: 1;
-  padding: 20px;
+  padding: 16px 20px;
   overflow-y: auto;
-  background: #f8f9fa;
+  background: #fff;
 }
 
 .message-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+.message-group.text-end {
+  align-items: flex-end;
 }
 
 .message-item {
   word-wrap: break-word;
-  animation: slideIn 0.3s ease;
+  animation: slideIn 0.2s ease;
+  border-radius: 18px;
+  max-width: 70%;
+  padding: 8px 12px !important;
+  line-height: 1.4;
 }
 
 @keyframes slideIn {
@@ -177,73 +195,95 @@
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .message-text {
   line-height: 1.5;
 }
 
 .message-file {
-  background: #e9ecef;
-  padding: 10px;
-  border-radius: 6px;
-  margin-top: 5px;
+  background: #f0f2f5;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-top: 6px;
+  border: 1px solid #e5e5ea;
 }
 
 .message-file a {
-  color: #15696B;
+  color: #0084ff;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .message-file a:hover {
-  text-decoration: underline;
+  color: #0073e6;
+  text-decoration: none;
 }
 
 .chat-input-area {
-  padding: 20px;
-  border-top: 1px solid #e9ecef;
-  background: white;
+  padding: 16px 20px;
+  border-top: 1px solid #e5e5ea;
+  background: #fff;
 }
 
 .chat-input-wrapper {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: center;
 }
 
 .chat-input-wrapper input {
   flex: 1;
-  padding: 10px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  padding: 10px 16px;
+  border: 1px solid #e5e5ea;
+  border-radius: 20px;
+  font-size: 0.9rem;
   font-family: inherit;
+  background: #f0f2f5;
+  transition: all 0.2s ease;
 }
 
 .chat-input-wrapper input:focus {
   outline: none;
-  border-color: #15696B;
-  box-shadow: 0 0 0 0.2rem rgba(21, 105, 107, 0.25);
+  border-color: #0084ff;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.1);
 }
 
 .chat-button-group {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .chat-button-group button {
-  padding: 10px 16px;
+  padding: 8px 12px;
   border: none;
-  border-radius: 6px;
-  background: #15696B;
-  color: white;
+  border-radius: 50%;
+  background: transparent;
+  color: #0084ff;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
 }
 
 .chat-button-group button:hover {
-  background: #0F4449;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(21, 105, 107, 0.3);
+  background: #f0f2f5;
 }
 
 .chat-button-group button.secondary {
@@ -260,26 +300,38 @@
 }
 
 .file-upload-btn {
-  padding: 10px 16px !important;
-  background: #6c757d !important;
+  padding: 8px 12px !important;
+  background: transparent !important;
+  border-radius: 50% !important;
+  color: #0084ff !important;
+  transition: all 0.2s ease !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 20px !important;
+  border: none !important;
 }
 
 .file-upload-btn:hover {
-  background: #5a6268 !important;
+  background: #f0f2f5 !important;
 }
 
 /* Contact list styling */
 .contact-item {
   display: flex;
   align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #e9ecef;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e5ea;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
+  margin: 0;
+  border-radius: 0;
 }
 
 .contact-item:hover {
-  background: #f8f9fa;
+  background: #f0f2f5;
 }
 
 .contact-item input[type="checkbox"] {
@@ -299,8 +351,42 @@
 }
 
 .modal-header.bg-primary {
-  background: #15696B !important;
+  background: #fff !important;
+  color: #000;
+  border-bottom: 1px solid #e5e5ea;
+}
+
+.modal-header.bg-primary .modal-title {
+  color: #000;
+  font-weight: 700;
+}
+
+.modal-header.bg-info {
+  background: #fff !important;
+  color: #000;
+  border-bottom: 1px solid #e5e5ea;
+}
+
+.modal-header.bg-info .modal-title {
+  color: #000;
+  font-weight: 700;
+}
+
+/* Style buttons in modals */
+.modal-body .btn-primary,
+.modal-body .btn-info {
+  background: #0084ff;
+  border: none;
   color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.modal-body .btn-primary:hover,
+.modal-body .btn-info:hover {
+  background: #0073e6;
 }
 
 .modal-body {
