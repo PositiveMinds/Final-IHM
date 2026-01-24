@@ -1,5 +1,0 @@
-on the dashboard.html, can we add a intelligent chatbot for the facility that can answer facility staff queries about the patients. the chatbot should be able to generate an appropriate response for example if the query is baout patients who are on appointmet next week, it shold be able to generate a list in a tabular form and well formated etc. the question could be anything but related to patients data.
-
-the patients information should be returned only for the current logged in user facility.
-
-can that be achieved using pure vanilla javascript with supabase database?. am asking
