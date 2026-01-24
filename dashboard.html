@@ -265,8 +265,42 @@
         }
 
         .air-datepicker-input:focus {
-            outline: 2px solid #15696B !important;
-            outline-offset: 2px !important;
+             outline: 2px solid #15696B !important;
+             outline-offset: 2px !important;
+         }
+
+        /* Improved User Profile Dropdown Styles */
+        .dropdown-menu {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        #userSettings + .dropdown-menu a:hover {
+            background-color: #f8f9fa;
+        }
+
+        #userSettings + .dropdown-menu a:active,
+        #userSettings + .dropdown-menu a:focus {
+            background-color: #e9ecef;
+        }
+
+        .dropdown-menu .avatar-box {
+            background: linear-gradient(135deg, #15696B 0%, #0F4449 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            min-width: 48px;
+        }
+
+        #subscriptionType {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(21, 105, 107, 0.05) 0%, rgba(15, 68, 73, 0.05) 100%);
+            padding: 8px 12px;
+            border-radius: 6px;
         }
 
         /* Ensure datepicker is above SweetAlert2 */
@@ -1053,15 +1087,37 @@
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="avatar-box"><span id="userInitials">--</span><span class="status busy"></span></div>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end shadow-lg">
-                        <div class="px-3 py-2">
-                            <span class="small" id="userRole">User</span>
-                            <h6 class="m-0" id="userName">Loading...</h6>
-                            <p class="m-0 small text-muted" id="facilityName" style="font-size: 12px; margin-top: 4px;">
-                                Facility</p>
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg" style="min-width: 280px;">
+                        <!-- Profile Header -->
+                        <div class="px-3 py-3" style="border-bottom: 1px solid #e9ecef;">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="avatar-box me-3" style="width: 48px; height: 48px; font-size: 20px;"><span id="userInitialsLarge">--</span></div>
+                                <div class="flex-grow-1">
+                                    <h6 class="m-0 fw-semibold" id="userName">Loading...</h6>
+                                    <span class="small text-muted d-block" id="userRole">User</span>
+                                </div>
+                            </div>
+                            <p class="m-0 small text-muted" id="facilityName">
+                                <i class="ri-building-line me-1"></i>Facility</p>
+                            <p class="m-0 small mt-2" id="subscriptionType" style="color: #15696B; font-weight: 500; display: none;">
+                                <i class="ri-vip-crown-line me-1"></i>Subscription: <span id="subTypeValue"></span></p>
                         </div>
-                        <div class="mx-3 my-2 d-grid">
-                            <button id="logoutBtn" class="btn btn-danger">Logout</button>
+                        
+                        <!-- Actions -->
+                        <div class="px-3 py-3" style="border-bottom: 1px solid #e9ecef;">
+                            <a href="#" class="d-flex align-items-center text-decoration-none text-dark small py-2 rounded-2" style="transition: all 0.3s ease;">
+                                <i class="ri-user-line me-2"></i><span>Profile Settings</span>
+                            </a>
+                            <a href="#" class="d-flex align-items-center text-decoration-none text-dark small py-2 rounded-2" style="transition: all 0.3s ease;">
+                                <i class="ri-settings-3-line me-2"></i><span>Account Settings</span>
+                            </a>
+                        </div>
+
+                        <!-- Logout -->
+                        <div class="px-3 py-2">
+                            <button id="logoutBtn" class="btn btn-danger btn-sm w-100">
+                                <i class="ri-logout-circle-line me-1"></i>Logout
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2072,75 +2128,125 @@
     <!-- Chat System Script -->
     <script src="chat-system.js"></script>
 
+    <!-- Feature Access Matrix -->
+    <script src="FEATURE_ACCESS_MATRIX.js"></script>
+
+    <!-- Subscription Upgrade Modal & Logging -->
+    <script src="subscription-upgrade-modal.js"></script>
+
     <!-- FAB Button Script -->
-    <script>
-        // FAB Button Functionality
-        document.addEventListener('DOMContentLoaded', function () {
-            const fabContainer = document.getElementById('fabContainer');
-            const fabButton = document.getElementById('fabButton');
-            const fabChatBtn = document.getElementById('fabChatBtn');
-            const fabChatbotBtn = document.getElementById('fabChatbotBtn');
-            const fabImportBtn = document.getElementById('fabImportBtn');
+     <script>
+         // FAB Button Functionality with Subscription Check
+         document.addEventListener('DOMContentLoaded', function () {
+             const fabContainer = document.getElementById('fabContainer');
+             const fabButton = document.getElementById('fabButton');
+             const fabChatBtn = document.getElementById('fabChatBtn');
+             const fabChatbotBtn = document.getElementById('fabChatbotBtn');
+             const fabImportBtn = document.getElementById('fabImportBtn');
 
-            // Ensure FAB is visible
-            if (fabContainer) {
-                fabContainer.style.display = 'block';
-                fabContainer.style.visibility = 'visible';
-                console.log('FAB Container initialized');
-            }
+             // Get current subscription type from session
+             const sessionData = localStorage.getItem('userSession');
+             const session = sessionData ? JSON.parse(sessionData) : {};
+             const subscriptionType = session.subscriptionType;
+             const isAdvanced = subscriptionType === 'Advanced';
 
-            // Toggle FAB menu on main button click
-            if (fabButton) {
-                fabButton.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    fabContainer.classList.toggle('active');
-                    fabButton.classList.toggle('active');
-                });
-            }
+             // Ensure FAB is visible
+             if (fabContainer) {
+                 fabContainer.style.display = 'block';
+                 fabContainer.style.visibility = 'visible';
+                 console.log('FAB Container initialized');
+             }
 
-            // Close menu when clicking outside
-            document.addEventListener('click', function (e) {
-                if (fabContainer && !fabContainer.contains(e.target)) {
-                    fabContainer.classList.remove('active');
-                    if (fabButton) {
-                        fabButton.classList.remove('active');
-                    }
-                }
-            });
+             // Toggle FAB menu on main button click
+             if (fabButton) {
+                 fabButton.addEventListener('click', function (e) {
+                     e.preventDefault();
+                     fabContainer.classList.toggle('active');
+                     fabButton.classList.toggle('active');
+                 });
+             }
 
-            // Chat button functionality
-            if (fabChatBtn) {
-                fabChatBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+             // Close menu when clicking outside
+             document.addEventListener('click', function (e) {
+                 if (fabContainer && !fabContainer.contains(e.target)) {
+                     fabContainer.classList.remove('active');
+                     if (fabButton) {
+                         fabButton.classList.remove('active');
+                     }
+                 }
+             });
 
-                    // Close FAB menu
-                    fabContainer.classList.remove('active');
-                    fabButton.classList.remove('active');
+             // Chat button functionality - Advanced subscription only
+             if (fabChatBtn) {
+                 if (!isAdvanced) {
+                     fabChatBtn.style.opacity = '0.5';
+                     fabChatBtn.style.cursor = 'not-allowed';
+                     fabChatBtn.title = 'Chat available for Advanced subscriptions only';
+                 }
+                 
+                 fabChatBtn.addEventListener('click', function (e) {
+                     e.preventDefault();
+                     e.stopPropagation();
 
-                    // Open chat system
-                    if (typeof chatSystem !== 'undefined' && chatSystem.openChat) {
-                        chatSystem.openChat();
-                    }
-                });
-            }
+                     if (!isAdvanced) {
+                         SubscriptionUpgradeModal.showAccessDenied('chat.system', subscriptionType);
+                         return;
+                     }
 
-            // Chatbot button functionality
-            if (fabChatbotBtn) {
-                fabChatbotBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                     // Log successful access
+                     FeatureAccessLogger.logAccessAttempt({
+                         feature: 'chat.system',
+                         subscriptionType: subscriptionType,
+                         status: 'allowed',
+                         userAgent: navigator.userAgent
+                     });
 
-                    // Close FAB menu
-                    fabContainer.classList.remove('active');
-                    fabButton.classList.remove('active');
+                     // Close FAB menu
+                     fabContainer.classList.remove('active');
+                     fabButton.classList.remove('active');
 
-                    // Open chatbot
-                    if (typeof chatbotUI !== 'undefined' && chatbotUI.open) {
-                        chatbotUI.open();
-                    }
-                });
-            }
+                     // Open chat system
+                     if (typeof chatSystem !== 'undefined' && chatSystem.openChat) {
+                         chatSystem.openChat();
+                     }
+                 });
+             }
+
+             // Chatbot button functionality - Advanced subscription only
+             if (fabChatbotBtn) {
+                 if (!isAdvanced) {
+                     fabChatbotBtn.style.opacity = '0.5';
+                     fabChatbotBtn.style.cursor = 'not-allowed';
+                     fabChatbotBtn.title = 'AI Chatbot available for Advanced subscriptions only';
+                 }
+                 
+                 fabChatbotBtn.addEventListener('click', function (e) {
+                     e.preventDefault();
+                     e.stopPropagation();
+
+                     if (!isAdvanced) {
+                         SubscriptionUpgradeModal.showAccessDenied('chatbot.ai', subscriptionType);
+                         return;
+                     }
+
+                     // Log successful access
+                     FeatureAccessLogger.logAccessAttempt({
+                         feature: 'chatbot.ai',
+                         subscriptionType: subscriptionType,
+                         status: 'allowed',
+                         userAgent: navigator.userAgent
+                     });
+
+                     // Close FAB menu
+                     fabContainer.classList.remove('active');
+                     fabButton.classList.remove('active');
+
+                     // Open chatbot
+                     if (typeof chatbotUI !== 'undefined' && chatbotUI.open) {
+                         chatbotUI.open();
+                     }
+                 });
+             }
 
             // Import button functionality
             if (fabImportBtn) {
@@ -2871,36 +2977,53 @@
         });
 
         // Display user information in header and sidebar
-        function displayUserInfo(session) {
-            const fullname = session.fullname || session.username || 'User';
-            const userRole = session.userRole || 'User';
+         function displayUserInfo(session) {
+             const fullname = session.fullname || session.username || 'User';
+             const userRole = session.userRole || 'User';
+             const subscriptionType = session.subscriptionType;
+             
+             // Debug logging
+             console.log('Session data:', session);
+             console.log('Subscription type:', subscriptionType);
 
-            // Get initials from fullname
-            const initials = fullname
-                .split(' ')
-                .map(name => name.charAt(0))
-                .join('')
-                .toUpperCase()
-                .slice(0, 2);
+             // Get initials from fullname
+             const initials = fullname
+                 .split(' ')
+                 .map(name => name.charAt(0))
+                 .join('')
+                 .toUpperCase()
+                 .slice(0, 2);
 
-            // Update header dropdown UI
-            document.getElementById('userInitials').textContent = initials;
-            document.getElementById('userName').textContent = fullname;
-            document.getElementById('userRole').textContent = userRole;
+             // Update header dropdown UI
+             document.getElementById('userInitials').textContent = initials;
+             document.getElementById('userInitialsLarge').textContent = initials;
+             document.getElementById('userName').textContent = fullname;
+             document.getElementById('userRole').textContent = userRole;
 
-            // Update facility name in dropdown
-            const facilityNameEl = document.getElementById('facilityName');
-            if (facilityNameEl) {
-                facilityNameEl.textContent = session.facilityName || 'Facility';
-            }
+             // Update facility name in dropdown
+             const facilityNameEl = document.getElementById('facilityName');
+             if (facilityNameEl) {
+                 facilityNameEl.innerHTML = '<i class="ri-building-line me-1"></i>' + (session.facilityName || 'Facility');
+             }
 
-            // Update sidebar profile UI
-            document.getElementById('sidebarUserName').textContent = fullname;
-            document.getElementById('sidebarUserRole').textContent = userRole;
+             // Update subscription type in dropdown (only if it exists)
+             if (subscriptionType) {
+                 const subscriptionEl = document.getElementById('subscriptionType');
+                 const badgeColor = subscriptionType === 'Advanced' ? '#DC3545' : 
+                                  subscriptionType === 'Standard' ? '#FFC107' : '#15696B';
+                 document.getElementById('subTypeValue').textContent = subscriptionType;
+                 document.getElementById('subTypeValue').style.color = badgeColor;
+                 document.getElementById('subTypeValue').style.fontWeight = '600';
+                 subscriptionEl.style.display = 'block';
+             }
 
-            // Update greeting section with real data
-            updateGreetingSection(fullname, session);
-        }
+             // Update sidebar profile UI
+             document.getElementById('sidebarUserName').textContent = fullname;
+             document.getElementById('sidebarUserRole').textContent = userRole;
+
+             // Update greeting section with real data
+             updateGreetingSection(fullname, session);
+         }
 
         // Update the greeting section with user info
         function updateGreetingSection(fullname, session) {
@@ -6879,19 +7002,13 @@
                 <button type="button" class="import-btn" id="fabImportBtn" title="Import Patient Data"
                     style="font-size: 20px; font-weight: bold;">
                     <span class="fab-tooltip">Import Data</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-box-arrow-in-down" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M3.5 6a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5h-2a.5.5 0 0 1 0-1h2A1.5 1.5 0 0 1 14 6.5v8a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-8A1.5 1.5 0 0 1 3.5 5h2a.5.5 0 0 1 0 1z"/>
-                        <path fill-rule="evenodd" d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z"/>
-                    </svg>
+                    📤
                 </button>
             </li>
             <li class="fab-menu-item">
                 <button type="button" class="chat-btn" id="fabChatBtn" title="Open Chat" style="font-size: 20px;">
                     <span class="fab-tooltip">Chat Messages</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-chat-left-dots" viewBox="0 0 16 16">
-                        <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
-                        <path d="M5 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-                    </svg>
+                    💬
                 </button>
             </li>
             <li class="fab-menu-item">
@@ -6902,10 +7019,8 @@
                 </button>
             </li>
         </ul>
-        <button type="button" class="fab-button" id="fabButton">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
-            </svg>
+        <button type="button" class="fab-button" id="fabButton" style="font-size: 32px; font-weight: bold;">
+            +
         </button>
     </div>
     <!-- FAB Button Container Ends -->

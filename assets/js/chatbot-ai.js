@@ -13,9 +13,15 @@ class HealthFlowChatbot {
 
         // Intent patterns for NLP
         this.intents = {
+            identity: {
+                patterns: [
+                    "what is your name|who are you|what is your|what do they call you|what should i call you|your name|who am i talking to|identify yourself|what.s your name|whats your name|name|who are you",
+                ],
+                keywords: [""],
+            },
             greeting: {
                 patterns: [
-                    "hello|hi|hey|greetings|how are you|how's your day|how is your|what's up|good morning|good afternoon|good evening",
+                    "^hello|^hi|^hey|^greetings|^how are you|^how.s your day|^how is your|^what.s up|^good morning|^good afternoon|^good evening|^how do you do|^how you doing|^how.s it going|^how have you been|^how are things|^how.s everything|^wassup|^yo|^sup|^hey there|^howdy",
                 ],
                 keywords: [""],
             },
@@ -99,6 +105,7 @@ class HealthFlowChatbot {
 
         // Define intent priority order (most specific first)
         const intentOrder = [
+            "identity",
             "greeting",
             "date_range_query",
             "hiv_positive_search",
@@ -248,14 +255,34 @@ class HealthFlowChatbot {
         );
         if (dateRangeMatch) {
             const monthMap = {
-                january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
-                july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
-                jan: 1, feb: 2, mar: 3, apr: 4, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12
+                january: 1,
+                february: 2,
+                march: 3,
+                april: 4,
+                may: 5,
+                june: 6,
+                july: 7,
+                august: 8,
+                september: 9,
+                october: 10,
+                november: 11,
+                december: 12,
+                jan: 1,
+                feb: 2,
+                mar: 3,
+                apr: 4,
+                jun: 6,
+                jul: 7,
+                aug: 8,
+                sep: 9,
+                oct: 10,
+                nov: 11,
+                dec: 12
             };
             const monthFrom = monthMap[dateRangeMatch[2].toLowerCase()];
             const monthTo = monthMap[dateRangeMatch[4].toLowerCase()];
             const year = parseInt(dateRangeMatch[5]) || new Date().getFullYear();
-            
+
             if (monthFrom && monthTo) {
                 filters.date_from = new Date(year, monthFrom - 1, parseInt(dateRangeMatch[1])).toISOString();
                 filters.date_to = new Date(year, monthTo - 1, parseInt(dateRangeMatch[3])).toISOString();
@@ -517,18 +544,161 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
     }
 
     /**
+     * Format table response from backend handler
+     */
+    formatTableResponse(result) {
+        if (!result.data || result.data.length === 0) {
+            return "<strong>No data found.</strong>";
+        }
+
+        let html = `<table class="table table-sm table-striped mt-2">
+    <thead><tr>`;
+
+        // Add column headers
+        if (result.columns) {
+            result.columns.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+        }
+        html += `</tr></thead><tbody>`;
+
+        // Add rows
+        result.data.forEach((row) => {
+            html += `<tr>`;
+            if (result.columns) {
+                result.columns.forEach(col => {
+                    const value = row[col] || "—";
+                    html += `<td>${value}</td>`;
+                });
+            }
+            html += `</tr>`;
+        });
+
+        html += `</tbody></table>`;
+
+        // Add pagination info if present
+        if (result.pagination && result.pagination.total) {
+            html += `<small class="text-muted d-block mt-2">
+                Showing ${result.data.length} of ${result.pagination.total} records
+                ${result.pagination.page ? `(Page ${result.pagination.page})` : ""}
+            </small>`;
+        }
+
+        return html + this.getFollowUpSuggestions();
+    }
+
+    /**
+     * Call backend Supabase Edge Function handler
+     */
+    async callBackendHandler(handlerName, filters = {}) {
+        try {
+            if (!window.supabaseClient) {
+                throw new Error("Database connection not available");
+            }
+
+            // Get facility ID from session storage
+            let facilityId = sessionStorage.getItem("facility_id");
+            
+            // If not in sessionStorage, try localStorage (from healthflow_session)
+            if (!facilityId) {
+                try {
+                    const session = JSON.parse(localStorage.getItem("healthflow_session"));
+                    facilityId = session?.fid || session?.facility_id;
+                } catch (e) {
+                    console.warn("Could not parse session:", e);
+                }
+            }
+            
+            // Fallback to default-facility
+            if (!facilityId) {
+                facilityId = "default-facility";
+            }
+
+            // Prepare request body
+            const requestBody = {
+                query: "",
+                facility_id: facilityId,
+                handler: handlerName,
+                ...filters
+            };
+
+            console.log("Calling backend handler:", handlerName, "with params:", requestBody);
+
+            // Call the Supabase edge function
+            const response = await fetch(
+                `${window.supabaseClient.supabaseUrl}/functions/v1/chatbot-query`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${window.supabaseClient.auth.session()?.access_token || ""}`
+                    },
+                    body: JSON.stringify(requestBody)
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Backend error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("Backend handler response:", result);
+            return result;
+
+        } catch (error) {
+            console.error("Backend handler error:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Generate identity/name response
+     */
+    generateIdentityResponse() {
+        const identityResponses = [
+            `I'm <strong>Charlie</strong> 🤖, your HealthFlow AI Health Assistant! I'm an intelligent healthcare companion developed by <strong>HealthFlow</strong>, an AI-driven health company co-founded by <strong>Bwoye Charles</strong> in 2026. I'm here to help you manage patient data efficiently!`,
+            `My name is <strong>Charlie</strong> 🤖! I'm HealthFlow's AI assistant, created to revolutionize healthcare automation in African facilities. Always at your service for patient data management and analysis!`,
+            `I'm <strong>Charlie</strong> 🤖, HealthFlow's intelligent health companion. I was developed to help healthcare workers like you focus on patient care by handling data management, patient queries, and analytics seamlessly.`,
+            `You can call me <strong>Charlie</strong> 🤖! I'm the AI assistant behind HealthFlow, proudly serving healthcare facilities with intelligent automation and data management solutions.`,
+            `I'm <strong>Charlie</strong> 🤖 - your personal AI Health Assistant from HealthFlow! Engineered to streamline patient data management and help you provide better care.`,
+        ];
+
+        const response = identityResponses[Math.floor(Math.random() * identityResponses.length)];
+
+        const companyInfo = `<br/><br/><small style="color: #666; font-size: 12px;">
+            <strong>HealthFlow</strong> - AI-Driven Healthcare Company<br/>
+            Co-founded by <strong>Bwoye Charles</strong> in 2026<br/>
+            Automating healthcare for African facilities
+        </small>`;
+
+        return response + companyInfo;
+    }
+
+    /**
      * Get current time of day period
      */
     getTimeOfDay() {
         const hour = new Date().getHours();
         if (hour >= 5 && hour < 12) {
-            return { period: 'morning', greeting: 'Good morning' };
+            return {
+                period: 'morning',
+                greeting: 'Good morning'
+            };
         } else if (hour >= 12 && hour < 17) {
-            return { period: 'afternoon', greeting: 'Good afternoon' };
+            return {
+                period: 'afternoon',
+                greeting: 'Good afternoon'
+            };
         } else if (hour >= 17 && hour < 21) {
-            return { period: 'evening', greeting: 'Good evening' };
+            return {
+                period: 'evening',
+                greeting: 'Good evening'
+            };
         } else {
-            return { period: 'night', greeting: 'Good night' };
+            return {
+                period: 'night',
+                greeting: 'Good night'
+            };
         }
     }
 
@@ -538,42 +708,55 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
     generateGreetingResponse(userMessage) {
         const timeInfo = this.getTimeOfDay();
         const timeGreeting = timeInfo.greeting;
-        
+
         const greetingResponses = {
             morning: [
-                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Ready to help you with patient data today?`,
-                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Great to see you this morning! How can I assist with your patients?`,
-                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong>, powered by HealthFlow. Let's make it a productive morning—what patient information do you need?`,
+                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Doing great! Ready to help you with patient data today?`,
+                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Great to see you this morning! I'm functioning perfectly. How can I assist with your patients?`,
+                `${timeGreeting}! ☀️ I'm <strong>Charlie</strong>, powered by HealthFlow. All systems running smoothly! Let's make it a productive morning—what patient information do you need?`,
+                `${timeGreeting}! ☀️ Doing well, thanks for asking! I'm <strong>Charlie</strong>, ready to help with your healthcare data needs.`,
             ],
             afternoon: [
-                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. How's your afternoon going? What can I help with?`,
-                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. I hope you're having a great day! What patient data can I assist with?`,
-                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Ready to help you manage patient information efficiently.`,
+                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Doing great! How's your afternoon going? What can I help with?`,
+                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Excellent! I hope you're having a great day. What patient data can I assist with?`,
+                `${timeGreeting}! 🌤️ I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Running smoothly and ready to help you manage patient information efficiently.`,
+                `${timeGreeting}! 🌤️ Doing fantastic, thanks for asking! What can I help you with?`,
             ],
             evening: [
-                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. How can I help you wrap up the day?`,
-                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Still here to help with your patient needs!`,
-                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Let's make this evening productive—what do you need?`,
+                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Doing well! How can I help you wrap up the day?`,
+                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Still going strong! Always here to help with your patient needs.`,
+                `${timeGreeting}! 🌙 I'm <strong>Charlie</strong>, HealthFlow's AI assistant. All good here! Let's make this evening productive—what do you need?`,
+                `${timeGreeting}! 🌙 Feeling great! Ready to assist you with your patient data.`,
             ],
             night: [
-                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Still working hard? How can I help?`,
-                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Always available to assist with patient data!`,
-                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Ready to help with your patient queries anytime.`,
+                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong>, your HealthFlow AI Health Assistant. Never tired! How can I help?`,
+                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong> from <strong>HealthFlow</strong>. Running strong at this hour! Ready to assist with patient data.`,
+                `${timeGreeting}! 🌟 I'm <strong>Charlie</strong>, HealthFlow's AI assistant. Always alert and ready to help with your queries anytime.`,
+                `${timeGreeting}! 🌟 Doing great! No sleep mode for me—always ready to help!`,
             ],
         };
 
         // Get responses for current time period
         const periodResponses = greetingResponses[timeInfo.period];
         const response = periodResponses[Math.floor(Math.random() * periodResponses.length)];
-        
-        // Add company info
+
+        // Add company info and inquiry
+        const inquiry = `<br/><br/><strong style="color: #333; margin-top: 16px;">What can I help you with today?</strong>
+        <br/><small style="color: #888;">
+            • Search for specific patients<br/>
+            • Get patient statistics<br/>
+            • Check appointments (past or upcoming)<br/>
+            • Find patients by condition or status<br/>
+            • Export and analyze patient data
+        </small>`;
+
         const companyInfo = `<br/><br/><small style="color: #666; font-size: 12px;">
             <strong>HealthFlow</strong> - AI-Driven Healthcare Company<br/>
             Co-founded by <strong>Bwoye Charles</strong> in 2026<br/>
             Automating healthcare for African facilities
         </small>`;
-        
-        return response + companyInfo;
+
+        return response + inquiry + companyInfo;
     }
 
     /**
@@ -628,7 +811,9 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
             let botResponse = "";
 
             // Process based on intent
-            if (detectedIntent === "greeting") {
+            if (detectedIntent === "identity") {
+                botResponse = this.generateIdentityResponse();
+            } else if (detectedIntent === "greeting") {
                 botResponse = this.generateGreetingResponse(userMessage);
             } else if (
                 detectedIntent === "patient_search" ||
@@ -675,10 +860,10 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                     const patients = await this.queryPatients(filters);
                     const withAppointments = patients.filter((p) => p.next_appointment);
                     this.lastQueryResults = withAppointments;
-                    
+
                     botResponse = `<strong>Appointment Statistics:</strong><br/>
                     Total patients with appointments: <strong>${withAppointments.length}</strong>`;
-                    
+
                     if (filters.is_today) {
                         const todayAppointments = withAppointments.filter(p => {
                             const appointDate = new Date(p.next_appointment).toDateString();
@@ -695,32 +880,32 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
             } else if (detectedIntent === "date_range_query") {
                 try {
                     const patients = await this.queryPatients(filters);
-                    
+
                     // Determine which appointment field to use
                     const appointmentField = filters.is_past_appointments ? 'visit_date' : 'next_appointment';
                     console.log("Date range query - Using field:", appointmentField, "is_past_appointments:", filters.is_past_appointments);
-                    
+
                     const withAppointments = patients.filter((p) => p[appointmentField]);
                     console.log("Patients with appointment field:", withAppointments.length, "out of", patients.length);
-                    
+
                     if (filters.date_range_query && filters.date_from && filters.date_to) {
                         const dateFrom = new Date(filters.date_from);
                         const dateTo = new Date(filters.date_to);
                         // Set end date to end of day
                         dateTo.setHours(23, 59, 59, 999);
                         console.log("Date range:", dateFrom, "to", dateTo);
-                        
+
                         const inRangeAppointments = withAppointments.filter(p => {
                             const appointDate = new Date(p[appointmentField]);
                             return appointDate >= dateFrom && appointDate <= dateTo;
                         });
-                        
+
                         console.log("Appointments in range:", inRangeAppointments.length);
                         this.lastQueryResults = inRangeAppointments;
                         const rangeLabel = filters.is_past_appointments ? 'Past Appointments' : 'Future Appointments';
                         botResponse = `<strong>${rangeLabel} between ${dateFrom.toLocaleDateString()} and ${dateTo.toLocaleDateString()}:</strong><br/>
                         Total: <strong>${inRangeAppointments.length}</strong><br/>`;
-                        
+
                         if (inRangeAppointments.length > 0) {
                             botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Appointment Date</th></tr></thead><tbody>';
                             inRangeAppointments.forEach((p) => {
@@ -742,10 +927,10 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                     // Filter for pregnant patients (assuming there's a pregnancy field in DB)
                     const pregnant = patients.filter((p) => p.is_pregnant || p.pregnancy_status === "Pregnant");
                     this.lastQueryResults = pregnant;
-                    
+
                     botResponse = `<strong>Pregnant Mothers:</strong><br/>
                     Total: <strong>${pregnant.length}</strong><br/>`;
-                    
+
                     if (pregnant.length > 0) {
                         botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Name</th><th>Age</th><th>Status</th></tr></thead><tbody>';
                         pregnant.forEach((p) => {
@@ -763,13 +948,13 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                     const patients = await this.queryPatients(filters);
                     const withViralStatus = patients.filter((p) => p.viral_load_status);
                     this.lastQueryResults = withViralStatus;
-                    
+
                     if (filters.search_type === "not_suppressing") {
                         const notSuppressing = withViralStatus.filter((p) => p.viral_load_status === "Detectable");
                         this.lastQueryResults = notSuppressing;
                         botResponse = `<strong>Patients Not Suppressing Virus (Detectable Viral Load):</strong><br/>
                         Total: <strong>${notSuppressing.length}</strong><br/>`;
-                        
+
                         if (notSuppressing.length > 0) {
                             botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Viral Load</th><th>Copies</th></tr></thead><tbody>';
                             notSuppressing.forEach((p) => {
@@ -782,7 +967,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                         this.lastQueryResults = suppressing;
                         botResponse = `<strong>Patients With Viral Suppression (Undetectable Viral Load):</strong><br/>
                         Total: <strong>${suppressing.length}</strong><br/>`;
-                        
+
                         if (suppressing.length > 0) {
                             botResponse += '<table class="table table-sm table-striped mt-2"><thead><tr><th>Patient</th><th>Viral Load</th></tr></thead><tbody>';
                             suppressing.forEach((p) => {
@@ -845,17 +1030,24 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
                 }
             } else if (detectedIntent === "high_risk") {
                 try {
-                    const patients = await this.queryPatients({
-                        status: "Critical",
-                        ...filters,
-                    });
+                    // Call the backend handler which uses clinical criteria (VL>=1000, CD4<50, HTN/DM)
+                    const result = await this.callBackendHandler("getCriticalPatients", filters);
+
                     // Store high-risk results for export
-                    this.lastQueryResults = patients;
-                    if (patients.length > 0) {
-                        botResponse = `<strong>High-Risk Patients (${patients.length}):</strong><br/>`;
-                        botResponse += this.formatPatientResponse(patients);
+                    if (result.type === "table" && result.data) {
+                        this.lastQueryResults = result.data;
+                        botResponse = `<strong>Critical Patients (${result.data.length}):</strong><br/>`;
+                        botResponse += this.formatTableResponse(result);
+
+                        // Add alert if present
+                        if (result.alerts && result.alerts.length > 0) {
+                            botResponse = `<div style="background: #ffe5e5; border-left: 4px solid #d32f2f; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                                <strong style="color: #d32f2f;">${result.alerts[0].icon} ${result.alerts[0].message}</strong>
+                            </div>` + botResponse;
+                        }
                     } else {
-                        botResponse = "No critical patients at this time.";
+                        botResponse = result.message || "No critical patients at this time.";
+                        this.lastQueryResults = [];
                     }
                 } catch (error) {
                     console.error("Error fetching high-risk patients:", error);
@@ -915,7 +1107,10 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
      */
     saveSearch(searchName, filters) {
         if (!searchName || !filters) {
-            return { success: false, message: 'Search name and filters are required' };
+            return {
+                success: false,
+                message: 'Search name and filters are required'
+            };
         }
 
         const search = {
@@ -927,11 +1122,11 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
 
         this.savedSearches.push(search);
         localStorage.setItem('healthFlowSavedSearches', JSON.stringify(this.savedSearches));
-        
-        return { 
-            success: true, 
+
+        return {
+            success: true,
             message: `Search "${searchName}" saved successfully`,
-            search: search 
+            search: search
         };
     }
 
@@ -1028,7 +1223,9 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
 
         // Build a natural language query from filters
         let query = 'Show me ';
-        const { filters } = search;
+        const {
+            filters
+        } = search;
 
         if (filters.patient_no) query += `patient ${filters.patient_no} `;
         if (filters.status) query += `${filters.status.toLowerCase()} patients `;
@@ -1051,7 +1248,7 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
 
         this.savedSearches = this.savedSearches.filter(s => s.id !== searchId);
         localStorage.setItem('healthFlowSavedSearches', JSON.stringify(this.savedSearches));
-        
+
         if (typeof chatbotUI !== 'undefined') {
             // Refresh the saved searches display
             chatbotUI.showSavedSearches();

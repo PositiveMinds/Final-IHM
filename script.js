@@ -4,36 +4,36 @@
 // DASHBOARD ACCESS CONTROL
 // ============================================
 function checkDashboardAccess(event) {
-  event.preventDefault();
-  
-  // Check if user session exists
-  const sessionData = localStorage.getItem("healthflow_session");
-  
-  if (sessionData) {
-    try {
-      const session = JSON.parse(sessionData);
-      // If session exists and is valid, redirect to dashboard
-      if (session.id && session.email) {
-        window.location.href = "dashboard.html";
-        return;
-      }
-    } catch (e) {
-      console.error("Invalid session data:", e);
+    event.preventDefault();
+
+    // Check if user session exists
+    const sessionData = localStorage.getItem("healthflow_session");
+
+    if (sessionData) {
+        try {
+            const session = JSON.parse(sessionData);
+            // If session exists and is valid, redirect to dashboard
+            if (session.id && session.email) {
+                window.location.href = "dashboard.html";
+                return;
+            }
+        } catch (e) {
+            console.error("Invalid session data:", e);
+        }
     }
-  }
-  
-  // No valid session, redirect to login
-  Swal.fire({
-    icon: "warning",
-    title: "Login Required",
-    text: "Please log in to access the dashboard.",
-    confirmButtonColor: "#0052CC",
-    confirmButtonText: "Go to Login",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      window.location.href = "login.html";
-    }
-  });
+
+    // No valid session, redirect to login
+    Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in to access the dashboard.",
+        confirmButtonColor: "#0052CC",
+        confirmButtonText: "Go to Login",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "login.html";
+        }
+    });
 }
 
 // Dark mode toggle functionality
@@ -314,186 +314,186 @@ document.addEventListener("DOMContentLoaded", function () {
 // TESTIMONIALS CAROUSEL (OWL CAROUSEL)
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
-  if (document.querySelector(".owl-testimonials")) {
-    try {
-      $(".owl-testimonials").owlCarousel({
-        loop: true,
-        margin: 20,
-        nav: true,
-        dots: true,
-        autoplay: true,
-        autoplayTimeout: 5000,
-        autoplayHoverPause: true,
-        stagePadding: 0,
-        responsive: {
-          0: {
-            items: 1,
-            margin: 10,
-          },
-          480: {
-            items: 1,
-            margin: 15,
-          },
-          576: {
-            items: 1,
-            margin: 15,
-          },
-          768: {
-            items: 2,
-            margin: 20,
-          },
-          1024: {
-            items: 2,
-            margin: 20,
-          },
-          1200: {
-            items: 2,
-            margin: 25,
-          },
-        },
-      });
-    } catch (e) {
-      console.error("Testimonials carousel initialization error:", e);
+    if (document.querySelector(".owl-testimonials")) {
+        try {
+            $(".owl-testimonials").owlCarousel({
+                loop: true,
+                margin: 20,
+                nav: true,
+                dots: true,
+                autoplay: true,
+                autoplayTimeout: 5000,
+                autoplayHoverPause: true,
+                stagePadding: 0,
+                responsive: {
+                    0: {
+                        items: 1,
+                        margin: 10,
+                    },
+                    480: {
+                        items: 1,
+                        margin: 15,
+                    },
+                    576: {
+                        items: 1,
+                        margin: 15,
+                    },
+                    768: {
+                        items: 2,
+                        margin: 20,
+                    },
+                    1024: {
+                        items: 2,
+                        margin: 20,
+                    },
+                    1200: {
+                        items: 2,
+                        margin: 25,
+                    },
+                },
+            });
+        } catch (e) {
+            console.error("Testimonials carousel initialization error:", e);
+        }
     }
-  }
 });
 
 // ============================================
 // PRICING TOGGLE FUNCTIONALITY
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
-  const toggleBtns = document.querySelectorAll(".toggle-btn");
-  const pricingCards = document.querySelectorAll(".pricing-card");
+    const toggleBtns = document.querySelectorAll(".toggle-btn");
+    const pricingCards = document.querySelectorAll(".pricing-card");
 
-  toggleBtns.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const period = this.getAttribute("data-period");
+    toggleBtns.forEach((btn) => {
+        btn.addEventListener("click", function () {
+            const period = this.getAttribute("data-period");
 
-      // Update active button
-      toggleBtns.forEach((b) => b.classList.remove("active"));
-      this.classList.add("active");
+            // Update active button
+            toggleBtns.forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
 
-      // Update pricing cards
-      pricingCards.forEach((card) => {
-        const monthlyPrice = card.getAttribute("data-monthly-price");
-        const annualPrice = card.getAttribute("data-annual-price");
-        const amountElement = card.querySelector(".amount");
-        const periodElement = card.querySelector(".period");
+            // Update pricing cards
+            pricingCards.forEach((card) => {
+                const monthlyPrice = card.getAttribute("data-monthly-price");
+                const annualPrice = card.getAttribute("data-annual-price");
+                const amountElement = card.querySelector(".amount");
+                const periodElement = card.querySelector(".period");
 
-        if (period === "annual" && annualPrice) {
-          amountElement.textContent = annualPrice;
-          periodElement.textContent = "/year";
-          card.setAttribute("data-current-period", "annual");
-        } else {
-          amountElement.textContent = monthlyPrice;
-          periodElement.textContent = "/month";
-          card.setAttribute("data-current-period", "monthly");
-        }
-      });
+                if (period === "annual" && annualPrice) {
+                    amountElement.textContent = annualPrice;
+                    periodElement.textContent = "/year";
+                    card.setAttribute("data-current-period", "annual");
+                } else {
+                    amountElement.textContent = monthlyPrice;
+                    periodElement.textContent = "/month";
+                    card.setAttribute("data-current-period", "monthly");
+                }
+            });
+        });
     });
-  });
 });
 
 // ============================================
 // MOBILE FAB MENU & SIDEBAR NAVIGATION
 // ============================================
 document.addEventListener("DOMContentLoaded", function () {
-  const fabButton = document.getElementById("fabButton");
-  const fabMenuItems = document.getElementById("fabMenuItems");
-  const fabChatBtn = document.getElementById("fabChatBtn");
-  const fabImportBtn = document.getElementById("fabImportBtn");
-  const fabNavBtn = document.getElementById("fabNavBtn");
-  const sidebarNav = document.getElementById("mobileSidebarNav");
-  const sidebarOverlay = document.getElementById("sidebarOverlay");
-  const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
-  const sidebarMenuItems = document.querySelectorAll(".sidebar-menu-item");
+    const fabButton = document.getElementById("fabButton");
+    const fabMenuItems = document.getElementById("fabMenuItems");
+    const fabChatBtn = document.getElementById("fabChatBtn");
+    const fabImportBtn = document.getElementById("fabImportBtn");
+    const fabNavBtn = document.getElementById("fabNavBtn");
+    const sidebarNav = document.getElementById("mobileSidebarNav");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+    const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
+    const sidebarMenuItems = document.querySelectorAll(".sidebar-menu-item");
 
-  let menuOpen = false;
+    let menuOpen = false;
 
-  // Toggle FAB menu
-  fabButton.addEventListener("click", function (e) {
-    e.stopPropagation();
-    menuOpen = !menuOpen;
-    
-    if (menuOpen) {
-      fabMenuItems.classList.add("active");
-      fabButton.classList.add("active");
-    } else {
-      fabMenuItems.classList.remove("active");
-      fabButton.classList.remove("active");
+    // Toggle FAB menu
+    fabButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+        menuOpen = !menuOpen;
+
+        if (menuOpen) {
+            fabMenuItems.classList.add("active");
+            fabButton.classList.add("active");
+        } else {
+            fabMenuItems.classList.remove("active");
+            fabButton.classList.remove("active");
+        }
+    });
+
+    // Chat button - Open chat system
+    fabChatBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (typeof chatSystem !== "undefined" && chatSystem.openChat) {
+            chatSystem.openChat();
+            closeFabMenu();
+        } else {
+            alert("Chat system is not loaded yet. Please try again.");
+        }
+    });
+
+    // Import button - Open import modal
+    fabImportBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        openImportModal();
+        closeFabMenu();
+    });
+
+    // Navigation button - Open sidebar
+    fabNavBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        sidebarNav.classList.add("show");
+        sidebarOverlay.classList.add("show");
+        closeFabMenu();
+    });
+
+    // Close FAB menu
+    function closeFabMenu() {
+        menuOpen = false;
+        fabMenuItems.classList.remove("active");
+        fabButton.classList.remove("active");
     }
-  });
 
-  // Chat button - Open chat system
-  fabChatBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    if (typeof chatSystem !== "undefined" && chatSystem.openChat) {
-      chatSystem.openChat();
-      closeFabMenu();
-    } else {
-      alert("Chat system is not loaded yet. Please try again.");
+    // Close sidebar
+    function closeSidebar() {
+        sidebarNav.classList.remove("show");
+        sidebarOverlay.classList.remove("show");
     }
-  });
 
-  // Import button - Open import modal
-  fabImportBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    openImportModal();
-    closeFabMenu();
-  });
+    // Close when clicking close button
+    sidebarCloseBtn.addEventListener("click", closeSidebar);
 
-  // Navigation button - Open sidebar
-  fabNavBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    sidebarNav.classList.add("show");
-    sidebarOverlay.classList.add("show");
-    closeFabMenu();
-  });
+    // Close when clicking overlay
+    sidebarOverlay.addEventListener("click", closeSidebar);
 
-  // Close FAB menu
-  function closeFabMenu() {
-    menuOpen = false;
-    fabMenuItems.classList.remove("active");
-    fabButton.classList.remove("active");
-  }
+    // Close when clicking a menu item
+    sidebarMenuItems.forEach((item) => {
+        item.addEventListener("click", closeSidebar);
+    });
 
-  // Close sidebar
-  function closeSidebar() {
-    sidebarNav.classList.remove("show");
-    sidebarOverlay.classList.remove("show");
-  }
-
-  // Close when clicking close button
-  sidebarCloseBtn.addEventListener("click", closeSidebar);
-
-  // Close when clicking overlay
-  sidebarOverlay.addEventListener("click", closeSidebar);
-
-  // Close when clicking a menu item
-  sidebarMenuItems.forEach((item) => {
-    item.addEventListener("click", closeSidebar);
-  });
-
-  // Close menu when clicking outside
-  document.addEventListener("click", function (e) {
-    const fabMenu = document.querySelector(".mobile-fab-menu");
-    if (!sidebarNav.contains(e.target) && !fabMenu.contains(e.target)) {
-      closeSidebar();
-      closeFabMenu();
-    }
-  });
+    // Close menu when clicking outside
+    document.addEventListener("click", function (e) {
+        const fabMenu = document.querySelector(".mobile-fab-menu");
+        if (!sidebarNav.contains(e.target) && !fabMenu.contains(e.target)) {
+            closeSidebar();
+            closeFabMenu();
+        }
+    });
 });
 
 // ============================================
 // IMPORT DATA MODAL
 // ============================================
 function openImportModal() {
-  // Create or show import modal
-  let importModal = document.getElementById("importDataModal");
-  
-  if (!importModal) {
-    // Create the modal if it doesn't exist
-    const modalHTML = `
+    // Create or show import modal
+    let importModal = document.getElementById("importDataModal");
+
+    if (!importModal) {
+        // Create the modal if it doesn't exist
+        const modalHTML = `
       <div class="modal fade" id="importDataModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
@@ -566,87 +566,151 @@ function openImportModal() {
         </div>
       </div>
     `;
-    document.body.insertAdjacentHTML("beforeend", modalHTML);
-    importModal = document.getElementById("importDataModal");
+        document.body.insertAdjacentHTML("beforeend", modalHTML);
+        importModal = document.getElementById("importDataModal");
 
-    // Add event listeners
-    document.getElementById("importPatientsBtn").addEventListener("click", function () {
-      handleFileImport("patients");
-    });
-    document.getElementById("importAppointmentsBtn").addEventListener("click", function () {
-      handleFileImport("appointments");
-    });
-  }
+        // Add event listeners
+        document.getElementById("importPatientsBtn").addEventListener("click", function () {
+            handleFileImport("patients");
+        });
+        document.getElementById("importAppointmentsBtn").addEventListener("click", function () {
+            handleFileImport("appointments");
+        });
+    }
 
-  // Show the modal
-  const bsModal = new bootstrap.Modal(importModal);
-  bsModal.show();
+    // Show the modal
+    const bsModal = new bootstrap.Modal(importModal);
+    bsModal.show();
 }
 
 // Handle file import
 function handleFileImport(type) {
-  const fileInput = type === "patients" 
-    ? document.getElementById("patientsFileInput")
-    : document.getElementById("appointmentsFileInput");
-  
-  const file = fileInput.files[0];
-  if (!file) {
-    alert("Please select a file to import.");
-    return;
-  }
+    const fileInput = type === "patients" ?
+        document.getElementById("patientsFileInput") :
+        document.getElementById("appointmentsFileInput");
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    try {
-      const csv = e.target.result;
-      const data = parseCSV(csv);
-      
-      // Show progress
-      const progressDiv = document.getElementById("importProgress");
-      progressDiv.style.display = "block";
-      
-      // Simulate processing
-      let progress = 0;
-      const interval = setInterval(function () {
-        progress += Math.random() * 30;
-        if (progress >= 90) progress = 90;
-        document.getElementById("progressBar").style.width = progress + "%";
-        document.getElementById("progressBar").textContent = Math.round(progress) + "%";
-      }, 300);
-
-      // Process the data
-      setTimeout(function () {
-        clearInterval(interval);
-        document.getElementById("progressBar").style.width = "100%";
-        document.getElementById("progressBar").textContent = "100%";
-        document.getElementById("progressText").textContent = `Successfully imported ${data.length} ${type} records`;
-
-        // Redirect to dashboard after 2 seconds
-        setTimeout(function () {
-          window.location.href = "dashboard.html";
-        }, 2000);
-      }, 2000);
-    } catch (error) {
-      alert("Error importing file: " + error.message);
+    const file = fileInput.files[0];
+    if (!file) {
+        alert("Please select a file to import.");
+        return;
     }
-  };
-  reader.readAsText(file);
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const csv = e.target.result;
+            const data = parseCSV(csv);
+
+            // Show progress
+            const progressDiv = document.getElementById("importProgress");
+            progressDiv.style.display = "block";
+
+            // Simulate processing
+            let progress = 0;
+            const interval = setInterval(function () {
+                progress += Math.random() * 30;
+                if (progress >= 90) progress = 90;
+                document.getElementById("progressBar").style.width = progress + "%";
+                document.getElementById("progressBar").textContent = Math.round(progress) + "%";
+            }, 300);
+
+            // Process the data
+            setTimeout(function () {
+                clearInterval(interval);
+                document.getElementById("progressBar").style.width = "100%";
+                document.getElementById("progressBar").textContent = "100%";
+                document.getElementById("progressText").textContent = `Successfully imported ${data.length} ${type} records`;
+
+                // Redirect to dashboard after 2 seconds
+                setTimeout(function () {
+                    window.location.href = "dashboard.html";
+                }, 2000);
+            }, 2000);
+        } catch (error) {
+            alert("Error importing file: " + error.message);
+        }
+    };
+    reader.readAsText(file);
 }
 
 // Simple CSV parser
 function parseCSV(csv) {
-  const lines = csv.split("\n").filter(line => line.trim());
-  const headers = lines[0].split(",");
-  const data = [];
-  
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(",");
-    const row = {};
-    headers.forEach((header, index) => {
-      row[header.trim()] = values[index] ? values[index].trim() : "";
-    });
-    data.push(row);
-  }
-  
-  return data;
+    const lines = csv.split("\n").filter(line => line.trim());
+    const headers = lines[0].split(",");
+    const data = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(",");
+        const row = {};
+        headers.forEach((header, index) => {
+            row[header.trim()] = values[index] ? values[index].trim() : "";
+        });
+        data.push(row);
+    }
+
+    return data;
 }
+
+// ============================================
+// FAB BUTTON INITIALIZATION
+// ============================================
+document.addEventListener('DOMContentLoaded', function () {
+    const fabButton = document.getElementById('fabButton');
+    const fabContainer = document.getElementById('fabContainer');
+    const fabChatbotBtn = document.getElementById('fabChatbotBtn');
+    const fabChatBtn = document.getElementById('fabChatBtn');
+    const fabImportBtn = document.getElementById('fabImportBtn');
+
+    if (fabButton && fabContainer) {
+        // Toggle FAB menu on main button click
+        fabButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            fabContainer.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!fabContainer.contains(e.target)) {
+                fabContainer.classList.remove('active');
+            }
+        });
+
+        // Chatbot button
+        if (fabChatbotBtn) {
+            fabChatbotBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                fabContainer.classList.remove('active');
+                // Trigger chatbot
+                if (typeof chatbotUI !== 'undefined' && chatbotUI.toggleChat) {
+                    chatbotUI.toggleChat();
+                }
+            });
+        }
+
+        // Chat button
+        if (fabChatBtn) {
+            fabChatBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                fabContainer.classList.remove('active');
+                // Trigger chat system
+                if (typeof chatSystem !== 'undefined' && chatSystem.openChat) {
+                    chatSystem.openChat();
+                }
+            });
+        }
+
+        // Import button
+        if (fabImportBtn) {
+            fabImportBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                fabContainer.classList.remove('active');
+                // Trigger import modal
+                const importModal = document.getElementById('importModal');
+                if (importModal) {
+                    const modal = new bootstrap.Modal(importModal);
+                    modal.show();
+                }
+            });
+        }
+    }
+});

@@ -66,31 +66,33 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         return;
       }
 
-      // Fetch the actual facility info from the facilities table
-       let facilityId = null;
-       let facilityRegion = null;
-       let facilityName = users.facility_name || "Facility";
-       try {
-         const { data: facility, error: facilityError } = await supabaseClient
-           .from('facilities')
-           .select('fid, facility_id, region, facility_name')
-           .eq('fid', users.fid)
-           .single();
-        
-         console.log("Facility lookup result:", { facility, facilityError });
-        
-         if (facility && !facilityError) {
-           facilityId = facility.fid;
-           facilityRegion = facility.region;
-           facilityName = facility.facility_name || facilityName;
-         } else if (facilityError) {
-           console.warn('Facility not found:', facilityError);
-           facilityId = users.fid;
-         }
-         } catch (e) {
-         console.warn('Could not fetch facility:', e);
-         facilityId = users.fid;
-         }
+      // Fetch the actual facility info from the facilities table (including subscription type)
+        let facilityId = null;
+        let facilityRegion = null;
+        let facilityName = users.facility_name || "Facility";
+        let subscriptionType = null;
+        try {
+          const { data: facility, error: facilityError } = await supabaseClient
+            .from('facilities')
+            .select('fid, facility_id, region, facility_name, subscription_type')
+            .eq('fid', users.fid)
+            .single();
+         
+          console.log("Facility lookup result:", { facility, facilityError });
+         
+          if (facility && !facilityError) {
+            facilityId = facility.fid;
+            facilityRegion = facility.region;
+            facilityName = facility.facility_name || facilityName;
+            subscriptionType = facility.subscription_type;
+          } else if (facilityError) {
+            console.warn('Facility not found:', facilityError);
+            facilityId = users.fid;
+          }
+          } catch (e) {
+          console.warn('Could not fetch facility:', e);
+          facilityId = users.fid;
+          }
 
          // Store session data
           const sessionData = {
@@ -105,6 +107,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
             facilityRegion: facilityRegion,
             userRole: users.user_role,
             isActive: users.is_active,
+            subscriptionType: subscriptionType,
             loginTime: new Date().toISOString(),
           };
 
