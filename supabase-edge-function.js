@@ -816,7 +816,7 @@ async function getHypertensionPatients(facilityId, query) {
   try {
     const { data, error } = await supabase
       .from('patients')
-      .select('pid, patient_name, ncd_conditions, blood_pressure, status')
+      .select('pid, patient_name, ncd_conditions, status')
       .eq('fid', facilityId)
       .ilike('ncd_conditions', '%Hypertension%')
       .order('patient_name', { ascending: true })
@@ -829,11 +829,11 @@ async function getHypertensionPatients(facilityId, query) {
 
     return {
       type: 'table',
-      columns: ['Patient ID', 'Name', 'Blood Pressure', 'Status'],
+      columns: ['Patient ID', 'Name', 'Status'],
       data: data.map(p => ({
         'Patient ID': p.pid,
         'Name': p.patient_name || 'N/A',
-        'Blood Pressure': p.blood_pressure || 'Not recorded',
+
         'Status': p.status || 'Active'
       }))
     }

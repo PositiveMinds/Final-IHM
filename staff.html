@@ -3743,10 +3743,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label">Blood Pressure (Text)</label>
-                  <input type="text" class="form-control" id="edit_blood_pressure" value="${patient.blood_pressure || ''}">
-                </div>
+
                 <div class="mb-3">
                   <label class="form-label">Glucose Level (mg/dL)</label>
                   <input type="number" step="0.1" class="form-control" id="edit_glucose_level" value="${patient.glucose_level || ''}">
@@ -4283,36 +4280,9 @@
                 }, 50);
             }
 
-            // Auto-fill Blood Pressure from Systolic and Diastolic
+            // Auto-fill Blood Pressure from Systolic and Diastolic (removed - blood_pressure column not in database)
             function setupBloodPressureAutoFill() {
-                const systolicInputs = document.querySelectorAll('input[id*="systolic"]');
-                const diastolicInputs = document.querySelectorAll('input[id*="diastolic"]');
-                const bpInputs = document.querySelectorAll('input[id*="blood_pressure"]');
-
-                const updateBloodPressure = () => {
-                    systolicInputs.forEach((systolicInput) => {
-                        const prefix = systolicInput.id.replace('systolic', '');
-                        const diastolicInput = document.getElementById(prefix + 'diastolic');
-                        const bpInput = document.getElementById(prefix + 'blood_pressure');
-
-                        if (diastolicInput && bpInput) {
-                            const systolic = systolicInput.value;
-                            const diastolic = diastolicInput.value;
-
-                            if (systolic && diastolic) {
-                                bpInput.value = systolic + '/' + diastolic + ' mmHg';
-                            }
-                        }
-                    });
-                };
-
-                systolicInputs.forEach(input => {
-                    input.addEventListener('input', updateBloodPressure);
-                });
-
-                diastolicInputs.forEach(input => {
-                    input.addEventListener('input', updateBloodPressure);
-                });
+                // Function disabled - blood_pressure column has been removed from database
             }
 
             // Initialize all date pickers once at modal open
@@ -4513,10 +4483,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="mb-3">
-                  <label class="form-label">Blood Pressure (Text)</label>
-                  <input type="text" class="form-control" id="add_blood_pressure" placeholder="e.g., 120/80">
-                </div>
+
                 <div class="mb-3">
                   <label class="form-label">Glucose Level (mg/dL)</label>
                   <input type="number" step="0.1" class="form-control" id="add_glucose_level" placeholder="Enter glucose level">
@@ -4710,8 +4677,7 @@
                                 .value) || null,
                             diastolic: parseInt(document.getElementById('add_diastolic')
                                 .value) || null,
-                            blood_pressure: document.getElementById(
-                                'add_blood_pressure').value || null,
+
                             glucose_level: document.getElementById('add_glucose_level')
                                 .value ? parseFloat(document.getElementById(
                                     'add_glucose_level').value) : null,
