@@ -110,8 +110,8 @@ if (installButton) {
         console.log('[PWA] App installed successfully!');
         showNotification('HealthFlow Installed!', {
           body: 'You can now use HealthFlow offline. Look for it in your apps!',
-          icon: './assets/images/healthflow-icon-192x192.png',
-          badge: './assets/images/healthflow-icon-192x192.png'
+          icon: '/Final-IHM/assets/images/healthflow-icon-192x192.png',
+          badge: '/Final-IHM/assets/images/healthflow-icon-192x192.png'
         });
         
         // Also log to console
@@ -153,7 +153,7 @@ window.addEventListener('appinstalled', () => {
 // Register service worker with periodic updates
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
+    navigator.serviceWorker.register('/Final-IHM/service-worker.js', { scope: '/Final-IHM/' })
       .then(registration => {
         console.log('[PWA] Service Worker registered:', registration);
         
@@ -213,8 +213,8 @@ function requestPersistentStorage() {
 function showNotification(title, options = {}) {
   if ('Notification' in window && Notification.permission === 'granted') {
     const defaultOptions = {
-      icon: './assets/images/favicon.png',
-      badge: './assets/images/favicon.png',
+      icon: '/Final-IHM/assets/images/favicon.png',
+      badge: '/Final-IHM/assets/images/favicon.png',
       ...options
     };
     
@@ -300,9 +300,9 @@ function preCacheImportantAssets() {
     navigator.serviceWorker.ready.then(registration => {
       // Pre-cache dashboard and other important pages
       const importantAssets = [
-        './dashboard.html',
-        './patient-portal.html',
-        './forms.html'
+        '/Final-IHM/dashboard.html',
+        '/Final-IHM/patient-portal.html',
+        '/Final-IHM/forms.html'
       ];
       
       navigator.serviceWorker.controller?.postMessage({

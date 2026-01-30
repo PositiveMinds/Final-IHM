@@ -5,19 +5,19 @@ const API_CACHE = 'healthflow-api-v1';
 
 // Core files to cache on install
 const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './login.html',
-  './dashboard.html',
-  './patient-portal.html',
-  './forms.html',
-  './healthflow-styles.css',
-  './styles.css',
-  './script.js',
-  './login.js',
-  './dashboard-data.js',
-  './pwa-install.js',
-  './manifest.json',
+  '/Final-IHM/',
+  '/Final-IHM/index.html',
+  '/Final-IHM/login.html',
+  '/Final-IHM/dashboard.html',
+  '/Final-IHM/patient-portal.html',
+  '/Final-IHM/forms.html',
+  '/Final-IHM/healthflow-styles.css',
+  '/Final-IHM/styles.css',
+  '/Final-IHM/script.js',
+  '/Final-IHM/login.js',
+  '/Final-IHM/dashboard-data.js',
+  '/Final-IHM/pwa-install.js',
+  '/Final-IHM/manifest.json',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
@@ -94,33 +94,33 @@ function cacheFirst(request) {
       }
       
       return fetch(request)
-        .then(response => {
-          // Cache successful responses
-          if (!response || response.status !== 200 || response.type === 'error') {
-            return response;
-          }
+         .then(response => {
+           // Cache successful responses
+           if (!response || response.status !== 200 || response.type === 'error') {
+             return response;
+           }
 
-          const responseToCache = response.clone();
-          const cacheName = request.destination === 'script' || 
-                           request.destination === 'style' 
-                           ? CACHE_NAME 
-                           : RUNTIME_CACHE;
-          
-          caches.open(cacheName)
-            .then(cache => {
-              cache.put(request, responseToCache);
-            })
-            .catch(err => console.error('[Service Worker] Cache put error:', err));
+           const responseToCache = response.clone();
+           const cacheName = request.destination === 'script' || 
+                            request.destination === 'style' 
+                            ? CACHE_NAME 
+                            : RUNTIME_CACHE;
+           
+           caches.open(cacheName)
+             .then(cache => {
+               cache.put(request, responseToCache);
+             })
+             .catch(err => console.error('[Service Worker] Cache put error:', err));
 
-          return response;
-        })
-        .catch(() => {
-          // Return offline fallback for navigation requests
-          if (request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
-          return null;
-        });
+           return response;
+         })
+         .catch(() => {
+           // Return offline fallback for navigation requests
+           if (request.mode === 'navigate') {
+             return caches.match('/Final-IHM/index.html');
+           }
+           return null;
+         });
     });
 }
 
@@ -149,7 +149,7 @@ function cacheExternal(request) {
           }
           // Return placeholder for failed image requests
           if (request.destination === 'image') {
-            return caches.match('./assets/images/placeholder.png');
+            return caches.match('/Final-IHM/assets/images/placeholder.png');
           }
           return null;
         });
@@ -240,17 +240,17 @@ function syncOfflineData() {
 // Push notification handler
 self.addEventListener('push', event => {
   const data = event.data ? event.data.json() : {};
-  const options = {
-    body: data.body || 'HealthFlow Notification',
-    icon: './assets/images/favicon.png',
-    badge: './assets/images/favicon.png',
-    tag: 'healthflow-notification',
-    requireInteraction: data.requireInteraction || false,
-    actions: [
-      { action: 'open', title: 'Open' },
-      { action: 'close', title: 'Close' }
-    ]
-  };
+   const options = {
+     body: data.body || 'HealthFlow Notification',
+     icon: '/Final-IHM/assets/images/favicon.png',
+     badge: '/Final-IHM/assets/images/favicon.png',
+     tag: 'healthflow-notification',
+     requireInteraction: data.requireInteraction || false,
+     actions: [
+       { action: 'open', title: 'Open' },
+       { action: 'close', title: 'Close' }
+     ]
+   };
 
   event.waitUntil(
     self.registration.showNotification(data.title || 'HealthFlow', options)
@@ -262,21 +262,21 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
 
   if (event.action === 'open' || !event.action) {
-    event.waitUntil(
-      clients.matchAll({ type: 'window' }).then(clientList => {
-        // Check if there's already a window open with the target URL
-        for (let client of clientList) {
-          if (client.url === './' && 'focus' in client) {
-            return client.focus();
-          }
-        }
-        // Open new window if none exists
-        if (clients.openWindow) {
-          return clients.openWindow('./');
-        }
-      })
-    );
-  }
+     event.waitUntil(
+       clients.matchAll({ type: 'window' }).then(clientList => {
+         // Check if there's already a window open with the target URL
+         for (let client of clientList) {
+           if (client.url.includes('/Final-IHM/') && 'focus' in client) {
+             return client.focus();
+           }
+         }
+         // Open new window if none exists
+         if (clients.openWindow) {
+           return clients.openWindow('/Final-IHM/');
+         }
+       })
+     );
+   }
 });
 
 console.log('[Service Worker] Loaded and ready');
