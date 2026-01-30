@@ -1,0 +1,282 @@
+const CACHE_NAME = 'healthflow-v1';
+const RUNTIME_CACHE = 'healthflow-runtime-v1';
+const IMAGE_CACHE = 'healthflow-images-v1';
+const API_CACHE = 'healthflow-api-v1';
+
+// Core files to cache on install
+const STATIC_ASSETS = [
+  './',
+  './index.html',
+  './login.html',
+  './dashboard.html',
+  './patient-portal.html',
+  './forms.html',
+  './healthflow-styles.css',
+  './styles.css',
+  './script.js',
+  './login.js',
+  './dashboard-data.js',
+  './pwa-install.js',
+  './manifest.json',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'
+];
+
+// Install Service Worker
+self.addEventListener('install', event => {
+  console.log('[Service Worker] Installing...');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('[Service Worker] Caching core assets');
+        return cache.addAll(STATIC_ASSETS.filter(url => url.startsWith('.')));
+      })
+      .catch(err => console.error('[Service Worker] Cache install error:', err))
+  );
+  self.skipWaiting();
+});
+
+// Activate Service Worker
+self.addEventListener('activate', event => {
+  console.log('[Service Worker] Activating...');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          // Delete old cache versions
+          if (cacheName !== CACHE_NAME && 
+              cacheName !== RUNTIME_CACHE && 
+              cacheName !== IMAGE_CACHE &&
+              cacheName !== API_CACHE) {
+            console.log('[Service Worker] Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// Fetch Event - Implement cache strategies
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Skip non-GET requests
+  if (request.method !== 'GET') {
+    return;
+  }
+
+  // Skip chrome extensions and certain protocols
+  if (url.protocol === 'chrome-extension:' || url.protocol === 'moz-extension:') {
+    return;
+  }
+
+  // Route different types of requests to appropriate handlers
+  if (request.destination === 'image') {
+    event.respondWith(cacheImage(request));
+  } else if (url.origin !== location.origin) {
+    event.respondWith(cacheExternal(request));
+  } else {
+    event.respondWith(cacheFirst(request));
+  }
+});
+
+// Cache first strategy for local assets
+function cacheFirst(request) {
+  return caches.match(request)
+    .then(response => {
+      if (response) {
+        return response;
+      }
+      
+      return fetch(request)
+        .then(response => {
+          // Cache successful responses
+          if (!response || response.status !== 200 || response.type === 'error') {
+            return response;
+          }
+
+          const responseToCache = response.clone();
+          const cacheName = request.destination === 'script' || 
+                           request.destination === 'style' 
+                           ? CACHE_NAME 
+                           : RUNTIME_CACHE;
+          
+          caches.open(cacheName)
+            .then(cache => {
+              cache.put(request, responseToCache);
+            })
+            .catch(err => console.error('[Service Worker] Cache put error:', err));
+
+          return response;
+        })
+        .catch(() => {
+          // Return offline fallback for navigation requests
+          if (request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          return null;
+        });
+    });
+}
+
+// Network first strategy for external resources
+function cacheExternal(request) {
+  return fetch(request)
+    .then(response => {
+      if (!response || response.status !== 200 || response.type === 'error') {
+        return response;
+      }
+
+      const responseToCache = response.clone();
+      caches.open(RUNTIME_CACHE)
+        .then(cache => {
+          cache.put(request, responseToCache);
+        })
+        .catch(err => console.error('[Service Worker] Cache external error:', err));
+
+      return response;
+    })
+    .catch(() => {
+      return caches.match(request)
+        .then(response => {
+          if (response) {
+            return response;
+          }
+          // Return placeholder for failed image requests
+          if (request.destination === 'image') {
+            return caches.match('./assets/images/placeholder.png');
+          }
+          return null;
+        });
+    });
+}
+
+// Image caching strategy
+function cacheImage(request) {
+  return caches.open(IMAGE_CACHE)
+    .then(cache => {
+      return cache.match(request).then(response => {
+        if (response) {
+          return response;
+        }
+
+        return fetch(request)
+          .then(response => {
+            if (!response || response.status !== 200 || response.type === 'error') {
+              return response;
+            }
+
+            const responseToCache = response.clone();
+            cache.put(request, responseToCache);
+            return response;
+          })
+          .catch(() => {
+            // Return placeholder image on network failure
+            return new Response(
+              '<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#ddd"/></svg>',
+              { headers: { 'Content-Type': 'image/svg+xml' } }
+            );
+          });
+      });
+    });
+}
+
+// Handle messages from client
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    caches.delete(RUNTIME_CACHE).then(() => {
+      event.ports[0].postMessage({ success: true });
+    });
+  }
+
+  if (event.data && event.data.type === 'CACHE_URLS') {
+    const urls = event.data.urls || [];
+    caches.open(RUNTIME_CACHE).then(cache => {
+      cache.addAll(urls).catch(err => {
+        console.error('[Service Worker] Failed to cache URLs:', err);
+      });
+    });
+  }
+});
+
+// Background sync for offline actions (requires browser support)
+self.addEventListener('sync', event => {
+  console.log('[Service Worker] Background sync event:', event.tag);
+  
+  if (event.tag === 'sync-offline-data') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+// Sync offline data when connection returns
+function syncOfflineData() {
+  return caches.open(API_CACHE)
+    .then(cache => {
+      return cache.keys().then(requests => {
+        return Promise.all(
+          requests.map(request => {
+            return fetch(request).then(response => {
+              if (response.ok) {
+                cache.delete(request);
+              }
+            }).catch(err => {
+              console.error('[Service Worker] Sync error:', err);
+            });
+          })
+        );
+      });
+    });
+}
+
+// Push notification handler
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  const options = {
+    body: data.body || 'HealthFlow Notification',
+    icon: './assets/images/favicon.png',
+    badge: './assets/images/favicon.png',
+    tag: 'healthflow-notification',
+    requireInteraction: data.requireInteraction || false,
+    actions: [
+      { action: 'open', title: 'Open' },
+      { action: 'close', title: 'Close' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'HealthFlow', options)
+  );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+
+  if (event.action === 'open' || !event.action) {
+    event.waitUntil(
+      clients.matchAll({ type: 'window' }).then(clientList => {
+        // Check if there's already a window open with the target URL
+        for (let client of clientList) {
+          if (client.url === './' && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // Open new window if none exists
+        if (clients.openWindow) {
+          return clients.openWindow('./');
+        }
+      })
+    );
+  }
+});
+
+console.log('[Service Worker] Loaded and ready');

@@ -29,6 +29,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="healthflow-styles.css">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
 
 </head>
 <body>
@@ -36,14 +38,22 @@
     <nav class="navbar navbar-expand-lg navbar-light sticky-top hf-navbar">
         <div class="container-fluid px-3 px-md-4 px-lg-5">
             <a class="navbar-brand d-flex align-items-center" href="#home">
-                <img src="assets/images/logo.png" alt="HealthFlow" height="60" class="me-2 navbar-logo">
+                <img src="assets/images/logo.png" alt="HealthFlow" height="80" class="me-2 navbar-logo">
                 <span class="fw-bold hf-brand-text d-none d-md-inline">
                     <span class="brand-health">Health</span><span class="brand-flow">Flow</span>
                 </span>
             </a>
             <div class="ms-auto d-flex gap-2 align-items-center">
+                <!-- Install App Button - Hidden by default -->
+                <button id="pwa-install-button" class="btn btn-success btn-sm" style="display: none;" title="Install HealthFlow App">
+                    <i class="fas fa-download me-2"></i><span class="d-none d-sm-inline">Install App</span>
+                </button>
+                <!-- Dashboard Link - Show only on mobile -->
+                <a href="dashboard.html" class="btn btn-outline-primary btn-sm d-lg-none" title="Dashboard">
+                    <i class="fas fa-chart-line"></i>
+                </a>
                 <!-- Get Demo Button - Show only on mobile -->
-                <a href="#contact" class="btn btn-primary btn-sm d-lg-none">Get Demo</a>
+                <button class="btn btn-primary btn-sm d-lg-none" data-bs-toggle="modal" data-bs-target="#demoFormModal">Get Demo</button>
             </div>
             <div class="collapse navbar-collapse d-none d-lg-block" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
@@ -54,10 +64,11 @@
                     <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
                     <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
                     <li class="nav-item"><a class="nav-link" href="#video-demos">Videos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#webinars">Webinars</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
                 </ul>
-                <a href="#contact" class="btn btn-primary btn-sm ms-3">Get Demo</a>
+                <button class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#demoFormModal">Get Demo</button>
             </div>
         </div>
     </nav>
@@ -103,9 +114,10 @@
             <li><a href="#team" class="sidebar-menu-item">Team</a></li>
             <li><a href="#testimonials" class="sidebar-menu-item">Testimonials</a></li>
             <li><a href="#video-demos" class="sidebar-menu-item">Videos</a></li>
+            <li><a href="#webinars" class="sidebar-menu-item">Webinars</a></li>
             <li><a href="#contact" class="sidebar-menu-item">Contact</a></li>
             <li><a href="dashboard.html" class="sidebar-menu-item">Dashboard</a></li>
-            <li class="sidebar-demo-btn"><a href="#contact" class="sidebar-menu-item">Get Demo</a></li>
+            <li class="sidebar-demo-btn"><button class="sidebar-menu-item" data-bs-toggle="modal" data-bs-target="#demoFormModal">Get Demo</button></li>
         </ul>
     </div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -120,6 +132,7 @@
         
         <div class="container-fluid px-3 px-md-4 px-lg-5 hero-content-wrapper">
             <div class="row align-items-center min-vh-100 py-5">
+                <!-- Left Content -->
                 <div class="col-12 col-lg-6 mb-5 mb-lg-0 d-flex flex-column justify-content-center">
                     <div class="hf-hero-content">
                         <div class="hero-badge-group mb-4">
@@ -155,10 +168,10 @@
                         </div>
                         
                         <div class="hero-cta-buttons d-flex gap-3 flex-column flex-sm-row animate-fade-in-delayed-4">
-                            <a href="#contact" class="btn btn-primary btn-lg btn-cta-primary">
+                            <button class="btn btn-primary btn-lg btn-cta-primary" data-bs-toggle="modal" data-bs-target="#demoFormModal">
                                 <span>Get Free Demo</span>
                                 <i class="fas fa-arrow-right ms-2"></i>
-                            </a>
+                            </button>
                             <a href="#how-it-works" class="btn btn-outline-primary btn-lg btn-cta-outline">
                                 <span>See How It Works</span>
                                 <i class="fas fa-play-circle ms-2"></i>
@@ -182,30 +195,184 @@
                     </div>
                 </div>
                 
+                <!-- Right Content - Phone Mockup -->
                 <div class="col-12 col-lg-6 d-none d-lg-flex align-items-center justify-content-center">
                     <div class="hf-hero-visual">
-                        <div class="hero-visual-container">
-                            <div class="hf-hero-card card-1">
-                                <div class="card-icon">📊</div>
-                                <div class="card-text">
-                                    <strong>Instant Reports</strong>
-                                    <small>In seconds, not hours</small>
+                        <div class="phone-mockup">
+                            <div class="phone-notch"></div>
+                            <div class="phone-screen">
+                                <!-- Notification Badge -->
+                                <div class="phone-notification-badge">
+                                    <span class="badge-count">3</span>
+                                </div>
+
+                                <!-- Phone Status Bar -->
+                                <div class="phone-status-bar">
+                                    <span class="status-time" id="phone-time">9:41</span>
+                                    <div class="status-icons">
+                                        <i class="fas fa-wifi"></i>
+                                        <i class="fas fa-signal"></i>
+                                        <i class="fas fa-battery-three-quarters"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Analytics Content -->
+                                <div class="phone-content">
+                                    <div class="analytics-header">
+                                        <h4>Patient Care Hub</h4>
+                                        <p>Real-time Health Monitoring</p>
+                                    </div>
+
+                                    <!-- Appointments Card - White -->
+                                    <div class="analytics-card appointments-card animate-slide-up">
+                                        <div class="card-header-icon">
+                                            <i class="fas fa-calendar-check"></i>
+                                            <span class="card-title">Appointments Today</span>
+                                        </div>
+                                        <div class="appointment-stats">
+                                            <div class="apt-item">
+                                                <span class="apt-count animate-number" data-value="12">0</span>
+                                                <span class="apt-label">Scheduled</span>
+                                            </div>
+                                            <div class="apt-item">
+                                                <span class="apt-count apt-completed animate-number" data-value="8">0</span>
+                                                <span class="apt-label">Completed</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Viral Load Card -->
+                                    <div class="analytics-card viral-load-card animate-slide-up">
+                                        <div class="vital-label">Viral Load Status</div>
+                                        <div class="viral-load-content">
+                                            <div class="viral-indicator good">
+                                                <i class="fas fa-shield-alt"></i>
+                                                <span>Suppressed</span>
+                                            </div>
+                                            <div class="viral-value">
+                                                <span class="value-number animate-number" data-value="< 50">0</span>
+                                                <span class="value-unit">copies/ml</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bleeding/Complications Alert Card -->
+                                    <div class="analytics-card bleeding-alert-card animate-slide-up-delayed">
+                                        <div class="alert-header">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span class="card-title">Health Alerts</span>
+                                        </div>
+                                        <div class="alert-items">
+                                            <div class="alert-item warning">
+                                                <span class="alert-icon">⚠️</span>
+                                                <span class="alert-text">3 Patients at Risk</span>
+                                            </div>
+                                            <div class="alert-item info">
+                                                <span class="alert-icon">ℹ️</span>
+                                                <span class="alert-text">Follow-ups Due</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Diabetes Management Card - White -->
+                                    <div class="analytics-card ncd-diabetes-card animate-slide-up-delayed">
+                                        <div class="ncd-header">
+                                            <div class="ncd-icon diabetes">🩺</div>
+                                            <span class="ncd-title">Diabetes Management</span>
+                                        </div>
+                                        <div class="ncd-metrics">
+                                            <div class="metric-row">
+                                                <span class="metric-name">Glucose Level</span>
+                                                <span class="metric-value glucose animate-number" data-value="145">0</span>
+                                                <span class="metric-unit">mg/dL</span>
+                                            </div>
+                                            <div class="ncd-progress">
+                                                <div class="progress-bar" style="width: 65%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hypertension Card -->
+                                    <div class="analytics-card ncd-hypertension-card animate-slide-up-delayed">
+                                        <div class="ncd-header">
+                                            <div class="ncd-icon hypertension">❤️</div>
+                                            <span class="ncd-title">Hypertension Control</span>
+                                        </div>
+                                        <div class="ncd-metrics">
+                                            <div class="metric-row">
+                                                <span class="metric-name">BP Reading</span>
+                                                <span class="metric-value hypertension-bp animate-number" data-value="138/85">0</span>
+                                                <span class="metric-unit">mmHg</span>
+                                            </div>
+                                            <div class="status-badge status-warning">
+                                                <i class="fas fa-info-circle"></i>
+                                                Slightly Elevated
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Patient Load Chart -->
+                                    <div class="analytics-card patient-load-chart animate-slide-up-delayed-2">
+                                        <div class="chart-label">Patient Load Distribution</div>
+                                        <div class="chart-bars mini-bars">
+                                            <div class="chart-bar" style="--chart-height: 35%;"></div>
+                                            <div class="chart-bar" style="--chart-height: 55%;"></div>
+                                            <div class="chart-bar" style="--chart-height: 40%;"></div>
+                                            <div class="chart-bar" style="--chart-height: 70%;"></div>
+                                            <div class="chart-bar" style="--chart-height: 80%;"></div>
+                                            <div class="chart-bar active" style="--chart-height: 85%;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Active Cases Summary - White -->
+                                    <div class="analytics-card cases-summary-card animate-slide-up-delayed-2">
+                                        <div class="summary-title">Active Cases</div>
+                                        <div class="summary-grid">
+                                            <div class="summary-item hiv">
+                                                <span class="case-icon">🦠</span>
+                                                <span class="case-count animate-number" data-value="247">0</span>
+                                                <span class="case-label">HIV+</span>
+                                            </div>
+                                            <div class="summary-item tb">
+                                                <span class="case-icon">🫁</span>
+                                                <span class="case-count animate-number" data-value="34">0</span>
+                                                <span class="case-label">TB</span>
+                                            </div>
+                                            <div class="summary-item malaria">
+                                                <span class="case-icon">🦟</span>
+                                                <span class="case-count animate-number" data-value="12">0</span>
+                                                <span class="case-label">Malaria</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Notification Toast Container -->
+                                <div class="phone-notification-center" id="phoneNotificationCenter"></div>
+
+                                <!-- Appointments Popup Notification -->
+                                <div class="phone-popup-notification" id="appointmentsPopup">
+                                    <div class="popup-content">
+                                        <div class="popup-icon">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </div>
+                                        <div class="popup-text">
+                                            <h4>Today's Appointments</h4>
+                                            <div class="popup-count">
+                                                <span class="big-number" id="appointmentCount">12</span>
+                                                <span class="count-label">Patients to see</span>
+                                            </div>
+                                        </div>
+                                        <button class="popup-close" onclick="closeAppointmentsPopup()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="hf-hero-card card-2">
-                                <div class="card-icon">🔔</div>
-                                <div class="card-text">
-                                    <strong>Smart Alerts</strong>
-                                    <small>Never miss at-risk patients</small>
-                                </div>
-                            </div>
-                            <div class="hf-hero-card card-3">
-                                <div class="card-icon">📱</div>
-                                <div class="card-text">
-                                    <strong>Works Offline</strong>
-                                    <small>Sync when online</small>
-                                </div>
-                            </div>
+
+                            <!-- Phone Home Indicator -->
+                            <div class="phone-home-indicator"></div>
+                            <div class="phone-frame"></div>
                         </div>
                     </div>
                 </div>
@@ -349,7 +516,7 @@
                             <li class="disabled"><i class="fas fa-times"></i> AI chatbot</li>
                             <li class="disabled"><i class="fas fa-times"></i> Advanced analytics</li>
                         </ul>
-                        <a href="#contact" class="btn btn-outline-primary w-100">Start Free Trial</a>
+                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#demoFormModal">Start Free Trial</button>
                     </div>
                 </div>
 
@@ -375,10 +542,10 @@
                             <li><i class="fas fa-check"></i> Advanced reporting & analytics</li>
                             <li><i class="fas fa-check"></i> Multi-user access</li>
                             <li><i class="fas fa-check"></i> Priority support & training</li>
-                        </ul>
-                        <a href="#contact" class="btn btn-primary w-100">Get Started</a>
-                    </div>
-                </div>
+                            </ul>
+                            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#demoFormModal">Get Started</button>
+                            </div>
+                            </div>
 
                 <!-- Advanced Plan -->
                 <div class="col-12 col-md-6 col-lg-4">
@@ -401,10 +568,10 @@
                             <li><i class="fas fa-check"></i> Dedicated account manager</li>
                             <li><i class="fas fa-check"></i> 24/7 premium support & training</li>
                             <li><i class="fas fa-check"></i> SLA guarantee & custom development</li>
-                        </ul>
-                        <a href="#contact" class="btn btn-outline-primary w-100">Contact Sales</a>
-                    </div>
-                </div>
+                            </ul>
+                            <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#demoFormModal">Contact Sales</button>
+                            </div>
+                            </div>
             </div>
 
             <div class="row mt-5">
@@ -514,9 +681,9 @@
             <div class="team-carousel-wrapper">
                 <div class="team-carousel owl-carousel owl-theme">
                     <!-- Team Member 1 -->
-                    <div class="team-member-card">
+                    <div class="team-member-card" data-member-name="Dr. Sarah Mwase" data-member-position="Medical Director" data-member-image="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" data-member-bio="Dr. Sarah Mwase is a pioneering healthcare professional with 15+ years of experience in healthcare innovation and patient care optimization across East Africa. Her passion lies in leveraging technology to improve healthcare delivery and patient outcomes." data-member-expertise="Healthcare Innovation, Patient Care, Clinical Operations, EHR Systems" data-member-experience="Medical degree from Makerere University, 15+ years in healthcare management, Led digital transformation at three major hospitals">
                         <div class="member-image-container">
-                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" alt="Dr. Sarah Mwase - Medical Director" class="member-image">
+                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" alt="Dr. Sarah Mwase - Medical Director" class="member-image">
                             <div class="member-overlay">
                                 <div class="member-social">
                                     <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -532,9 +699,9 @@
                     </div>
 
                     <!-- Team Member 2 -->
-                    <div class="team-member-card">
+                    <div class="team-member-card" data-member-name="James Katumba" data-member-position="Chief Technology Officer" data-member-image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" data-member-bio="James Katumba is a visionary tech entrepreneur with deep expertise in healthcare AI and cloud infrastructure solutions. He leads HealthFlow's technology strategy and oversees the development of scalable, secure, and innovative healthcare platforms." data-member-expertise="Healthcare AI, Cloud Infrastructure, System Architecture, DevOps, Security" data-member-experience="B.S. Computer Science from Makerere University, 12+ years in tech, Founded two successful startups">
                         <div class="member-image-container">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" alt="James Katumba - Chief Technology Officer" class="member-image">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" alt="James Katumba - Chief Technology Officer" class="member-image">
                             <div class="member-overlay">
                                 <div class="member-social">
                                     <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -550,9 +717,9 @@
                     </div>
 
                     <!-- Team Member 3 -->
-                    <div class="team-member-card">
+                    <div class="team-member-card" data-member-name="Amara Okafor" data-member-position="Operations Manager" data-member-image="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" data-member-bio="Amara Okafor brings 10+ years of operations management experience in healthcare settings. She is dedicated to streamlining healthcare operations, improving facility efficiency, and ensuring smooth implementation of HealthFlow across diverse healthcare settings." data-member-expertise="Operations Management, Process Optimization, Healthcare Administration, Staff Training" data-member-experience="MBA in Healthcare Management, 10+ years in healthcare operations, Implemented systems in 50+ facilities">
                         <div class="member-image-container">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" alt="Amara Okafor - Operations Manager" class="member-image">
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" alt="Amara Okafor - Operations Manager" class="member-image">
                             <div class="member-overlay">
                                 <div class="member-social">
                                     <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -568,9 +735,9 @@
                     </div>
 
                     <!-- Team Member 4 -->
-                    <div class="team-member-card">
+                    <div class="team-member-card" data-member-name="David Luwum" data-member-position="Product Lead" data-member-image="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" data-member-bio="David Luwum is a user-experience visionary with a passion for creating intuitive healthcare technology. He ensures every aspect of HealthFlow is designed with healthcare workers in mind, making complex operations simple and accessible." data-member-expertise="UX/UI Design, User Research, Product Strategy, Healthcare HCI, Accessibility" data-member-experience="Design degree from Makerere University, 8+ years in product design, Designed interfaces for 20+ health apps">
                         <div class="member-image-container">
-                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" alt="David Luwum - Product Lead" class="member-image">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" alt="David Luwum - Product Lead" class="member-image">
                             <div class="member-overlay">
                                 <div class="member-social">
                                     <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -586,9 +753,9 @@
                     </div>
 
                     <!-- Team Member 5 -->
-                    <div class="team-member-card">
+                    <div class="team-member-card" data-member-name="Grace Nakibuule" data-member-position="Customer Success Lead" data-member-image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop" data-member-bio="Grace Nakibuule is committed to ensuring every healthcare facility gets maximum value from HealthFlow deployment. She works closely with clients to provide comprehensive support, training, and optimization strategies for long-term success." data-member-expertise="Customer Success, Client Relations, Training Programs, Change Management, Support Systems" data-member-experience="B.A. Business Administration, 7+ years in customer success, Managed 100+ client relationships">
                         <div class="member-image-container">
-                            <img src="https://images.unsplash.com/photo-1494888286169-3c12ee809df5?w=400&h=400&fit=crop" alt="Grace Nakibuule - Customer Success Lead" class="member-image">
+                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop" alt="Grace Nakibuule - Customer Success Lead" class="member-image">
                             <div class="member-overlay">
                                 <div class="member-social">
                                     <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -604,9 +771,9 @@
                     </div>
 
                     <!-- Team Member 6 -->
-                    <div class="team-member-card">
+                    <div class="team-member-card" data-member-name="Emmanuel Ngabe" data-member-position="Data Analyst" data-member-image="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" data-member-bio="Emmanuel Ngabe specializes in transforming healthcare data into actionable insights that drive better patient outcomes. He leverages advanced analytics to help healthcare facilities understand their operations and make data-driven decisions." data-member-expertise="Data Analytics, Statistical Analysis, Healthcare Metrics, Data Visualization, Business Intelligence" data-member-experience="M.S. Statistics from Makerere University, 6+ years in healthcare analytics, Analyzed data from 100+ facilities">
                         <div class="member-image-container">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" alt="Emmanuel Ngabe - Data Analyst" class="member-image">
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&w=500&h=500&fit=crop" alt="Emmanuel Ngabe - Data Analyst" class="member-image">
                             <div class="member-overlay">
                                 <div class="member-social">
                                     <a href="#" class="social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
@@ -624,6 +791,43 @@
             </div>
         </div>
     </section>
+
+    <!-- Team Member Details Modal -->
+    <div class="modal fade" id="teamMemberModal" tabindex="-1" aria-labelledby="teamMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content team-modal-content">
+                <button type="button" class="btn-close team-modal-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                
+                <div class="team-modal-header">
+                    <img id="modalMemberImage" src="" alt="Team Member" class="modal-member-image">
+                </div>
+                
+                <div class="team-modal-body">
+                    <div class="modal-member-info">
+                        <h3 id="modalMemberName" class="modal-member-name"></h3>
+                        <p id="modalMemberPosition" class="modal-member-position"></p>
+                        
+                        <div class="modal-member-social">
+                            <a href="#" class="modal-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" class="modal-social-link" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-member-details">
+                        <h5 class="details-title">About</h5>
+                        <p id="modalMemberBio" class="modal-member-bio"></p>
+                        
+                        <h5 class="details-title mt-4">Expertise</h5>
+                        <div id="modalMemberExpertise" class="expertise-tags">
+                        </div>
+                        
+                        <h5 class="details-title mt-4">Experience</h5>
+                        <p id="modalMemberExperience" class="modal-member-experience"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Testimonials Section -->
     <section id="testimonials" class="hf-section hf-testimonials-section">
@@ -766,7 +970,7 @@
                         <div class="testimonial-card">
                             <div class="testimonial-header">
                                 <div class="testimonial-avatar">
-                                    <img src="https://images.unsplash.com/photo-1494888286169-3c12ee809df5?w=100&h=100&fit=crop" alt="Dr. Susan Atwine" class="rounded-circle">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Dr. Susan Atwine" class="rounded-circle">
                                 </div>
                                 <div class="testimonial-info">
                                     <h5 class="testimonial-name">Dr. Susan Atwine</h5>
@@ -982,6 +1186,134 @@
         </div>
     </section>
 
+    <!-- Webinar Section -->
+    <section id="webinars" class="hf-section hf-webinar-section">
+        <div class="container-fluid px-3 px-md-4 px-lg-5">
+            <div class="text-center mb-5">
+                <span class="hf-badge">📅 Live Training</span>
+                <h2 class="hf-section-title text-white">Join Our Weekly Webinars</h2>
+                <p class="hf-section-subtitle text-white-75">Expert-led sessions to help you master HealthFlow and optimize your healthcare facility</p>
+            </div>
+
+            <div class="row">
+                <!-- Calendar Section -->
+                <div class="col-12 col-lg-6 mb-4 mb-lg-0">
+                    <div class="webinar-calendar-card">
+                        <div class="calendar-header">
+                            <h5 class="mb-0">Schedule Calendar</h5>
+                            <div class="calendar-nav">
+                                <button id="prevMonth" class="calendar-btn"><i class="fas fa-chevron-left"></i></button>
+                                <span id="currentMonth" class="calendar-month"></span>
+                                <button id="nextMonth" class="calendar-btn"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <div class="weekday">Sun</div>
+                            <div class="weekday">Mon</div>
+                            <div class="weekday">Tue</div>
+                            <div class="weekday">Wed</div>
+                            <div class="weekday">Thu</div>
+                            <div class="weekday">Fri</div>
+                            <div class="weekday">Sat</div>
+                        </div>
+                        <div id="calendarDays" class="calendar-days"></div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Webinars Section -->
+                <div class="col-12 col-lg-6">
+                    <div class="webinar-list-card">
+                        <h5 class="mb-4">Upcoming Webinars</h5>
+                        
+                        <!-- Webinar 1 -->
+                        <div class="webinar-item">
+                            <div class="webinar-date">
+                                <span class="date-day">05</span>
+                                <span class="date-month">Feb</span>
+                            </div>
+                            <div class="webinar-content">
+                                <h6 class="webinar-title">Patient Data Management 101</h6>
+                                <div class="webinar-meta">
+                                    <span><i class="fas fa-clock me-2"></i>2:00 PM - 3:00 PM EAT</span>
+                                </div>
+                                <p class="webinar-description">Learn how to efficiently manage patient records, organize medical histories, and ensure data accuracy.</p>
+                                <div class="webinar-speaker">
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span>Led by Dr. Sarah Okoro</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary register-webinar-btn" data-webinar="Patient Data Management 101">Register</button>
+                        </div>
+
+                        <!-- Webinar 2 -->
+                        <div class="webinar-item">
+                            <div class="webinar-date">
+                                <span class="date-day">12</span>
+                                <span class="date-month">Feb</span>
+                            </div>
+                            <div class="webinar-content">
+                                <h6 class="webinar-title">Advanced Reporting & Analytics</h6>
+                                <div class="webinar-meta">
+                                    <span><i class="fas fa-clock me-2"></i>3:00 PM - 4:00 PM EAT</span>
+                                </div>
+                                <p class="webinar-description">Master compliance reports, generate clinical insights, and create automated monthly analytics.</p>
+                                <div class="webinar-speaker">
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span>Led by Mr. James Kimani</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary register-webinar-btn" data-webinar="Advanced Reporting & Analytics">Register</button>
+                        </div>
+
+                        <!-- Webinar 3 -->
+                        <div class="webinar-item">
+                            <div class="webinar-date">
+                                <span class="date-day">19</span>
+                                <span class="date-month">Feb</span>
+                            </div>
+                            <div class="webinar-content">
+                                <h6 class="webinar-title">WhatsApp Integration for Patient Reminders</h6>
+                                <div class="webinar-meta">
+                                    <span><i class="fas fa-clock me-2"></i>2:00 PM - 3:00 PM EAT</span>
+                                </div>
+                                <p class="webinar-description">Automate appointment reminders and patient notifications through WhatsApp. Reduce no-shows by 40%.</p>
+                                <div class="webinar-speaker">
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span>Led by Ms. Grace Mwangi</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary register-webinar-btn" data-webinar="WhatsApp Integration">Register</button>
+                        </div>
+
+                        <!-- Webinar 4 -->
+                        <div class="webinar-item">
+                            <div class="webinar-date">
+                                <span class="date-day">26</span>
+                                <span class="date-month">Feb</span>
+                            </div>
+                            <div class="webinar-content">
+                                <h6 class="webinar-title">Mobile-First Healthcare Solutions</h6>
+                                <div class="webinar-meta">
+                                    <span><i class="fas fa-clock me-2"></i>3:00 PM - 4:00 PM EAT</span>
+                                </div>
+                                <p class="webinar-description">Leverage mobile technology for offline access, field data collection, and remote patient monitoring.</p>
+                                <div class="webinar-speaker">
+                                    <i class="fas fa-user-circle me-2"></i>
+                                    <span>Led by Dr. Peter Otieno</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary register-webinar-btn" data-webinar="Mobile-First Healthcare">Register</button>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="#" class="btn btn-outline-light btn-sm">View All Webinars</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact/CTA Section -->
     <section id="contact" class="hf-section hf-section-light">
         <div class="container-fluid px-3 px-md-4 px-lg-5">
@@ -993,6 +1325,37 @@
                         <p class="hf-section-subtitle">Schedule a free demo. See exactly how HealthFlow works. No credit card required.</p>
                     </div>
 
+                    <!-- CTA Button -->
+                    <div class="text-center">
+                        <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#demoFormModal">
+                            <i class="fas fa-calendar-check me-2"></i>Schedule Your Free Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Request Modal -->
+    <div class="modal fade" id="demoFormModal" tabindex="-1" aria-labelledby="demoFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content demo-modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header demo-modal-header">
+                    <div class="modal-header-content">
+                        <div class="modal-header-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title" id="demoFormModalLabel">Schedule Your Demo</h5>
+                            <p class="demo-modal-subtitle mb-0">Let us show you how HealthFlow transforms healthcare facilities</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
                     <div class="multi-step-form-card">
                         <!-- Step Indicators -->
                         <div class="step-indicators mb-5">
@@ -1012,7 +1375,7 @@
                             </div>
                         </div>
 
-                        <form id="multiStepDemoForm" action="https://n8n.srv939400.hstgr.cloud/webhook-test/d45cbb95-8685-401e-837f-162c9bfc74e6" method="POST">
+                        <form id="multiStepDemoForm" action="https://n8n.srv939400.hstgr.cloud/webhook-test/81aa11e0-cf91-47bb-bbae-21deaf54041e" method="POST">
                             <!-- Step 1: Personal Details -->
                             <div class="form-step active" id="step-1">
                                 <h5 class="fw-bold mb-4">Tell us about yourself</h5>
@@ -1126,7 +1489,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="hf-footer">
@@ -1187,5 +1550,8 @@
 
     
     <script src="healthflow-script.js"></script>
+    
+    <!-- PWA Install Handler -->
+    <script src="pwa-install.js"></script>
 </body>
 </html>

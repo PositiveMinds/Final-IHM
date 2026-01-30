@@ -1,0 +1,154 @@
+{
+  "name": "HealthFlow - Healthcare Automation Platform",
+  "short_name": "HealthFlow",
+  "description": "Healthcare automation platform for African facilities. Automate data entry, patient monitoring, and compliance reports with offline support.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#15696B",
+  "dir": "ltr",
+  "lang": "en-US",
+  "icons": [
+    {
+      "src": "assets/images/healthflow-icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/healthflow-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/images/healthflow-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["healthcare", "medical", "productivity"],
+  "screenshots": [
+    {
+      "src": "assets/images/healthflow-icon-512x512.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "assets/images/healthflow-icon-512x512.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "splash_pages": [
+    {
+      "src": "./splash-screen.html",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "./splash-screen.html",
+      "sizes": "1280x720",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Access your healthcare dashboard",
+      "url": "./dashboard.html",
+      "icons": [
+        {
+          "src": "assets/images/healthflow-icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "short_name": "Login",
+      "description": "Login to your account",
+      "url": "./login.html",
+      "icons": [
+        {
+          "src": "assets/images/healthflow-icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Patient Portal",
+      "short_name": "Patients",
+      "description": "Manage patient records",
+      "url": "./patient-portal.html",
+      "icons": [
+        {
+          "src": "assets/images/healthflow-icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./forms.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "prefer_related_applications": false
+}

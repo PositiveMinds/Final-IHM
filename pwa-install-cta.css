@@ -1,0 +1,334 @@
+/* PWA Install CTA Modal Styles */
+
+:root {
+  --pwa-primary: #15696B;
+  --pwa-success: #28a745;
+  --pwa-text: #333;
+  --pwa-light: #f8f9fa;
+  --pwa-border: #e0e0e0;
+  --pwa-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal Container */
+.pwa-install-cta-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.pwa-install-cta-modal.show {
+  display: flex;
+}
+
+/* Backdrop */
+.pwa-install-cta-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Main Content */
+.pwa-install-cta-content {
+  position: relative;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: var(--pwa-shadow);
+  max-width: 420px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 40px 32px;
+  text-align: center;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Close Button */
+.pwa-install-cta-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: transparent;
+  color: var(--pwa-text);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.pwa-install-cta-close:hover {
+  background-color: var(--pwa-light);
+}
+
+.pwa-install-cta-close:active {
+  background-color: #e0e0e0;
+}
+
+/* Icon */
+.pwa-install-cta-icon {
+  margin-bottom: 24px;
+}
+
+.pwa-install-cta-icon img {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.pwa-install-cta-title {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--pwa-text);
+  line-height: 1.3;
+}
+
+/* Description */
+.pwa-install-cta-description {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Features Grid */
+.pwa-install-cta-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.pwa-install-cta-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: var(--pwa-light);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--pwa-text);
+}
+
+.pwa-install-cta-feature i {
+  font-size: 20px;
+  color: var(--pwa-primary);
+}
+
+/* Buttons Container */
+.pwa-install-cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Button Styles */
+.pwa-install-cta-btn {
+  width: 100%;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* Install Button (Primary) */
+.pwa-install-cta-install-btn {
+  background-color: var(--pwa-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(21, 105, 107, 0.3);
+}
+
+.pwa-install-cta-install-btn:hover {
+  background-color: #0f4547;
+  box-shadow: 0 4px 12px rgba(21, 105, 107, 0.4);
+  transform: translateY(-2px);
+}
+
+.pwa-install-cta-install-btn:active {
+  transform: translateY(0);
+}
+
+/* Cancel Button (Secondary) */
+.pwa-install-cta-cancel-btn {
+  background-color: var(--pwa-light);
+  color: var(--pwa-text);
+  border: 1px solid var(--pwa-border);
+}
+
+.pwa-install-cta-cancel-btn:hover {
+  background-color: #e8e8e8;
+}
+
+.pwa-install-cta-cancel-btn:active {
+  background-color: #d0d0d0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .pwa-install-cta-content {
+    width: 95%;
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+  
+  .pwa-install-cta-close {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+  
+  .pwa-install-cta-icon img {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+  }
+  
+  .pwa-install-cta-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .pwa-install-cta-description {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  
+  .pwa-install-cta-features {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .pwa-install-cta-feature {
+    padding: 10px;
+    font-size: 11px;
+  }
+  
+  .pwa-install-cta-feature i {
+    font-size: 18px;
+  }
+  
+  .pwa-install-cta-buttons {
+    gap: 10px;
+  }
+  
+  .pwa-install-cta-btn {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) and (min-width: 481px) {
+  .pwa-install-cta-content {
+    max-width: 380px;
+    padding: 32px 28px;
+  }
+  
+  .pwa-install-cta-title {
+    font-size: 22px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .pwa-install-cta-content {
+    background-color: #1e1e1e;
+  }
+  
+  .pwa-install-cta-title,
+  .pwa-install-cta-feature {
+    color: #f0f0f0;
+  }
+  
+  .pwa-install-cta-description {
+    color: #b0b0b0;
+  }
+  
+  .pwa-install-cta-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .pwa-install-cta-feature {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .pwa-install-cta-cancel-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f0f0f0;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .pwa-install-cta-cancel-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* Accessibility */
+.pwa-install-cta-btn:focus-visible {
+  outline: 2px solid var(--pwa-primary);
+  outline-offset: 2px;
+}
+
+.pwa-install-cta-close:focus-visible {
+  outline: 2px solid var(--pwa-primary);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .pwa-install-cta-backdrop,
+  .pwa-install-cta-content,
+  .pwa-install-cta-btn,
+  .pwa-install-cta-close {
+    animation: none;
+    transition: none;
+  }
+}

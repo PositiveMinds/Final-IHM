@@ -16,6 +16,10 @@ function initializeApp() {
     initializeTeamCarousel();
     initializeTestimonialsCarousel();
     initializeVideoCarousel();
+    animatePhoneCounters();
+    initializeWebinarCalendar();
+    initializeWebinarRegistration();
+    initializeTeamMemberModals();
 }
 
 // ========================================
@@ -80,82 +84,57 @@ function handleStickyNavbar() {
 // ========================================
 
 function handleMultiStepForm() {
-    const demoForm = document.getElementById('multiStepDemoForm');
-    if (!demoForm) return;
+     const demoForm = document.getElementById('multiStepDemoForm');
+     if (!demoForm) return;
 
-    demoForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+     // Reset form when modal is hidden
+     const demoModal = document.getElementById('demoFormModal');
+     if (demoModal) {
+         demoModal.addEventListener('hidden.bs.modal', function() {
+             resetMultiStepForm();
+         });
+     }
 
-        // Collect form data from all steps
-        const formSteps = document.querySelectorAll('.form-step');
-        const formData = {};
-
-        // Step 1 data
+    demoForm.addEventListener('submit', function(e) {
+        // Validate form data before native submission
         const step1 = document.getElementById('step-1');
         const inputs1 = step1.querySelectorAll('input');
-        formData.fullName = inputs1[0]?.value || '';
-        formData.email = inputs1[1]?.value || '';
-        formData.phone = inputs1[2]?.value || '';
-
-        // Step 2 data
-        const step2 = document.getElementById('step-2');
-        const inputs2 = step2.querySelectorAll('input, select');
-        formData.facilityName = inputs2[0]?.value || '';
-        formData.facilityType = inputs2[1]?.value || '';
-        formData.patientLoad = inputs2[2]?.value || '';
-
-        // Step 3 data
-        const step3 = document.getElementById('step-3');
-        const inputs3 = step3.querySelectorAll('input, select');
-        formData.demoDate = inputs3[0]?.value || '';
-        formData.preferredTime = inputs3[1]?.value || '';
-        
-        // Collect selected interests
-        const interests = [];
-        step3.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-            interests.push(checkbox.value);
-        });
-        formData.interests = interests;
+        const fullName = inputs1[0]?.value || '';
+        const email = inputs1[1]?.value || '';
+        const phone = inputs1[2]?.value || '';
 
         // Validate
-        if (!formData.fullName || !formData.email || !formData.phone) {
+        if (!fullName || !email || !phone) {
+            e.preventDefault();
             showAlert('error', 'Please fill in all required fields');
-            return;
+            return false;
         }
 
-        if (!validateEmail(formData.email)) {
+        if (!validateEmail(email)) {
+            e.preventDefault();
             showAlert('error', 'Please enter a valid email address');
-            return;
+            return false;
         }
 
-        if (!validatePhone(formData.phone)) {
+        if (!validatePhone(phone)) {
+            e.preventDefault();
             showAlert('error', 'Please enter a valid phone number');
-            return;
+            return false;
         }
 
-        // Show loading
-        const submitBtn = demoForm.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Scheduling...';
-
-        try {
-            // Send form data
-            await sendDemoRequest(formData);
-
-            // Reset form
-            resetMultiStepForm();
-
-            // Show success
-            showAlert('success', 'Demo scheduled successfully! Check your email for confirmation details.');
-
-        } catch (error) {
-            showAlert('error', 'Something went wrong. Please try again.');
-            console.error('Form error:', error);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        }
+        // Allow native form submission to webhook
+        showAlert('success', 'Demo request submitted! Check your email for confirmation.');
+        
+        // Close modal after submission
+        setTimeout(() => {
+            const demoModal = document.getElementById('demoFormModal');
+            if (demoModal) {
+                const modalInstance = bootstrap.Modal.getInstance(demoModal);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            }
+        }, 1000);
     });
 }
 
@@ -194,28 +173,38 @@ window.nextStep = function(stepNum) {
     nextStepEl.classList.add('active');
 
     // Update step indicators
-    updateStepIndicators(stepNum);
+     updateStepIndicators(stepNum);
 
-    // Scroll to form
-    setTimeout(() => {
-        document.querySelector('.multi-step-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+     // Scroll modal body to top
+     setTimeout(() => {
+         const modalBody = document.querySelector('#demoFormModal .modal-body');
+         if (modalBody) {
+             modalBody.scrollTop = 0;
+         } else {
+             document.querySelector('.multi-step-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+         }
+     }, 100);
 };
 
 window.prevStep = function(stepNum) {
-    const currentStep = document.querySelector('.form-step.active');
-    const prevStepEl = document.getElementById('step-' + stepNum);
-    
-    if (!currentStep || !prevStepEl) return;
+     const currentStep = document.querySelector('.form-step.active');
+     const prevStepEl = document.getElementById('step-' + stepNum);
+     
+     if (!currentStep || !prevStepEl) return;
 
-    currentStep.classList.remove('active');
-    prevStepEl.classList.add('active');
-    updateStepIndicators(stepNum);
+     currentStep.classList.remove('active');
+     prevStepEl.classList.add('active');
+     updateStepIndicators(stepNum);
 
-    setTimeout(() => {
-        document.querySelector('.multi-step-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-};
+     setTimeout(() => {
+         const modalBody = document.querySelector('#demoFormModal .modal-body');
+         if (modalBody) {
+             modalBody.scrollTop = 0;
+         } else {
+             document.querySelector('.multi-step-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+         }
+     }, 100);
+ };
 
 function updateStepIndicators(activeStep) {
     document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
@@ -437,6 +426,7 @@ function initializeVideoCarousel() {
         margin: 20,
         nav: false,
         dots: true,
+        dotsData: false,
         autoplay: false,
         responsive: {
             0: {
@@ -444,7 +434,7 @@ function initializeVideoCarousel() {
                 margin: 10
             },
             576: {
-                items: 1.3,
+                items: 1,
                 margin: 15
             },
             768: {
@@ -453,7 +443,7 @@ function initializeVideoCarousel() {
                 nav: true
             },
             1024: {
-                items: 2.5,
+                items: 2,
                 margin: 20,
                 nav: true
             },
@@ -531,6 +521,7 @@ function initializeTestimonialsCarousel() {
         margin: 20,
         nav: false,
         dots: true,
+        dotsData: false,
         autoplay: true,
         autoplayTimeout: 6000,
         autoplayHoverPause: true,
@@ -540,7 +531,7 @@ function initializeTestimonialsCarousel() {
                 margin: 10
             },
             576: {
-                items: 1.2,
+                items: 1,
                 margin: 15
             },
             768: {
@@ -549,7 +540,7 @@ function initializeTestimonialsCarousel() {
                 nav: true
             },
             1024: {
-                items: 2.5,
+                items: 2,
                 margin: 20,
                 nav: true
             },
@@ -580,6 +571,7 @@ function initializeTeamCarousel() {
         margin: 20,
         nav: false,
         dots: true,
+        dotsData: false,
         autoplay: false,
         autoplayTimeout: 5000,
         autoplayHoverPause: true,
@@ -589,22 +581,17 @@ function initializeTeamCarousel() {
                 margin: 10
             },
             576: {
-                items: 1.5,
+                items: 2,
                 margin: 15
             },
             768: {
-                items: 2,
-                margin: 20,
-                nav: true
-            },
-            1024: {
                 items: 3,
                 margin: 20,
                 nav: true
             },
             1200: {
-                items: 3,
-                margin: 30,
+                items: 4,
+                margin: 20,
                 nav: true
             }
         },
@@ -954,6 +941,309 @@ document.querySelectorAll('.btn-primary, .btn-outline-primary').forEach(btn => {
         });
     });
 });
+
+// ========================================
+// Phone Mockup Counter Animation
+// ========================================
+
+function animatePhoneCounters() {
+    // Animate all counter elements with data-value attribute
+    const counterElements = document.querySelectorAll('.animate-number');
+    
+    counterElements.forEach(element => {
+        const targetValue = element.getAttribute('data-value');
+        
+        // Handle string values (like "< 50" or "138/85")
+        if (targetValue.includes('<') || targetValue.includes('/')) {
+            element.textContent = targetValue;
+            return;
+        }
+        
+        const numValue = parseInt(targetValue, 10);
+        if (isNaN(numValue)) return;
+        
+        let currentValue = 0;
+        const increment = numValue / 30; // 30 frames of animation
+        const duration = 1000; // 1 second total
+        const stepTime = duration / 30;
+        
+        const counter = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= numValue) {
+                element.textContent = numValue.toLocaleString();
+                clearInterval(counter);
+            } else {
+                element.textContent = Math.floor(currentValue).toLocaleString();
+            }
+        }, stepTime);
+    });
+    
+    // Add real-time notifications
+    addPhoneNotifications();
+    updatePhoneTime();
+}
+
+function addPhoneNotifications() {
+    const notificationCenter = document.getElementById('phoneNotificationCenter');
+    if (!notificationCenter) return;
+    
+    const notifications = [
+        {
+            type: 'success',
+            icon: '✓',
+            title: 'Patient Checked',
+            message: 'John Doe appointment completed'
+        },
+        {
+            type: 'alert',
+            icon: '⚠️',
+            title: 'High BP Alert',
+            message: 'Patient ID #2845 - 160/95 mmHg'
+        },
+        {
+            type: 'info',
+            icon: 'ℹ️',
+            title: 'Medication Due',
+            message: 'Patient #5612 - ART refill reminder'
+        },
+        {
+            type: 'success',
+            icon: '✓',
+            title: 'Viral Suppressed',
+            message: 'Patient #4521 - VL < 50 copies/ml'
+        }
+    ];
+    
+    // Add notifications with staggered timing
+    notifications.forEach((notif, index) => {
+        setTimeout(() => {
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${notif.type}`;
+            toast.innerHTML = `
+                <span class="notification-icon">${notif.icon}</span>
+                <div class="notification-content">
+                    <div class="notification-title">${notif.title}</div>
+                    <div class="notification-message">${notif.message}</div>
+                </div>
+            `;
+            notificationCenter.appendChild(toast);
+            
+            // Auto remove notification after 4 seconds
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.4s ease-out forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }, index * 1500); // Stagger notifications
+    });
+}
+
+function updatePhoneTime() {
+    const timeElement = document.getElementById('phone-time');
+    if (!timeElement) return;
+    
+    function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        timeElement.textContent = `${hours}:${minutes}`;
+    }
+    
+    updateTime();
+    setInterval(updateTime, 60000); // Update every minute
+    
+    // Show appointments popup after 2 seconds
+    setTimeout(showAppointmentsPopup, 2000);
+}
+
+function showAppointmentsPopup() {
+    const popup = document.getElementById('appointmentsPopup');
+    if (popup) {
+        popup.classList.remove('hidden');
+        
+        // Auto-hide after 6 seconds
+        setTimeout(() => {
+            closeAppointmentsPopup();
+        }, 6000);
+    }
+}
+
+function closeAppointmentsPopup() {
+    const popup = document.getElementById('appointmentsPopup');
+    if (popup) {
+        popup.classList.add('hidden');
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 400);
+    }
+}
+
+// ========================================
+// Webinar Calendar
+// ========================================
+
+function initializeWebinarCalendar() {
+    let currentDate = new Date();
+    const webinarDates = [5, 12, 19, 26]; // Webinar dates in February
+    
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+    const currentMonthSpan = document.getElementById('currentMonth');
+    const calendarDays = document.getElementById('calendarDays');
+    
+    if (!prevMonthBtn || !nextMonthBtn || !calendarDays) return;
+    
+    function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        // Update month display
+        const monthName = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        currentMonthSpan.textContent = monthName;
+        
+        // Get first day of month and number of days
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Clear previous days
+        calendarDays.innerHTML = '';
+        
+        // Add empty cells for days before month starts
+        for (let i = 0; i < firstDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day empty';
+            calendarDays.appendChild(emptyDay);
+        }
+        
+        // Add days of month
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            dayEl.textContent = day;
+            
+            // Check if it's today
+            if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+                dayEl.classList.add('today');
+            }
+            
+            // Check if webinar scheduled
+            if (webinarDates.includes(day) && month === 1) { // February is month 1
+                dayEl.classList.add('has-event');
+            }
+            
+            calendarDays.appendChild(dayEl);
+        }
+    }
+    
+    // Event listeners
+    prevMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+    
+    nextMonthBtn.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+    
+    // Initial render
+    renderCalendar();
+}
+
+function initializeWebinarRegistration() {
+    const registerBtns = document.querySelectorAll('.register-webinar-btn');
+    
+    registerBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const webinarName = this.getAttribute('data-webinar');
+            
+            // Show SweetAlert confirmation
+            Swal.fire({
+                title: 'Register for Webinar',
+                html: `<p>You're registering for:</p><strong>${webinarName}</strong>`,
+                icon: 'info',
+                input: 'email',
+                inputPlaceholder: 'Enter your email address',
+                confirmButtonText: 'Register',
+                confirmButtonColor: '#12a16b',
+                cancelButtonText: 'Cancel',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Please enter your email address'
+                    }
+                    // Basic email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        return 'Please enter a valid email address'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Here you would send the registration to your backend
+                    Swal.fire({
+                        title: 'Registration Successful!',
+                        text: `We've sent confirmation details to ${result.value}. Check your email for the webinar link.`,
+                        icon: 'success',
+                        confirmButtonColor: '#12a16b'
+                    });
+                    
+                    // Change button text
+                    this.textContent = 'Registered ✓';
+                    this.disabled = true;
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-success');
+                }
+            });
+        });
+    });
+}
+
+// ========================================
+// Team Member Modal Initialization
+// ========================================
+
+function initializeTeamMemberModals() {
+    const teamCards = document.querySelectorAll('.team-member-card');
+    const modal = document.getElementById('teamMemberModal');
+    const bootstrapModal = modal ? new bootstrap.Modal(modal) : null;
+    
+    teamCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const name = this.getAttribute('data-member-name');
+            const position = this.getAttribute('data-member-position');
+            const image = this.getAttribute('data-member-image');
+            const bio = this.getAttribute('data-member-bio');
+            const expertise = this.getAttribute('data-member-expertise');
+            const experience = this.getAttribute('data-member-experience');
+            
+            // Populate modal
+            document.getElementById('modalMemberName').textContent = name;
+            document.getElementById('modalMemberPosition').textContent = position;
+            document.getElementById('modalMemberImage').src = image;
+            document.getElementById('modalMemberBio').textContent = bio;
+            document.getElementById('modalMemberExperience').textContent = experience;
+            
+            // Create expertise tags
+            const expertiseTags = document.getElementById('modalMemberExpertise');
+            expertiseTags.innerHTML = '';
+            
+            const expertiseArray = expertise.split(',').map(item => item.trim());
+            expertiseArray.forEach(skill => {
+                const tag = document.createElement('span');
+                tag.className = 'expertise-tag';
+                tag.textContent = skill;
+                expertiseTags.appendChild(tag);
+            });
+            
+            // Show modal
+            if (bootstrapModal) {
+                bootstrapModal.show();
+            }
+        });
+    });
+}
 
 // ========================================
 // Initialization Complete

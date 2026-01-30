@@ -1,0 +1,42 @@
+# GitHub Pages Configuration for HealthFlow PWA
+
+# Theme (minimal/no processing recommended for PWA)
+theme: null
+
+# Exclude certain files from Jekyll processing
+exclude:
+  - service-worker.js
+  - pwa-*.js
+  - healthflow-carousel.js
+  - manifest.json
+  - .nojekyll
+
+# Markdown processor (for pages)
+markdown: kramdown
+
+# Output directory
+destination: ./_site
+
+# Don't process files
+safe: false
+
+# Allow HTML processing
+keep_files:
+  - service-worker.js
+  - pwa-github-pages-handler.js
+  - healthflow-carousel.js
+  - manifest.json
+
+# Optional: custom domain
+# cname: healthflow.example.com
+
+# GitHub Pages specific
+github:
+  owner_name: PositiveMinds
+  owner_url: https://github.com/PositiveMinds
+  repository_url: https://github.com/PositiveMinds/IHM2
+
+# Build settings
+url: "https://positiveminds.github.io"
+# If this is a project repo, uncomment:
+# baseurl: "/IHM2"
