@@ -20,6 +20,7 @@ function initializeApp() {
     initializeWebinarCalendar();
     initializeWebinarRegistration();
     initializeTeamMemberModals();
+    initializeBottomNavbar();
 }
 
 // ========================================
@@ -1242,6 +1243,65 @@ function initializeTeamMemberModals() {
                 bootstrapModal.show();
             }
         });
+    });
+}
+
+// ========================================
+// Mobile Bottom Navbar Active State
+// ========================================
+
+function initializeBottomNavbar() {
+    const navbarItems = document.querySelectorAll('.mobile-bottom-navbar .navbar-item');
+    
+    // Set active state on page load
+    updateBottomNavbar();
+    
+    // Update on scroll
+    window.addEventListener('scroll', updateBottomNavbar);
+    
+    // Handle clicks
+    navbarItems.forEach(item => {
+        item.addEventListener('click', function() {
+            navbarItems.forEach(i => i.classList.remove('active'));
+            
+            // Only add active to anchor links, not buttons
+            if (this.tagName === 'A') {
+                this.classList.add('active');
+            }
+        });
+    });
+}
+
+function updateBottomNavbar() {
+    const sections = document.querySelectorAll('[id]');
+    const navbarItems = document.querySelectorAll('.mobile-bottom-navbar a.navbar-item');
+    let currentSection = 'home';
+    
+    // Determine current section based on scroll position
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 150;
+        if (window.pageYOffset >= sectionTop) {
+            currentSection = section.getAttribute('id');
+        }
+    });
+    
+    // Check if on dashboard or other pages
+    if (!currentSection || currentSection === '') {
+        currentSection = 'home';
+    }
+    
+    // Update active states
+    navbarItems.forEach(item => {
+        const href = item.getAttribute('href');
+        item.classList.remove('active');
+        
+        if (href === '#home' && currentSection === 'home') {
+            item.classList.add('active');
+        } else if (href === '#contact' && currentSection === 'contact') {
+            item.classList.add('active');
+        } else if (currentSection && href === '#' + currentSection) {
+            item.classList.add('active');
+        }
     });
 }
 

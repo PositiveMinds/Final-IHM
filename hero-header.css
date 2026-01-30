@@ -988,3 +988,28 @@ span {
         transform: translate3d(0, 0, 0);
     }
 }
+
+/* ========================================
+   Phone Mockup Custom Scrollbar
+   ======================================== */
+
+/* Phone Content Scrollbar - WebKit (Chrome, Safari, Edge) */
+.phone-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.phone-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.phone-content::-webkit-scrollbar-thumb {
+    background: rgba(18, 161, 107, 0.3);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.phone-content::-webkit-scrollbar-thumb:hover,
+.phone-mockup:hover .phone-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #12a16b 0%, #1abc9c 100%);
+    box-shadow: 0 0 10px rgba(18, 161, 107, 0.5);
+}

@@ -325,6 +325,19 @@ function clearOldCaches() {
   }
 }
 
+// Request notification permission on user interaction
+function requestNotificationPermissionOnInteraction() {
+  const interactionHandler = () => {
+    requestNotificationPermission();
+    requestPersistentStorage();
+    document.removeEventListener('click', interactionHandler);
+    document.removeEventListener('touchstart', interactionHandler);
+  };
+  
+  document.addEventListener('click', interactionHandler, { once: true });
+  document.addEventListener('touchstart', interactionHandler, { once: true });
+}
+
 // Initialize PWA features
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('[PWA] Initializing...');
@@ -340,12 +353,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('[PWA] Running as standalone app');
   }
   
-  // Request permissions after a short delay
-  setTimeout(() => {
-    requestNotificationPermission();
-    requestPersistentStorage();
-    preCacheImportantAssets();
-  }, 2000);
+  // Request permissions only on user interaction
+  requestNotificationPermissionOnInteraction();
+  
+  // Pre-cache important assets
+  preCacheImportantAssets();
   
   // Log online status
   console.log('[PWA] Online:', navigator.onLine);

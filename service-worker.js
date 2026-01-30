@@ -5,23 +5,63 @@ const API_CACHE = 'healthflow-api-v1';
 
 // Core files to cache on install
 const STATIC_ASSETS = [
+  // HTML Pages
   '/Final-IHM/',
   '/Final-IHM/index.html',
   '/Final-IHM/login.html',
   '/Final-IHM/dashboard.html',
   '/Final-IHM/patient-portal.html',
   '/Final-IHM/forms.html',
+  '/Final-IHM/staff.html',
+  
+  // CSS Files
   '/Final-IHM/healthflow-styles.css',
   '/Final-IHM/styles.css',
+  '/Final-IHM/hero-header.css',
+  '/Final-IHM/hero-styles.css',
+  '/Final-IHM/chat-system.css',
+  '/Final-IHM/forma-styles.css',
+  '/Final-IHM/pwa-install-cta.css',
+  '/Final-IHM/landing-sections.css',
+  '/Final-IHM/how-it-works-responsive.css',
+  
+  // JavaScript Files
   '/Final-IHM/script.js',
   '/Final-IHM/login.js',
   '/Final-IHM/dashboard-data.js',
   '/Final-IHM/pwa-install.js',
+  '/Final-IHM/healthflow-script.js',
+  '/Final-IHM/hero-header.js',
+  '/Final-IHM/landing-sections.js',
+  '/Final-IHM/health-chat-features.js',
+  '/Final-IHM/facility-registration.js',
+  '/Final-IHM/user-registration.js',
+  '/Final-IHM/pwa-install-cta.js',
+  '/Final-IHM/pwa-github-pages-handler.js',
+  '/Final-IHM/subscription-upgrade-modal.js',
+  '/Final-IHM/subscription-upgrade-modal-supabase.js',
+  '/Final-IHM/n8n_gemini_response_parser.js',
+  '/Final-IHM/supabase-config.js',
+  '/Final-IHM/dashboard-enhancements.js',
+  
+  // Config Files
   '/Final-IHM/manifest.json',
+  
+  // External CDN Resources
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'
+  'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css',
+  'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css',
+  'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
+  'https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js',
+  'https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js',
+  'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
+  'https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.js',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
 ];
 
 // Install Service Worker
@@ -31,7 +71,11 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('[Service Worker] Caching core assets');
-        return cache.addAll(STATIC_ASSETS.filter(url => url.startsWith('.')));
+        // Filter out external CDN URLs, only cache local assets
+        const localAssets = STATIC_ASSETS.filter(url => url.startsWith('/Final-IHM/'));
+        return cache.addAll(localAssets).catch(err => {
+          console.warn('[Service Worker] Some assets failed to cache:', err);
+        });
       })
       .catch(err => console.error('[Service Worker] Cache install error:', err))
   );
