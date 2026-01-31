@@ -3,49 +3,52 @@ const RUNTIME_CACHE = 'healthflow-runtime-v1';
 const IMAGE_CACHE = 'healthflow-images-v1';
 const API_CACHE = 'healthflow-api-v1';
 
+// Detect base path (GitHub Pages vs local)
+const BASE_PATH = self.registration.scope.includes('Final-IHM') ? '/Final-IHM/' : '/';
+
 // Core files to cache on install
 const STATIC_ASSETS = [
   // HTML Pages
-  '/Final-IHM/',
-  '/Final-IHM/index.html',
-  '/Final-IHM/login.html',
-  '/Final-IHM/dashboard.html',
-  '/Final-IHM/patient-portal.html',
-  '/Final-IHM/forms.html',
-  '/Final-IHM/staff.html',
+  BASE_PATH,
+  BASE_PATH + 'index.html',
+  BASE_PATH + 'login.html',
+  BASE_PATH + 'dashboard.html',
+  BASE_PATH + 'patient-portal.html',
+  BASE_PATH + 'forms.html',
+  BASE_PATH + 'staff.html',
   
   // CSS Files
-  '/Final-IHM/healthflow-styles.css',
-  '/Final-IHM/styles.css',
-  '/Final-IHM/hero-header.css',
-  '/Final-IHM/hero-styles.css',
-  '/Final-IHM/chat-system.css',
-  '/Final-IHM/forma-styles.css',
-  '/Final-IHM/pwa-install-cta.css',
-  '/Final-IHM/landing-sections.css',
-  '/Final-IHM/how-it-works-responsive.css',
+  BASE_PATH + 'healthflow-styles.css',
+  BASE_PATH + 'styles.css',
+  BASE_PATH + 'hero-header.css',
+  BASE_PATH + 'hero-styles.css',
+  BASE_PATH + 'chat-system.css',
+  BASE_PATH + 'forma-styles.css',
+  BASE_PATH + 'pwa-install-cta.css',
+  BASE_PATH + 'landing-sections.css',
+  BASE_PATH + 'how-it-works-responsive.css',
   
   // JavaScript Files
-  '/Final-IHM/script.js',
-  '/Final-IHM/login.js',
-  '/Final-IHM/dashboard-data.js',
-  '/Final-IHM/pwa-install.js',
-  '/Final-IHM/healthflow-script.js',
-  '/Final-IHM/hero-header.js',
-  '/Final-IHM/landing-sections.js',
-  '/Final-IHM/health-chat-features.js',
-  '/Final-IHM/facility-registration.js',
-  '/Final-IHM/user-registration.js',
-  '/Final-IHM/pwa-install-cta.js',
-  '/Final-IHM/pwa-github-pages-handler.js',
-  '/Final-IHM/subscription-upgrade-modal.js',
-  '/Final-IHM/subscription-upgrade-modal-supabase.js',
-  '/Final-IHM/n8n_gemini_response_parser.js',
-  '/Final-IHM/supabase-config.js',
-  '/Final-IHM/dashboard-enhancements.js',
+  BASE_PATH + 'script.js',
+  BASE_PATH + 'login.js',
+  BASE_PATH + 'dashboard-data.js',
+  BASE_PATH + 'pwa-install.js',
+  BASE_PATH + 'healthflow-script.js',
+  BASE_PATH + 'hero-header.js',
+  BASE_PATH + 'landing-sections.js',
+  BASE_PATH + 'health-chat-features.js',
+  BASE_PATH + 'facility-registration.js',
+  BASE_PATH + 'user-registration.js',
+  BASE_PATH + 'pwa-install-cta.js',
+  BASE_PATH + 'pwa-github-pages-handler.js',
+  BASE_PATH + 'subscription-upgrade-modal.js',
+  BASE_PATH + 'subscription-upgrade-modal-supabase.js',
+  BASE_PATH + 'n8n_gemini_response_parser.js',
+  BASE_PATH + 'supabase-config.js',
+  BASE_PATH + 'dashboard-enhancements.js',
   
   // Config Files
-  '/Final-IHM/manifest.json',
+  BASE_PATH + 'manifest.json',
   
   // External CDN Resources
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
@@ -66,13 +69,13 @@ const STATIC_ASSETS = [
 
 // Install Service Worker
 self.addEventListener('install', event => {
-  console.log('[Service Worker] Installing...');
+  console.log('[Service Worker] Installing... Base path:', BASE_PATH);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('[Service Worker] Caching core assets');
-        // Filter out external CDN URLs, only cache local assets
-        const localAssets = STATIC_ASSETS.filter(url => url.startsWith('/Final-IHM/'));
+        // Filter to only cache local assets
+        const localAssets = STATIC_ASSETS.filter(url => url.startsWith(BASE_PATH) || url.startsWith('/'));
         return cache.addAll(localAssets).catch(err => {
           console.warn('[Service Worker] Some assets failed to cache:', err);
         });
@@ -161,7 +164,7 @@ function cacheFirst(request) {
          .catch(() => {
            // Return offline fallback for navigation requests
            if (request.mode === 'navigate') {
-             return caches.match('/Final-IHM/index.html');
+             return caches.match(BASE_PATH + 'index.html');
            }
            return null;
          });
@@ -193,7 +196,7 @@ function cacheExternal(request) {
           }
           // Return placeholder for failed image requests
           if (request.destination === 'image') {
-            return caches.match('/Final-IHM/assets/images/placeholder.png');
+            return caches.match(BASE_PATH + 'assets/images/placeholder.png');
           }
           return null;
         });
@@ -286,8 +289,8 @@ self.addEventListener('push', event => {
   const data = event.data ? event.data.json() : {};
    const options = {
      body: data.body || 'HealthFlow Notification',
-     icon: '/Final-IHM/assets/images/favicon.png',
-     badge: '/Final-IHM/assets/images/favicon.png',
+     icon: BASE_PATH + 'assets/images/favicon.png',
+     badge: BASE_PATH + 'assets/images/favicon.png',
      tag: 'healthflow-notification',
      requireInteraction: data.requireInteraction || false,
      actions: [
@@ -310,17 +313,17 @@ self.addEventListener('notificationclick', event => {
        clients.matchAll({ type: 'window' }).then(clientList => {
          // Check if there's already a window open with the target URL
          for (let client of clientList) {
-           if (client.url.includes('/Final-IHM/') && 'focus' in client) {
+           if (client.url.includes(BASE_PATH) && 'focus' in client) {
              return client.focus();
            }
          }
          // Open new window if none exists
          if (clients.openWindow) {
-           return clients.openWindow('/Final-IHM/');
+           return clients.openWindow(BASE_PATH);
          }
        })
      );
    }
 });
 
-console.log('[Service Worker] Loaded and ready');
+console.log('[Service Worker] Loaded and ready with BASE_PATH:', BASE_PATH);

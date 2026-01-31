@@ -152,8 +152,9 @@ window.addEventListener('appinstalled', () => {
 
 // Register service worker with periodic updates
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Final-IHM/service-worker.js', { scope: '/Final-IHM/' })
+   window.addEventListener('load', () => {
+     const basePath = window.APP_BASE_PATH || '/Final-IHM/';
+     navigator.serviceWorker.register(basePath + 'service-worker.js', { scope: basePath })
       .then(registration => {
         console.log('[PWA] Service Worker registered:', registration);
         

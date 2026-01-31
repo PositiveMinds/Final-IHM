@@ -30,7 +30,15 @@
     <link rel="stylesheet" href="healthflow-styles.css">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/Final-IHM/manifest.json">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- GitHub Pages Path Configuration -->
+    <script>
+        // Set base path for GitHub Pages (/Final-IHM/) vs local dev (/)
+        window.APP_BASE_PATH = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? '/' 
+            : '/Final-IHM/';
+    </script>
 
 </head>
 <body>
