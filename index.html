@@ -1409,15 +1409,15 @@
                                 <h5 class="fw-bold mb-4">Tell us about yourself</h5>
                                 <div class="mb-3">
                                     <label class="form-label fw-500">Full Name</label>
-                                    <input type="text" class="form-control" placeholder="Your name" required="">
+                                    <input type="text" name="fullName" class="form-control" placeholder="Your name" required="">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-500">Email Address</label>
-                                    <input type="email" class="form-control" placeholder="your@healthcare.ug" required="">
+                                    <input type="email" name="email" class="form-control" placeholder="your@healthcare.ug" required="">
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label fw-500">Phone Number</label>
-                                    <input type="tel" class="form-control" placeholder="+256-775-582-968" required="">
+                                    <input type="tel" name="phone" class="form-control" placeholder="+256-775-582-968" required="">
                                 </div>
                                 <button type="button" class="btn btn-primary w-100" onclick="nextStep(2)">
                                     Continue →
@@ -1429,11 +1429,11 @@
                                 <h5 class="fw-bold mb-4">Tell us about your facility</h5>
                                 <div class="mb-3">
                                     <label class="form-label fw-500">Facility Name</label>
-                                    <input type="text" class="form-control" placeholder="e.g., Mbarara Regional Hospital" required="">
+                                    <input type="text" name="facilityName" class="form-control" placeholder="e.g., Mbarara Regional Hospital" required="">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-500">Facility Type</label>
-                                    <select class="form-select" required="">
+                                    <select name="facilityType" class="form-select" required="">
                                         <option value="">Select facility type...</option>
                                         <option value="regional">
                                             Regional Referral Hospital
@@ -1446,7 +1446,7 @@
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label fw-500">Patient Load</label>
-                                    <select class="form-select" required="">
+                                    <select name="patientLoad" class="form-select" required="">
                                         <option value="">
                                             Select approximate number of patients...
                                         </option>
@@ -1471,11 +1471,11 @@
                                 <h5 class="fw-bold mb-4">When works best for you?</h5>
                                 <div class="mb-3">
                                     <label class="form-label fw-500">Preferred Demo Date</label>
-                                    <input type="text" class="form-control" id="demoDatPickerInput" placeholder="YYYY-MM-DD" required="">
+                                    <input type="text" name="demoDate" class="form-control" id="demoDatPickerInput" placeholder="YYYY-MM-DD" required="">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label fw-500">Preferred Time</label>
-                                    <select class="form-select" required="">
+                                    <select name="preferredTime" class="form-select" required="">
                                         <option value="">Select preferred time...</option>
                                         <option value="morning">Morning (8 AM - 12 PM)</option>
                                         <option value="afternoon">
@@ -1487,19 +1487,19 @@
                                 <div class="mb-4">
                                     <label class="form-label fw-500">What areas interest you most?</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="hiv" value="hiv">
+                                        <input class="form-check-input" type="checkbox" name="interests" id="hiv" value="hiv">
                                         <label class="form-check-label" for="hiv">HIV Patient Management</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="chronic" value="chronic">
+                                        <input class="form-check-input" type="checkbox" name="interests" id="chronic" value="chronic">
                                         <label class="form-check-label" for="chronic">Chronic Disease Management</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="maternal" value="maternal">
+                                        <input class="form-check-input" type="checkbox" name="interests" id="maternal" value="maternal">
                                         <label class="form-check-label" for="maternal">Maternal Health</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="compliance" value="compliance">
+                                        <input class="form-check-input" type="checkbox" name="interests" id="compliance" value="compliance">
                                         <label class="form-check-label" for="compliance">Compliance &amp; Reporting</label>
                                     </div>
                                 </div>
