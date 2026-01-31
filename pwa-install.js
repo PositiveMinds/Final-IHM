@@ -186,14 +186,20 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Request notification permission
+// Request notification permission (only call from user interaction)
 function requestNotificationPermission() {
   if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        console.log('[PWA] Notification permission granted');
-      }
-    });
+    try {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('[PWA] Notification permission granted');
+        }
+      }).catch(err => {
+        console.error('[PWA] Notification permission error:', err);
+      });
+    } catch (err) {
+      console.error('[PWA] Notification not supported:', err);
+    }
   }
 }
 

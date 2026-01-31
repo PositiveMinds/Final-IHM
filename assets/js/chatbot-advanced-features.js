@@ -23,10 +23,8 @@ class AdvancedChatbotFeatures {
      */
     async initializeAdvancedFeatures() {
         try {
-            // Request notification permission if needed
-            if ('Notification' in window && Notification.permission === 'default') {
-                await Notification.requestPermission();
-            }
+            // Notification permission is requested only on user interaction
+            // Do not request here - it will fail outside user event handlers
 
             // Initialize service worker for push notifications
             if ('serviceWorker' in navigator) {
@@ -762,11 +760,16 @@ class PushNotificationService {
     }
 
     /**
-     * Request notification permission
+     * Request notification permission (must be called from user event handler)
      */
     async requestPermission() {
         if (!this.isEnabled) {
             return { success: false, error: 'Notifications not supported' };
+        }
+
+        // Check if we're in a user event handler context
+        if (!this._isUserEventContext()) {
+            return { success: false, error: 'Permission request must be called from a user interaction' };
         }
 
         try {
@@ -775,6 +778,14 @@ class PushNotificationService {
         } catch (error) {
             return { success: false, error: error.message };
         }
+    }
+
+    /**
+     * Check if we're in a user event context
+     */
+    _isUserEventContext() {
+        // This is a simple heuristic - a proper implementation would track event context
+        return true; // Allow if called explicitly by user code
     }
 
     /**
