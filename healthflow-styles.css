@@ -5145,3 +5145,15 @@ body {
     display: none !important;
   }
 }
+
+/* ========================================
+   Air Datepicker Modal Fix
+   Ensure datepicker appears above modal
+   ======================================== */
+.air-datepicker {
+  z-index: 1060 !important;
+}
+
+.air-datepicker-body {
+  z-index: 1060 !important;
+}
