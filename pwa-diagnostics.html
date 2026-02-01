@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthFlow PWA Diagnostics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #15696B 0%, #0F4449 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .diagnostic-section {
+            margin-bottom: 30px;
+        }
+
+        .diagnostic-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #15696B;
+            padding-bottom: 10px;
+        }
+
+        .diagnostic-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            background: #f5f5f5;
+            font-size: 14px;
+        }
+
+        .diagnostic-item.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .diagnostic-item.warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .diagnostic-item.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .diagnostic-item.success .status-icon {
+            background: #4caf50;
+        }
+
+        .diagnostic-item.warning .status-icon {
+            background: #ff9800;
+        }
+
+        .diagnostic-item.error .status-icon {
+            background: #f44336;
+        }
+
+        .diagnostic-text {
+            flex: 1;
+        }
+
+        .diagnostic-value {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            word-break: break-all;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #15696B;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0F4449;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(21, 105, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .log-area {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
+        .log-line {
+            margin-bottom: 5px;
+        }
+
+        .log-error {
+            color: #ff6b6b;
+        }
+
+        .log-warn {
+            color: #ffd93d;
+        }
+
+        .log-info {
+            color: #6bcf7f;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #15696B15 0%, #0F444915 100%);
+            border-left: 4px solid #15696B;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .summary h3 {
+            color: #15696B;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .summary p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .percentage {
+            font-size: 24px;
+            font-weight: bold;
+            color: #15696B;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 HealthFlow PWA Diagnostics</h1>
+            <p>Check PWA installation readiness</p>
+        </div>
+
+        <div class="content">
+            <!-- Browser Support -->
+            <div class="diagnostic-section">
+                <h2>Browser Capabilities</h2>
+                <div id="browserCapabilities"></div>
+            </div>
+
+            <!-- PWA Status -->
+            <div class="diagnostic-section">
+                <h2>PWA Status</h2>
+                <div id="pwaStatus"></div>
+            </div>
+
+            <!-- Service Worker -->
+            <div class="diagnostic-section">
+                <h2>Service Worker</h2>
+                <div id="serviceWorkerStatus"></div>
+            </div>
+
+            <!-- Manifest -->
+            <div class="diagnostic-section">
+                <h2>Web App Manifest</h2>
+                <div id="manifestStatus"></div>
+            </div>
+
+            <!-- Meta Tags -->
+            <div class="diagnostic-section">
+                <h2>PWA Meta Tags</h2>
+                <div id="metaTagsStatus"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button class="btn-primary" onclick="runFullDiagnostics()">Run Full Diagnostics</button>
+                <button class="btn-primary" onclick="clearLogsAndData()">Clear All Data</button>
+                <button class="btn-secondary" onclick="testInstallPrompt()">Test Install Prompt</button>
+                <button class="btn-secondary" onclick="downloadDiagnosticsReport()">Download Report</button>
+            </div>
+
+            <!-- Logs -->
+            <div style="margin-top: 20px;">
+                <h3 style="margin-bottom: 10px; color: #333;">Diagnostic Log</h3>
+                <div class="log-area" id="logArea"></div>
+            </div>
+
+            <!-- Summary -->
+            <div class="summary">
+                <h3>Installation Readiness</h3>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div>
+                        <div class="percentage" id="readinessScore">0%</div>
+                        <p style="margin: 0;">Readiness Score</p>
+                    </div>
+                    <div style="flex: 1;">
+                        <p id="readinessMessage">Run diagnostics to check PWA installation readiness...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let logs = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push({ message, type, timestamp });
+            
+            const logArea = document.getElementById('logArea');
+            const line = document.createElement('div');
+            line.className = `log-line log-${type}`;
+            line.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(line);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function addDiagnosticItem(containerId, text, status, value = null) {
+            const container = document.getElementById(containerId);
+            const item = document.createElement('div');
+            item.className = `diagnostic-item ${status}`;
+            
+            const icon = { success: '✓', warning: '⚠', error: '✗' }[status];
+            
+            item.innerHTML = `
+                <div class="status-icon">${icon}</div>
+                <div class="diagnostic-text">
+                    ${text}
+                    ${value ? `<div class="diagnostic-value">${value}</div>` : ''}
+                </div>
+            `;
+            
+            container.appendChild(item);
+        }
+
+        function clearContainer(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        async function runFullDiagnostics() {
+            logs = [];
+            document.getElementById('logArea').innerHTML = '';
+            
+            log('Starting PWA diagnostics...');
+            
+            await checkBrowserCapabilities();
+            await checkPWAStatus();
+            await checkServiceWorker();
+            await checkManifest();
+            await checkMetaTags();
+            calculateReadinessScore();
+            
+            log('Diagnostics complete!', 'info');
+        }
+
+        async function checkBrowserCapabilities() {
+            clearContainer('browserCapabilities');
+            log('Checking browser capabilities...');
+
+            const checks = {
+                'Service Worker Support': 'serviceWorker' in navigator,
+                'PWA Installation Support': 'getInstalledRelatedApps' in navigator,
+                'Notification Support': 'Notification' in window,
+                'Storage API': 'storage' in navigator,
+                'Cache API': 'caches' in window,
+                'Persistent Storage': 'storage' in navigator && 'persist' in navigator.storage,
+                'HTTPS/Secure Context': window.location.protocol === 'https:' || window.location.hostname === 'localhost'
+            };
+
+            Object.entries(checks).forEach(([feature, supported]) => {
+                const status = supported ? 'success' : 'warning';
+                addDiagnosticItem('browserCapabilities', feature, status);
+                log(`${feature}: ${supported ? 'Supported' : 'Not supported'}`, supported ? 'info' : 'warn');
+            });
+        }
+
+        async function checkPWAStatus() {
+            clearContainer('pwaStatus');
+            log('Checking PWA installation status...');
+
+            const isRunningAsApp = 
+                window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true ||
+                document.referrer.includes('android-app://');
+
+            const status = isRunningAsApp ? 'success' : 'warning';
+            addDiagnosticItem('pwaStatus', 
+                `Running as installed app: ${isRunningAsApp ? 'Yes' : 'No (browser mode)'}`, 
+                status);
+
+            log(`Running as installed app: ${isRunningAsApp ? 'Yes' : 'No'}`, isRunningAsApp ? 'info' : 'warn');
+
+            // Check installed apps
+            if ('getInstalledRelatedApps' in navigator) {
+                try {
+                    const apps = await navigator.getInstalledRelatedApps();
+                    const installed = apps.length > 0;
+                    addDiagnosticItem('pwaStatus', 
+                        `App installed via browser: ${installed ? 'Yes' : 'No'}`, 
+                        installed ? 'success' : 'warning');
+                    log(`App installed: ${installed}`, installed ? 'info' : 'warn');
+                } catch (error) {
+                    log(`Error checking installed apps: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function checkServiceWorker() {
+            clearContainer('serviceWorkerStatus');
+            log('Checking Service Worker...');
+
+            if (!('serviceWorker' in navigator)) {
+                addDiagnosticItem('serviceWorkerStatus', 'Service Worker not supported', 'error');
+                log('Service Worker not supported', 'error');
+                return;
+            }
+
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                
+                if (registrations.length > 0) {
+                    registrations.forEach(reg => {
+                        addDiagnosticItem('serviceWorkerStatus', 
+                            `Service Worker registered at: ${reg.scope}`, 
+                            'success',
+                            `Scope: ${reg.scope}`);
+                        log(`Service Worker registered: ${reg.scope}`, 'info');
+                    });
+                } else {
+                    addDiagnosticItem('serviceWorkerStatus', 
+                        'No Service Workers registered', 
+                        'warning');
+                    log('No Service Workers registered', 'warn');
+                }
+            } catch (error) {
+                addDiagnosticItem('serviceWorkerStatus', 
+                    `Error checking Service Workers: ${error.message}`, 
+                    'error');
+                log(`Service Worker error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkManifest() {
+            clearContainer('manifestStatus');
+            log('Checking Web App Manifest...');
+
+            try {
+                const response = await fetch('manifest.json');
+                if (!response.ok) {
+                    addDiagnosticItem('manifestStatus', 
+                        `Manifest load failed: ${response.status}`, 
+                        'error');
+                    log(`Manifest not found (${response.status})`, 'error');
+                    return;
+                }
+
+                const manifest = await response.json();
+                
+                addDiagnosticItem('manifestStatus', 
+                    `Manifest loaded successfully`, 
+                    'success',
+                    JSON.stringify(manifest, null, 2));
+
+                // Check required fields
+                const required = ['name', 'short_name', 'start_url', 'display', 'icons'];
+                required.forEach(field => {
+                    if (manifest[field]) {
+                        addDiagnosticItem('manifestStatus', 
+                            `✓ ${field}: Present`, 
+                            'success');
+                        log(`Manifest field ${field}: Present`, 'info');
+                    } else {
+                        addDiagnosticItem('manifestStatus', 
+                            `✗ ${field}: Missing`, 
+                            'error');
+                        log(`Manifest field ${field}: Missing`, 'error');
+                    }
+                });
+            } catch (error) {
+                addDiagnosticItem('manifestStatus', 
+                    `Error loading manifest: ${error.message}`, 
+                    'error');
+                log(`Manifest error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkMetaTags() {
+            clearContainer('metaTagsStatus');
+            log('Checking PWA meta tags...');
+
+            const metaTags = [
+                { name: 'viewport', required: true },
+                { name: 'mobile-web-app-capable', required: false },
+                { name: 'apple-mobile-web-app-capable', required: false },
+                { name: 'apple-mobile-web-app-status-bar-style', required: false },
+                { name: 'theme-color', required: false }
+            ];
+
+            metaTags.forEach(tag => {
+                const element = document.querySelector(`meta[name="${tag.name}"]`);
+                const status = element ? 'success' : (tag.required ? 'error' : 'warning');
+                const value = element ? element.getAttribute('content') : 'Not found';
+                
+                addDiagnosticItem('metaTagsStatus', 
+                    `${tag.name}: ${element ? 'Present' : 'Missing'}`, 
+                    status,
+                    value);
+                
+                log(`Meta tag ${tag.name}: ${element ? 'Present' : 'Missing'}`, element ? 'info' : (tag.required ? 'error' : 'warn'));
+            });
+        }
+
+        function calculateReadinessScore() {
+            const items = document.querySelectorAll('[id*="Status"] .diagnostic-item');
+            let score = 0;
+            
+            items.forEach(item => {
+                if (item.classList.contains('success')) {
+                    score += 2;
+                } else if (item.classList.contains('warning')) {
+                    score += 1;
+                }
+            });
+
+            const maxScore = items.length * 2;
+            const percentage = Math.round((score / maxScore) * 100);
+            
+            document.getElementById('readinessScore').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = '✓ Great! PWA installation should work on all devices.';
+            } else if (percentage >= 70) {
+                message = '⚠ Good! PWA installation should work on most devices. Check warnings above.';
+            } else if (percentage >= 50) {
+                message = '⚠ Fair! PWA installation may work. Please fix errors above.';
+            } else {
+                message = '✗ Poor! PWA installation likely won\'t work. Fix all errors above.';
+            }
+            
+            document.getElementById('readinessMessage').textContent = message;
+            log(`Readiness score: ${percentage}%`, percentage >= 70 ? 'info' : 'warn');
+        }
+
+        function testInstallPrompt() {
+            log('Testing install prompt...', 'info');
+            
+            if (window.pwaInstallManager) {
+                window.pwaInstallManager.handleInstallClick().then(() => {
+                    log('Install prompt handled', 'info');
+                }).catch(error => {
+                    log(`Install prompt error: ${error.message}`, 'error');
+                });
+            } else {
+                log('PWA Install Manager not available', 'error');
+            }
+        }
+
+        function clearLogsAndData() {
+            if (confirm('Clear all PWA data including service workers and cache?')) {
+                // Unregister service workers
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    registrations.forEach(reg => {
+                        reg.unregister();
+                        log(`Service Worker unregistered: ${reg.scope}`, 'info');
+                    });
+                });
+
+                // Clear caches
+                caches.keys().then(cacheNames => {
+                    cacheNames.forEach(name => {
+                        caches.delete(name);
+                        log(`Cache deleted: ${name}`, 'info');
+                    });
+                });
+
+                // Clear localStorage
+                localStorage.clear();
+                log('localStorage cleared', 'info');
+
+                log('All PWA data cleared. Reload page to re-initialize.', 'info');
+            }
+        }
+
+        function downloadDiagnosticsReport() {
+            const report = logs.map(l => `[${l.timestamp}] [${l.type.toUpperCase()}] ${l.message}`).join('\n');
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(report));
+            element.setAttribute('download', 'pwa-diagnostics-' + new Date().getTime() + '.txt');
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            log('Diagnostics report downloaded', 'info');
+        }
+
+        // Auto-run diagnostics on load
+        window.addEventListener('load', () => {
+            log('Page loaded. Ready for diagnostics.');
+        });
+    </script>
+</body>
+</html>

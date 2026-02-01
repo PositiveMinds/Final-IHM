@@ -98,6 +98,13 @@
     <!-- Chat System JS -->
     <script src="chat-system.js" defer></script>
 
+    <!-- Appointment Notifications -->
+    <script src="appointment-notifications.js" defer></script>
+
+    <!-- PWA Installation System -->
+    <script src="pwa-install-cta.js" defer></script>
+    <script src="pwa-install-improved.js" defer></script>
+
     <!-- FAB Button CSS -->
     <style>
         /* Hide the chatbot's default FAB button */
@@ -1540,10 +1547,11 @@
                     <div class="row gx-3">
                         <div class="col-xl-2 col-sm-6 col-12">
                             <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
                                 data-bs-toggle="modal" data-bs-target="#statDetailModal"
                                 onclick="openStatDetail('all-appointments', this)">
-                                <div class="card mb-3" style="cursor: pointer;">
-                                    <div class="card-body">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="icon-box md rounded-5 bg-primary mb-3">
                                                 <i class="ri-verified-badge-line fs-4 lh-1"></i>
@@ -1557,10 +1565,11 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-12">
                             <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
                                 data-bs-toggle="modal" data-bs-target="#statDetailModal"
                                 onclick="openStatDetail('next-week', this)">
-                                <div class="card mb-3" style="cursor: pointer;">
-                                    <div class="card-body">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="icon-box md rounded-5 bg-success mb-3">
                                                 <i class="ri-calendar-event-line fs-4 lh-1"></i>
@@ -1574,10 +1583,11 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-12">
                             <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
                                 data-bs-toggle="modal" data-bs-target="#statDetailModal"
                                 onclick="openStatDetail('overdue', this)">
-                                <div class="card mb-3" style="cursor: pointer;">
-                                    <div class="card-body">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="icon-box md rounded-5 bg-danger mb-3">
                                                 <i class="ri-time-line fs-4 lh-1"></i>
@@ -1591,10 +1601,11 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-12">
                             <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
                                 data-bs-toggle="modal" data-bs-target="#statDetailModal"
                                 onclick="openStatDetail('missed', this)">
-                                <div class="card mb-3" style="cursor: pointer;">
-                                    <div class="card-body">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="icon-box md rounded-5 bg-warning mb-3">
                                                 <i class="ri-close-circle-line fs-4 lh-1"></i>
@@ -1608,10 +1619,11 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-12">
                             <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
                                 data-bs-toggle="modal" data-bs-target="#statDetailModal"
                                 onclick="openStatDetail('high-viral', this)">
-                                <div class="card mb-3" style="cursor: pointer;">
-                                    <div class="card-body">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="icon-box md rounded-5 bg-danger mb-3">
                                                 <i class="ri-alert-line fs-4 lh-1"></i>
@@ -1625,16 +1637,53 @@
                         </div>
                         <div class="col-xl-2 col-sm-6 col-12">
                             <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
                                 data-bs-toggle="modal" data-bs-target="#statDetailModal"
                                 onclick="openStatDetail('low-viral', this)">
-                                <div class="card mb-3" style="cursor: pointer;">
-                                    <div class="card-body">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
                                         <div class="d-flex flex-column align-items-center">
                                             <div class="icon-box md rounded-5 bg-info mb-3">
                                                 <i class="ri-lungs-line fs-4 lh-1"></i>
                                             </div>
                                             <h6>Low Viraemia</h6>
                                             <h2 class="text-info m-0" id="lowViraemiaCount">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-xl-2 col-sm-6 col-12">
+                            <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
+                                data-bs-toggle="modal" data-bs-target="#statDetailModal"
+                                onclick="openStatDetail('hypertension', this)">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div class="icon-box md rounded-5 bg-danger mb-3">
+                                                <i class="ri-pulse-line fs-4 lh-1"></i>
+                                            </div>
+                                            <h6>Hypertension</h6>
+                                            <h2 class="text-danger m-0" id="hypertensionCount">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="col-xl-2 col-sm-6 col-12">
+                            <button type="button" class="btn btn-link text-decoration-none p-0 w-100 text-start"
+                                style="border: none; outline: none; box-shadow: none;"
+                                data-bs-toggle="modal" data-bs-target="#statDetailModal"
+                                onclick="openStatDetail('diabetes', this)">
+                                <div class="card mb-3" style="cursor: pointer; border: none; box-shadow: none;">
+                                    <div class="card-body" style="padding: 0;">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div class="icon-box md rounded-5 bg-warning mb-3">
+                                                <i class="ri-capsule-line fs-4 lh-1"></i>
+                                            </div>
+                                            <h6>Diabetes</h6>
+                                            <h2 class="text-warning m-0" id="diabetesCount">0</h2>
                                         </div>
                                     </div>
                                 </div>
@@ -3271,6 +3320,30 @@
 
                 const lowViraemiaCount = !lowViraemiaError && lowViraemiaPatients ? lowViraemiaPatients.length : 0;
 
+                // Fetch hypertension patients (condition = 'Hypertension')
+                const {
+                    data: hypertensionPatients,
+                    error: hypertensionError
+                } = await supabaseClient
+                    .from('patients')
+                    .select('pid, condition')
+                    .eq('fid', numericFacilityId)
+                    .eq('condition', 'Hypertension');
+
+                const hypertensionCount = !hypertensionError && hypertensionPatients ? hypertensionPatients.length : 0;
+
+                // Fetch diabetes patients (condition = 'Diabetes')
+                const {
+                    data: diabetesPatients,
+                    error: diabetesError
+                } = await supabaseClient
+                    .from('patients')
+                    .select('pid, condition')
+                    .eq('fid', numericFacilityId)
+                    .eq('condition', 'Diabetes');
+
+                const diabetesCount = !diabetesError && diabetesPatients ? diabetesPatients.length : 0;
+
                 // Debug: fetch all viral load values to inspect
                 const {
                     data: allVLData
@@ -3305,6 +3378,16 @@
                     nextWeekError,
                     numericFacilityId
                 });
+                console.log('Hypertension patients:', {
+                    hypertensionCount,
+                    hypertensionError,
+                    numericFacilityId
+                });
+                console.log('Diabetes patients:', {
+                    diabetesCount,
+                    diabetesError,
+                    numericFacilityId
+                });
 
                 // Update UI with fetched data
                 const patientCount = !patientError ? patients.length : 0;
@@ -3323,6 +3406,8 @@
                 const missedAppointmentsCountEl = document.getElementById('missedAppointmentsCount');
                 const highViraemiaCountEl = document.getElementById('highViraemiaCount');
                 const lowViraemiaCountEl = document.getElementById('lowViraemiaCount');
+                const hypertensionCountEl = document.getElementById('hypertensionCount');
+                const diabetesCountEl = document.getElementById('diabetesCount');
 
                 if (patientsCountEl) patientsCountEl.textContent = patientCount;
                 if (totalAppointmentsCountEl) totalAppointmentsCountEl.textContent = allAppointmentsCount;
@@ -3334,6 +3419,8 @@
                 if (missedAppointmentsCountEl) missedAppointmentsCountEl.textContent = missedCount;
                 if (highViraemiaCountEl) highViraemiaCountEl.textContent = highViraemiaCount;
                 if (lowViraemiaCountEl) lowViraemiaCountEl.textContent = lowViraemiaCount;
+                if (hypertensionCountEl) hypertensionCountEl.textContent = hypertensionCount;
+                if (diabetesCountEl) diabetesCountEl.textContent = diabetesCount;
             } catch (error) {
                 console.error('Error fetching dashboard stats:', error);
             }
@@ -6093,7 +6180,9 @@
                 'overdue': 'Overdue Appointments',
                 'missed': 'Missed Appointments',
                 'high-viral': 'High Viraemia Patients',
-                'low-viral': 'Low Viraemia Patients'
+                'low-viral': 'Low Viraemia Patients',
+                'hypertension': 'Hypertension Patients',
+                'diabetes': 'Diabetes Patients'
             };
 
             modalTitle.textContent = titles[statType] || 'Details';
@@ -6189,6 +6278,28 @@
                         .gte('viral_load_copies', 201)
                         .lte('viral_load_copies', 999);
                     console.log('Low viral:', data, error);
+                    patients = data || [];
+                } else if (statType === 'hypertension') {
+                    const {
+                        data,
+                        error
+                    } = await supabaseClient
+                        .from('patients')
+                        .select(selectFields)
+                        .eq('fid', numericFacilityId)
+                        .eq('condition', 'Hypertension');
+                    console.log('Hypertension:', data, error);
+                    patients = data || [];
+                } else if (statType === 'diabetes') {
+                    const {
+                        data,
+                        error
+                    } = await supabaseClient
+                        .from('patients')
+                        .select(selectFields)
+                        .eq('fid', numericFacilityId)
+                        .eq('condition', 'Diabetes');
+                    console.log('Diabetes:', data, error);
                     patients = data || [];
                 }
 
@@ -7165,6 +7276,84 @@
         }
     </style>
 
+    <!-- Appointment Notification Settings Modal -->
+    <div class="modal fade" id="appointmentNotificationModal" tabindex="-1" aria-labelledby="appointmentNotificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-2 text-white">
+                    <h5 class="modal-title" id="appointmentNotificationModalLabel">
+                        <i class="ri-notification-2-line me-2"></i>Appointment Notifications
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6 class="text-secondary mb-3">Notification Channels</h6>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enableBrowserNotifications" checked>
+                            <label class="form-check-label" for="enableBrowserNotifications">
+                                <strong>Browser Notifications</strong>
+                                <small class="d-block text-muted">Push notifications on your device</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enableInAppNotifications" checked>
+                            <label class="form-check-label" for="enableInAppNotifications">
+                                <strong>In-App Notifications</strong>
+                                <small class="d-block text-muted">Toast alerts within the dashboard</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enableSoundAlerts" checked>
+                            <label class="form-check-label" for="enableSoundAlerts">
+                                <strong>Sound Alerts</strong>
+                                <small class="d-block text-muted">Audio notification on appointments</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="mb-4">
+                        <h6 class="text-secondary mb-3">Notification Types</h6>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="notifyMissed" checked>
+                            <label class="form-check-label" for="notifyMissed">
+                                <strong>Missed Appointments</strong>
+                                <small class="d-block text-muted">Alert 1 day after appointment time if not completed</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="notifyDue1day" checked>
+                            <label class="form-check-label" for="notifyDue1day">
+                                <strong>Due in 1 Day</strong>
+                                <small class="d-block text-muted">Reminder 1 day before appointment scheduled time</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div>
+                        <h6 class="text-secondary mb-3">Recent Notifications</h6>
+                        <div id="notificationHistory" style="max-height: 200px; overflow-y: auto;">
+                            <p class="text-muted text-center py-3">No recent notifications</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="clearNotificationsBtn">Clear History</button>
+                    <button type="button" class="btn btn-primary" id="saveNotificationsBtn">Save Preferences</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- FAB Button Container -->
     <div class="fab-container" id="fabContainer">
         <ul class="fab-menu">
@@ -7188,12 +7377,139 @@
                     🤖
                 </button>
             </li>
+            <li class="fab-menu-item">
+                <button type="button" class="chat-btn" id="fabNotificationBtn" title="Notification Settings"
+                    style="font-size: 20px;">
+                    <span class="fab-tooltip">Notifications</span>
+                    🔔
+                </button>
+            </li>
         </ul>
         <button type="button" class="fab-button" id="fabButton" style="font-size: 32px; font-weight: bold;">
             +
         </button>
     </div>
     <!-- FAB Button Container Ends -->
+
+    <!-- Appointment Notification Handler Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationBtn = document.getElementById('fabNotificationBtn');
+            const modal = document.getElementById('appointmentNotificationModal');
+            const saveBtn = document.getElementById('saveNotificationsBtn');
+            const clearBtn = document.getElementById('clearNotificationsBtn');
+
+            if (notificationBtn && modal) {
+                notificationBtn.addEventListener('click', function() {
+                    loadNotificationSettings();
+                    const bootstrapModal = new bootstrap.Modal(modal);
+                    bootstrapModal.show();
+                });
+            }
+
+            if (saveBtn) {
+                saveBtn.addEventListener('click', saveNotificationSettings);
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    if (appointmentNotificationManager) {
+                        appointmentNotificationManager.clearNotificationHistory();
+                        loadNotificationHistory();
+                        alert('Notification history cleared');
+                    }
+                });
+            }
+        });
+
+        function loadNotificationSettings() {
+            if (!appointmentNotificationManager) return;
+
+            const prefs = appointmentNotificationManager.getNotificationPreferences();
+
+            document.getElementById('enableBrowserNotifications').checked = prefs.enableBrowserNotifications;
+            document.getElementById('enableInAppNotifications').checked = prefs.enableInAppNotifications;
+            document.getElementById('enableSoundAlerts').checked = prefs.enableSoundAlerts;
+            document.getElementById('notifyMissed').checked = prefs.notifyMissed;
+            document.getElementById('notifyDue1day').checked = prefs.notifyDue1day;
+
+            loadNotificationHistory();
+        }
+
+        function loadNotificationHistory() {
+            if (!appointmentNotificationManager) return;
+
+            const history = appointmentNotificationManager.getNotificationHistory();
+            const historyContainer = document.getElementById('notificationHistory');
+
+            if (history.length === 0) {
+                historyContainer.innerHTML = '<p class="text-muted text-center py-3">No recent notifications</p>';
+                return;
+            }
+
+            historyContainer.innerHTML = history
+                .slice()
+                .reverse()
+                .slice(0, 10)
+                .map(notif => {
+                    const date = new Date(notif.timestamp);
+                    const timeStr = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const typeColor = notif.type === 'missed' ? 'danger' : 'warning';
+
+                    return `
+                        <div class="p-2 mb-2 border-start border-${typeColor} ps-3">
+                            <small class="fw-600">${notif.title}</small>
+                            <div class="text-muted small">${notif.body}</div>
+                            <small class="text-secondary">${timeStr}</small>
+                        </div>
+                    `;
+                })
+                .join('');
+        }
+
+        function saveNotificationSettings() {
+            if (!appointmentNotificationManager) return;
+
+            const prefs = {
+                enableBrowserNotifications: document.getElementById('enableBrowserNotifications').checked,
+                enableInAppNotifications: document.getElementById('enableInAppNotifications').checked,
+                enableSoundAlerts: document.getElementById('enableSoundAlerts').checked,
+                notifyMissed: document.getElementById('notifyMissed').checked,
+                notifyDue1day: document.getElementById('notifyDue1day').checked
+            };
+
+            appointmentNotificationManager.saveNotificationPreferences(prefs);
+
+            // Show success message
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 30px;
+                background: #28a745;
+                color: white;
+                padding: 16px 24px;
+                border-radius: 8px;
+                z-index: 10001;
+                font-weight: 500;
+                animation: slideIn 0.3s ease-out;
+            `;
+            toast.textContent = '✓ Preferences saved successfully';
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('appointmentNotificationModal'));
+            if (modal) modal.hide();
+        }
+    </script>
 </body>
 
 </html>

@@ -210,12 +210,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check if page has opted in to CTA modal
   const enableCTA = document.documentElement.getAttribute('data-pwa-install-cta') !== 'false';
   
-  if (enableCTA && !window.PWA?.isRunningAsPWA?.()) {
-    window.PWAInstallCTA = new PWAInstallCTA({
+  // Check if running as app using multiple methods
+  const isRunningAsApp = 
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true ||
+    document.referrer.includes('android-app://');
+  
+  if (enableCTA && !isRunningAsApp) {
+    const ctaInstance = new PWAInstallCTA({
       showAfterSeconds: 5
     });
     
+    // Store instance globally for access by install manager
+    window.pwaInstallCTAInstance = ctaInstance;
+    
     console.log('[PWA CTA] Auto-initialized');
+  } else if (isRunningAsApp) {
+    console.log('[PWA CTA] App already running as standalone - not initializing CTA');
   }
 });
 

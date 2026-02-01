@@ -32,12 +32,25 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="HealthFlow">
+    <meta name="theme-color" content="#15696B">
+    <meta name="msapplication-TileColor" content="#15696B">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    
     <!-- GitHub Pages Path Configuration -->
     <script>
         // Set base path for GitHub Pages (/Final-IHM/) vs local dev (/)
         window.APP_BASE_PATH = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
             ? '/' 
             : '/Final-IHM/';
+        
+        console.log('[App] Base path:', window.APP_BASE_PATH);
+        console.log('[App] Hostname:', window.location.hostname);
+        console.log('[App] Protocol:', window.location.protocol);
     </script>
 
 </head>
@@ -1575,11 +1588,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     
-
-    
     <script src="healthflow-script.js"></script>
     
-    <!-- PWA Install Handler -->
-    <script src="pwa-install.js"></script>
+    <!-- PWA Installation System -->
+    <!-- Load CTA modal first -->
+    <script src="pwa-install-cta.js" defer></script>
+    <!-- Load improved installation manager -->
+    <script src="pwa-install-improved.js" defer></script>
 </body>
 </html>
