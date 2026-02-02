@@ -8163,21 +8163,6 @@ cursor: pointer;
                 });
             }
 
-            // Switch between Private and Group tabs
-            function switchChatTab(tabName) {
-                if (tabName === 'private') {
-                    $('#privateChatsPanel').show();
-                    $('#groupChatsPanel').hide();
-                    $('#privateTab').css({'color': '#1a1a1a', 'border-bottom-color': '#734CF4'});
-                    $('#groupTab').css({'color': '#9CA3AF', 'border-bottom-color': 'transparent'});
-                } else if (tabName === 'group') {
-                    $('#privateChatsPanel').hide();
-                    $('#groupChatsPanel').show();
-                    $('#groupTab').css({'color': '#1a1a1a', 'border-bottom-color': '#734CF4'});
-                    $('#privateTab').css({'color': '#9CA3AF', 'border-bottom-color': 'transparent'});
-                }
-            }
-
             // Select a contact
             function selectContact(contactId) {
                 var contact = contacts.find(c => c.id === contactId);
@@ -8378,6 +8363,21 @@ cursor: pointer;
 
         // Update on window resize
         window.addEventListener('resize', updateSidebarButtons);
+
+        // Global function to switch chat tabs
+        window.switchChatTab = function(tabName) {
+            if (tabName === 'private') {
+                $('#privateChatsPanel').show();
+                $('#groupChatsPanel').hide();
+                $('#privateTab').css({'color': '#1a1a1a', 'border-bottom-color': '#734CF4'});
+                $('#groupTab').css({'color': '#9CA3AF', 'border-bottom-color': 'transparent'});
+            } else if (tabName === 'group') {
+                $('#privateChatsPanel').hide();
+                $('#groupChatsPanel').show();
+                $('#groupTab').css({'color': '#1a1a1a', 'border-bottom-color': '#734CF4'});
+                $('#privateTab').css({'color': '#9CA3AF', 'border-bottom-color': 'transparent'});
+            }
+        };
     </script>
 
     <!-- Chat Button Handler -->
