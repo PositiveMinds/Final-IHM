@@ -6,9 +6,11 @@
 class PWAInstallationManager {
   constructor() {
     this.deferredPrompt = null;
-    this.installButton = document.getElementById('pwa-install-button');
+    this.installButton = null;
     this.isInstallable = false;
     this.isRunningAsApp = false;
+    this.buttonSearchAttempts = 0;
+    this.maxButtonSearchAttempts = 5;
     
     this.init();
   }
@@ -18,6 +20,9 @@ class PWAInstallationManager {
    */
   init() {
     console.log('[PWA Install] Initializing PWA installation manager');
+    
+    // Try to find the install button (may not be in DOM yet)
+    this.findInstallButton();
     
     // Check if already running as PWA
     this.checkIfRunningAsApp();
@@ -36,6 +41,27 @@ class PWAInstallationManager {
     
     // Log environment
     this.logEnvironment();
+  }
+
+  /**
+   * Find the install button with retry logic
+   */
+  findInstallButton() {
+    const button = document.getElementById('pwa-install-button');
+    if (button) {
+      this.installButton = button;
+      console.log('[PWA Install] Install button found in DOM');
+      return true;
+    }
+    
+    // Retry if not found
+    if (this.buttonSearchAttempts < this.maxButtonSearchAttempts) {
+      this.buttonSearchAttempts++;
+      setTimeout(() => this.findInstallButton(), 500);
+    } else {
+      console.warn('[PWA Install] Install button not found after multiple attempts');
+    }
+    return false;
   }
 
   /**
@@ -115,8 +141,11 @@ class PWAInstallationManager {
    * Setup beforeinstallprompt listener
    */
   setupInstallPromptListener() {
+    let beforeInstallPromptFired = false;
+
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('[PWA Install] beforeinstallprompt event fired');
+      console.log('[PWA Install] beforeinstallprompt event fired (HTTPS/Production)');
+      beforeInstallPromptFired = true;
       
       // Prevent the mini-infobar from appearing
       e.preventDefault();
@@ -151,14 +180,45 @@ class PWAInstallationManager {
       // Show success notification
       this.showInstallSuccessNotification();
     });
+
+    // Fallback for localhost/HTTP development
+    // beforeinstallprompt doesn't fire on HTTP, but PWA is still functional
+    setTimeout(() => {
+      if (!beforeInstallPromptFired && !this.isInstallable && !this.isRunningAsApp && 
+          this.installButton && ('serviceWorker' in navigator)) {
+        
+        const isLocalhost = window.location.hostname === 'localhost' || 
+                           window.location.hostname === '127.0.0.1';
+        
+        if (isLocalhost) {
+          console.log('[PWA Install] HTTP Localhost detected - enabling development install mode');
+          this.installButton.style.display = 'flex';
+          
+          // Create a mock deferred prompt for development testing
+          this.deferredPrompt = {
+            prompt: () => {
+              console.log('[PWA Install] Mock install prompt (development mode)');
+              return Promise.resolve();
+            },
+            userChoice: Promise.resolve({ outcome: 'accepted' })
+          };
+        }
+      }
+    }, 1500);
   }
 
   /**
    * Setup install button event listener
    */
   setupInstallButton() {
+    // If button not found yet, retry setup later
     if (!this.installButton) {
-      console.log('[PWA Install] Install button not found in DOM');
+      setTimeout(() => this.setupInstallButton(), 500);
+      return;
+    }
+
+    // Avoid duplicate listeners
+    if (this.installButton.hasAttribute('data-install-listener-attached')) {
       return;
     }
 
@@ -167,6 +227,7 @@ class PWAInstallationManager {
       await this.handleInstallClick();
     });
 
+    this.installButton.setAttribute('data-install-listener-attached', 'true');
     console.log('[PWA Install] Install button setup complete');
   }
 
@@ -179,7 +240,7 @@ class PWAInstallationManager {
     if (!this.deferredPrompt) {
       console.log('[PWA Install] No install prompt available');
       this.showNotification('Installation Not Available', {
-        body: 'Your browser does not support app installation.'
+        body: 'Your browser does not support app installation. Please use HTTPS or a supported browser.'
       });
       return;
     }
@@ -192,10 +253,17 @@ class PWAInstallationManager {
 
       // Show install prompt
       console.log('[PWA Install] Showing install prompt');
-      this.deferredPrompt.prompt();
+      
+      if (this.deferredPrompt.prompt) {
+        await this.deferredPrompt.prompt();
+      }
 
       // Wait for user response
-      const { outcome } = await this.deferredPrompt.userChoice;
+      let outcome = 'accepted';
+      if (this.deferredPrompt.userChoice) {
+        const result = await this.deferredPrompt.userChoice;
+        outcome = result?.outcome || 'accepted';
+      }
       
       console.log('[PWA Install] User response:', outcome);
 
@@ -219,9 +287,11 @@ class PWAInstallationManager {
     } catch (error) {
       console.error('[PWA Install] Installation error:', error);
       
-      // Restore button
-      this.installButton.innerHTML = originalHTML;
-      this.installButton.disabled = false;
+      // Restore button state
+      if (this.installButton) {
+        this.installButton.disabled = false;
+        this.installButton.innerHTML = '<i class="fas fa-download me-2"></i><span class="d-none d-sm-inline">Install App</span>';
+      }
       
       this.showNotification('Installation Error', {
         body: 'Could not complete installation. Please try again.'

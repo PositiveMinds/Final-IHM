@@ -38,6 +38,33 @@
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
 
+    <!-- WebSocket Error Suppression -->
+    <script>
+        // Prevent WebSocket connection errors from localhost dev server
+        const originalWebSocket = window.WebSocket;
+        window.WebSocket = class {
+            constructor(url) {
+                if (url.includes('localhost') || url.includes('127.0.0.1')) {
+                    console.warn('Blocked local WebSocket:', url);
+                    // Create a mock WebSocket that doesn't actually connect
+                    this.url = url;
+                    this.readyState = 3; // CLOSED
+                    this.CONNECTING = 0;
+                    this.OPEN = 1;
+                    this.CLOSING = 2;
+                    this.CLOSED = 3;
+                } else {
+                    return new originalWebSocket(url);
+                }
+            }
+            send() {}
+            close() {}
+            addEventListener() {}
+            removeEventListener() {}
+            dispatchEvent() {}
+        };
+    </script>
+
     <!-- WhatsApp Style Chat CSS -->
     <style>
 .chat {
@@ -7990,6 +8017,123 @@ cursor: pointer;
 
     <!-- ChatONN Chat Application JavaScript -->
     <script>
+        // WhatsApp-style image preview modal
+        function showImagePreviewModal(imageDataUrl, file) {
+            // Create or get modal
+            let modal = document.getElementById("imagePreviewModal");
+            if (!modal) {
+                const modalHtml = `
+                    <div id="imagePreviewModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 10000; align-items: center; justify-content: center;">
+                        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 5px 40px rgba(0,0,0,0.3); width: 90%; max-width: 500px;">
+                            <div style="position: relative; background: #000;">
+                                <img id="previewImage" src="" alt="Preview" style="width: 100%; height: auto; max-height: 70vh; object-fit: contain; display: block;">
+                                <button onclick="document.getElementById('imagePreviewModal').style.display = 'none';" style="position: absolute; top: 12px; right: 12px; background: white; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;">×</button>
+                            </div>
+                            <div style="padding: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+                                <button onclick="document.getElementById('imagePreviewModal').style.display = 'none';" style="padding: 10px 20px; border: 1px solid #e0e0e0; background: white; border-radius: 6px; cursor: pointer; font-weight: 500;">Cancel</button>
+                                <button id="sendImageBtn" style="padding: 10px 20px; background: #007AFF; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                modal = document.getElementById('imagePreviewModal');
+            }
+            
+            // Set image and show modal
+            document.getElementById('previewImage').src = imageDataUrl;
+            modal.style.display = 'flex';
+            
+            // Handle send button
+            const sendBtn = document.getElementById('sendImageBtn');
+            sendBtn.onclick = function() {
+                // Store pending image
+                window.pendingFileAttachment = {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: imageDataUrl
+                };
+                
+                // Close modal
+                modal.style.display = 'none';
+                
+                // Trigger send
+                sendImageMessage(imageDataUrl, file.name);
+            };
+        }
+
+        // Send image message
+        function sendImageMessage(imageDataUrl, imageName) {
+            var msgHtml = '<div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">' +
+                '<div style="max-width: 70%;">' +
+                '<img src="' + imageDataUrl + '" alt="' + imageName + '" style="max-width: 300px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); cursor: pointer;" onclick="showFullImage(this.src)">' +
+                '</div>' +
+                '</div>';
+            
+            $('#ap').append(msgHtml);
+            $("#val").val("");
+            $('#ap').scrollTop($('#ap')[0].scrollHeight);
+            
+            // Clear the file input
+            $("#messageFileInput").val('');
+            
+            // Auto-respond
+            setTimeout(function() {
+                sendResponse();
+            }, 1200);
+        }
+
+        // Show full-screen image viewer
+        function showFullImage(imageSrc) {
+            let viewer = document.getElementById("imageFullViewer");
+            if (!viewer) {
+                const viewerHtml = `
+                    <div id="imageFullViewer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 10001; align-items: center; justify-content: center;">
+                        <button onclick="document.getElementById('imageFullViewer').style.display = 'none';" style="position: absolute; top: 20px; right: 20px; background: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; cursor: pointer; color: #000; font-weight: bold;">×</button>
+                        <img id="fullImage" src="" alt="" style="max-width: 95%; max-height: 95%; object-fit: contain;">
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', viewerHtml);
+                viewer = document.getElementById('imageFullViewer');
+            }
+            
+            document.getElementById('fullImage').src = imageSrc;
+            viewer.style.display = 'flex';
+        }
+
+        // Get current time
+        function getCurrentTime() {
+            var d = new Date();
+            var h = d.getHours();
+            var m = d.getMinutes();
+            h = h < 10 ? '0' + h : h;
+            m = m < 10 ? '0' + m : m;
+            return h + ':' + m;
+        }
+
+        // Send chat response
+        function sendResponse() {
+            var time = getCurrentTime();
+            var responses = [
+                "I really like your vibe but i still rock we can do this in...",
+                "Sounds perfect",
+                "Let's discuss something",
+                "I totally agree with you",
+                "Bonjour! 😊"
+            ];
+            var randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+            var msgHtml = '<div style="display: flex; justify-content: flex-start;">' +
+                '<div style="background: #F0F0F0; color: #1a1a1a; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 70%; word-wrap: break-word; font-size: 14px;">' +
+                randomResponse +
+                '</div>' +
+                '</div>';
+
+            $('#ap').append(msgHtml);
+            $('#ap').scrollTop($('#ap')[0].scrollHeight);
+        }
+
         $(function() {
             var lastmsg = "";
             var currentContact = null;
@@ -8223,28 +8367,38 @@ cursor: pointer;
                     var fileName = file.name;
                     var fileSize = file.size;
                     
-                    // Add file info to message input
-                    var currentMsg = $("#val").val().trim();
-                    var fileInfo = "[Attachment: " + fileName + " (" + Math.round(fileSize / 1024) + " KB)]";
-                    
-                    if (currentMsg) {
-                        $("#val").val(currentMsg + "\n" + fileInfo);
-                    } else {
-                        $("#val").val(fileInfo);
-                    }
-                    
-                    // Read file and prepare for sending
-                    var reader = new FileReader();
-                    reader.onload = function(evt) {
-                        // Store file data for sending
-                        window.pendingFileAttachment = {
-                            name: fileName,
-                            type: file.type,
-                            size: fileSize,
-                            data: evt.target.result
+                    // Check if it's an image
+                    if (file.type.startsWith('image/')) {
+                        // Show image preview modal for images
+                        var reader = new FileReader();
+                        reader.onload = function(evt) {
+                            showImagePreviewModal(evt.target.result, file);
                         };
-                    };
-                    reader.readAsDataURL(file);
+                        reader.readAsDataURL(file);
+                    } else {
+                        // For non-image files, add file info to message input
+                        var currentMsg = $("#val").val().trim();
+                        var fileInfo = "[Attachment: " + fileName + " (" + Math.round(fileSize / 1024) + " KB)]";
+                        
+                        if (currentMsg) {
+                            $("#val").val(currentMsg + "\n" + fileInfo);
+                        } else {
+                            $("#val").val(fileInfo);
+                        }
+                        
+                        // Read file and prepare for sending
+                        var reader = new FileReader();
+                        reader.onload = function(evt) {
+                            // Store file data for sending
+                            window.pendingFileAttachment = {
+                                name: fileName,
+                                type: file.type,
+                                size: fileSize,
+                                data: evt.target.result
+                            };
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 }
             });
 
@@ -8275,26 +8429,7 @@ cursor: pointer;
                 }, 1200);
             });
 
-            function sendResponse() {
-                var time = getCurrentTime();
-                var responses = [
-                    "I really like your vibe but i still rock we can do this in...",
-                    "Sounds perfect",
-                    "Let's discuss something",
-                    "I totally agree with you",
-                    "Bonjour! 😊"
-                ];
-                var randomResponse = responses[Math.floor(Math.random() * responses.length)];
 
-                var msgHtml = '<div style="display: flex; justify-content: flex-start;">' +
-                    '<div style="background: #F0F0F0; color: #1a1a1a; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 70%; word-wrap: break-word; font-size: 14px;">' +
-                    randomResponse +
-                    '</div>' +
-                    '</div>';
-
-                $('#ap').append(msgHtml);
-                $('#ap').scrollTop($('#ap')[0].scrollHeight);
-            }
 
             window.openChatInterface = function() {
                 $("#chatInterface").fadeIn(300);

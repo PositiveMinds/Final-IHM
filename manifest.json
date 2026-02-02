@@ -37,12 +37,12 @@
     },
     {
       "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/Final-IHM/assets/images/healthflow-icon-256x256.png",
+       "sizes": "192x192",
+       "type": "image/png",
+       "purpose": "any"
+      },
+      {
+       "src": "/Final-IHM/assets/images/healthflow-icon-256x256.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "any"
@@ -55,33 +55,33 @@
     },
     {
       "src": "/Final-IHM/assets/images/healthflow-icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/Final-IHM/assets/images/healthflow-icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+       "sizes": "512x512",
+       "type": "image/png",
+       "purpose": "any"
+      },
+      {
+        "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
+       "sizes": "192x192",
+       "type": "image/png",
+       "purpose": "maskable"
+     },
+     {
+       "src": "/Final-IHM/assets/images/healthflow-icon-512x512.png",
+       "sizes": "512x512",
+       "type": "image/png",
+       "purpose": "maskable"
+       }
   ],
   "categories": ["healthcare", "medical", "productivity"],
   "screenshots": [
     {
       "src": "/Final-IHM/assets/images/healthflow-icon-512x512.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/Final-IHM/assets/images/healthflow-icon-512x512.png",
+       "sizes": "540x720",
+       "type": "image/png",
+       "form_factor": "narrow"
+      },
+      {
+       "src": "/Final-IHM/assets/images/healthflow-icon-512x512.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide"
@@ -90,11 +90,11 @@
   "splash_pages": [
     {
       "src": "/Final-IHM/splash-screen.html",
-      "sizes": "540x720",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/Final-IHM/splash-screen.html",
+       "sizes": "540x720",
+       "form_factor": "narrow"
+      },
+      {
+       "src": "/Final-IHM/splash-screen.html",
       "sizes": "1280x720",
       "form_factor": "wide"
     }
@@ -105,9 +105,9 @@
       "short_name": "Dashboard",
       "description": "Access your healthcare dashboard",
       "url": "/Final-IHM/dashboard.html",
-      "icons": [
-        {
-          "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
+       "icons": [
+         {
+           "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -118,9 +118,9 @@
       "short_name": "Login",
       "description": "Login to your account",
       "url": "/Final-IHM/login.html",
-      "icons": [
-        {
-          "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
+       "icons": [
+         {
+           "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -131,9 +131,9 @@
       "short_name": "Patients",
       "description": "Manage patient records",
       "url": "/Final-IHM/patient-portal.html",
-      "icons": [
-        {
-          "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
+       "icons": [
+         {
+           "src": "/Final-IHM/assets/images/healthflow-icon-192x192.png",
           "sizes": "192x192",
           "type": "image/png"
         }

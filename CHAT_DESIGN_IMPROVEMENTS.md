@@ -95,15 +95,59 @@ Message Layout (Group Chat):
 - Minimal JavaScript overhead
 - LocalStorage for chat persistence
 
+## Debugging & Testing
+### Image Preview Troubleshooting
+If images aren't displaying, check:
+1. **Console logs** - Open browser DevTools (F12) and check console for `[Chat]` logs
+2. **Test tool** - Use `test-image-preview.html` to verify image data URLs work
+3. **localStorage limit** - May hit quota on large images (see QuotaExceededError in console)
+4. **Browser support** - Ensure FileReader API is supported
+
+### Debug Logging
+Added comprehensive logging to track:
+- File upload: File name, type, size
+- Data URL creation: Length of converted image data
+- Message rendering: Attachment type and image URL availability
+- Image loading: Success/failure events with specific errors
+
 ## Future Enhancement Ideas
 ## Implemented ✓
 - Message read receipts
 - Typing indicators
 - Message reactions/emoji support
 - Message search functionality
-- Image preview thumbnails
-- Message pinning
+- **Image preview thumbnails** ✓ FULLY WORKING
+  - Upload PNG/JPEG/JPG images
+  - Displays thumbnail (max 200px × 200px)
+  - Click to view full-size in modal
+  - Shows filename below thumbnail
+  - Persists in chat history
 - Message deletion/editing
+- Message pinning
+- Image modal viewer (click to expand)
+- Image load error handling
+- Comprehensive debug logging
+
+## Recently Implemented
+- **Multiple file uploads in a single message** ✓ WORKING
+  - Select multiple files (images and/or PDFs) at once
+  - Images show in carousel preview with navigation (← 1/3 →)
+  - Send all files in one message
+  - All attachments grouped in single message bubble
+
+- **Multi-select images before sending** ✓ WORKING
+  - Click thumbnail images to select/deselect which ones to send
+  - Visual feedback: selected images highlighted with cyan border + checkmark
+  - Deselected images appear faded (50% opacity)
+  - Send button shows count: "Send (3)" for multiple selected images
+
+- **Add more images to existing selection** ✓ WORKING
+  - Click "Add More" button in preview modal to select additional images
+  - New images automatically added to existing selection
+  - Merge multiple batches of images before sending
 
 ## Not Yet Implemented
 - Voice message attachments
+- Cloud storage for large images (instead of localStorage)
+- Batch file compression optimization
+- File upload progress indicators

@@ -134,7 +134,7 @@ if (typeof ChatSystem === "undefined") {
              </div>
              <input type="file" id="chatFileInput" accept=".pdf,.png,.jpeg,.jpg" multiple>
              <small class="text-muted d-block mt-2">
-               <i class="ri-information-line"></i> Supported: PDF, PNG, JPEG, JPG (max 10MB)
+               <i class="ri-information-line"></i> Supported: PDF, PNG, JPEG, JPG (max 10MB). Images auto-compressed to 200KB.
              </small>
            </div>
         </div>
@@ -299,7 +299,6 @@ if (typeof ChatSystem === "undefined") {
             }
 
             // Typing indicator
-            const msgInput = document.getElementById("chatMessageInput");
             if (msgInput) {
                 msgInput.addEventListener("input", () =>
                     this.broadcastTypingIndicator(),
@@ -396,8 +395,8 @@ if (typeof ChatSystem === "undefined") {
                 return;
             }
 
-            const msgInput = document.getElementById("chatMessageInput");
-            const message = msgInput.value.trim();
+            const messageInput = document.getElementById("chatMessageInput");
+            const message = messageInput.value.trim();
 
             if (!message) return;
 
@@ -443,8 +442,15 @@ if (typeof ChatSystem === "undefined") {
          */
         handleFileUpload(event) {
             const files = event.target.files;
+            console.log(`[Chat] Files selected: ${files.length}`);
+
+            // Separate images and non-images
+            const imagesToPreview = [];
+            const filesToUpload = [];
+            let validFilesCount = 0;
 
             for (let file of files) {
+                console.log(`[Chat] Processing file: ${file.name}, type: ${file.type}, size: ${file.size}`);
                 // Validate file type
                 const isValidType =
                     this.allowedFileTypes.includes(file.type) ||
@@ -465,12 +471,45 @@ if (typeof ChatSystem === "undefined") {
                     continue;
                 }
 
-                // Read file and create message
+                validFilesCount++;
+
+                // Check if it's an image - collect for preview
+                if (file.type.startsWith('image/')) {
+                    console.log(`[Chat] Image detected, collecting for preview...`);
+                    imagesToPreview.push(file);
+                } else {
+                    // For PDFs and other files, collect for direct upload
+                    filesToUpload.push(file);
+                }
+            }
+
+            // Process non-image files immediately
+            filesToUpload.forEach((file) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    this.createFileMessage(file, e.target.result);
+                    console.log(`[Chat] File read complete for ${file.name}, dataUrl length: ${e.target.result.length}`);
+                    this.pendingAttachments = this.pendingAttachments || [];
+                    this.pendingAttachments.push({
+                        file: file,
+                        dataUrl: e.target.result
+                    });
+                };
+                reader.onerror = (e) => {
+                    console.error(`[Chat] Error reading file ${file.name}:`, e);
+                    alert(`Error reading file ${file.name}`);
                 };
                 reader.readAsDataURL(file);
+            });
+
+            // Show preview modal for images if any
+            if (imagesToPreview.length > 0) {
+                console.log(`[Chat] Showing preview modal for ${imagesToPreview.length} image(s)`);
+                this.showImagePreviewModal(imagesToPreview);
+            } else if (filesToUpload.length > 0 && imagesToPreview.length === 0) {
+                // If only non-image files were selected, send them after a short delay to ensure FileReader completes
+                setTimeout(() => {
+                    this.createFileMessage();
+                }, 100);
             }
 
             // Clear input
@@ -478,11 +517,430 @@ if (typeof ChatSystem === "undefined") {
         }
 
         /**
-         * Create a file message
+         * Open file upload dialog again to add more images
          */
-        createFileMessage(file, dataUrl) {
+        addMoreImages() {
+            const fileInput = document.getElementById("chatFileInput");
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+
+        /**
+         * Compress image to max 200KB using canvas
+         */
+        compressImage(file, callback) {
+            const MAX_SIZE = 200 * 1024; // 200KB
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`[Chat] Original image: ${img.width}x${img.height}, size: ${file.size} bytes`);
+
+                    let quality = 0.8;
+                    let compressedDataUrl = null;
+                    let attempts = 0;
+                    const maxAttempts = 5;
+
+                    const compressAttempt = () => {
+                        attempts++;
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        // Maintain aspect ratio, max 1200x1200
+                        const maxDimension = 1200;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxDimension || height > maxDimension) {
+                            const ratio = Math.min(maxDimension / width, maxDimension / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convert to data URL with reduced quality
+                        compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                        const compressedSize = compressedDataUrl.length;
+
+                        console.log(`[Chat] Compression attempt ${attempts}: quality=${quality.toFixed(2)}, size=${compressedSize} bytes, dims=${width}x${height}`);
+
+                        // If size is acceptable or we've tried enough, use it
+                        if (compressedSize <= MAX_SIZE || attempts >= maxAttempts) {
+                            console.log(`[Chat] Final compressed size: ${compressedSize} bytes (${(compressedSize / 1024).toFixed(2)}KB)`);
+                            callback(compressedDataUrl);
+                        } else {
+                            // Reduce quality and try again
+                            quality -= 0.1;
+                            compressAttempt();
+                        }
+                    };
+
+                    compressAttempt();
+                };
+
+                img.onerror = () => {
+                    console.error(`[Chat] Failed to load image for compression`);
+                    // Fallback: send original
+                    callback(e.target.result);
+                };
+
+                img.src = e.target.result;
+            };
+
+            reader.onerror = (e) => {
+                console.error(`[Chat] Error reading file for compression:`, e);
+                alert(`Error reading file ${file.name}`);
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        /**
+         * Show image preview modal (WhatsApp style) - supports multiple images
+         */
+        showImagePreviewModal(files) {
+            // Handle both single file and array of files
+            if (!Array.isArray(files)) {
+                files = [files];
+            }
+
+            console.log(`[Chat] Preparing preview modal for ${files.length} image(s)`);
+            
+            // Initialize or merge with existing pending images
+            if (!this.pendingImageFiles) {
+                this.pendingImageFiles = [];
+                this.pendingImageDataUrls = [];
+            }
+            
+            const startIndex = this.pendingImageFiles.length;
+            this.pendingImageFiles = this.pendingImageFiles.concat(files);
+            
+            let imagesLoadedCount = 0;
+
+            // Load all images
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageDataUrl = e.target.result;
+                    const globalIndex = startIndex + index;
+                    console.log(`[Chat] Image ${globalIndex + 1} loaded for preview, size: ${imageDataUrl.length}`);
+                    this.pendingImageDataUrls[globalIndex] = imageDataUrl;
+                    imagesLoadedCount++;
+                    
+                    // When all images are loaded, show the modal
+                    if (imagesLoadedCount === files.length) {
+                        this.displayImagePreviewModal(this.pendingImageFiles);
+                    }
+                };
+                reader.onerror = (e) => {
+                    console.error(`[Chat] Error reading file for preview:`, e);
+                    alert(`Error reading file ${file.name}`);
+                };
+                console.log(`[Chat] Reading file for preview: ${file.name}`);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /**
+         * Display the image preview modal with thumbnail carousel and multi-select
+         */
+        displayImagePreviewModal(files) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById("imagePreviewModal");
+            if (!modal) {
+                console.log(`[Chat] Creating image preview modal`);
+                const modalHtml = `
+                    <div class="modal fade" id="imagePreviewModal" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content bg-dark">
+                                <div class="modal-body p-0 position-relative">
+                                    <img id="previewModalImage" src="" alt="Preview" style="width: 100%; height: auto; max-height: 70vh; object-fit: contain; border-radius: 8px;">
+                                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+                                    
+                                    <!-- Image counter and navigation -->
+                                    <div id="imageCarouselControls" style="position: absolute; bottom: 75px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; align-items: center;">
+                                        <button type="button" class="btn btn-sm btn-light" id="prevImageBtn" style="display: none;">
+                                            <i class="ri-arrow-left-s-line"></i>
+                                        </button>
+                                        <span id="imageCounter" class="text-light" style="min-width: 60px; text-align: center; font-size: 12px;"></span>
+                                        <button type="button" class="btn btn-sm btn-light" id="nextImageBtn" style="display: none;">
+                                            <i class="ri-arrow-right-s-line"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Image thumbnails for multi-select -->
+                                    <div id="imageThumbnails" style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0, 0, 0, 0.7); padding: 10px; border-radius: 8px; max-width: 85%; overflow-x: auto;">
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 gap-2">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-outline-light" id="addMoreImagesBtn" onclick="chatSystem.addMoreImages()">
+                                        <i class="ri-add-line me-2"></i>Add More
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="sendImagesBtn">
+                                        <i class="ri-send-plane-fill me-2"></i>Send <span id="sendImageCount" style="margin-left: 4px;"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML("beforeend", modalHtml);
+                modal = document.getElementById("imagePreviewModal");
+                console.log(`[Chat] Modal created:`, modal);
+            }
+            
+            // Initialize selection state (all new images selected by default, preserve existing selections)
+            if (!this.selectedImageIndices) {
+                this.selectedImageIndices = new Set();
+            }
+            const newImagesStartIndex = files.length - (this.pendingImageFiles.length - files.length);
+            files.forEach((_, idx) => {
+                this.selectedImageIndices.add(idx);
+            });
+            this.currentImageIndex = 0;
+            
+            // Set initial preview image
+            const previewImg = document.getElementById("previewModalImage");
+            if (previewImg) {
+                previewImg.src = this.pendingImageDataUrls[0];
+                console.log(`[Chat] Preview image source set to image 1`);
+            }
+            
+            // Update counter
+            const imageCounter = document.getElementById("imageCounter");
+            if (imageCounter && files.length > 1) {
+                imageCounter.textContent = `1 / ${files.length}`;
+            }
+            
+            // Create and setup thumbnails
+            const thumbnailsContainer = document.getElementById("imageThumbnails");
+            if (thumbnailsContainer && files.length > 1) {
+                thumbnailsContainer.innerHTML = "";
+                files.forEach((file, index) => {
+                    const thumbnail = document.createElement("div");
+                    thumbnail.style.position = "relative";
+                    thumbnail.style.cursor = "pointer";
+                    thumbnail.style.borderRadius = "4px";
+                    thumbnail.style.overflow = "hidden";
+                    thumbnail.style.border = "2px solid transparent";
+                    thumbnail.style.transition = "all 0.2s ease";
+                    thumbnail.dataset.imageIndex = index;
+                    
+                    const img = document.createElement("img");
+                    img.src = this.pendingImageDataUrls[index];
+                    img.style.width = "50px";
+                    img.style.height = "50px";
+                    img.style.objectFit = "cover";
+                    
+                    // Selection checkmark overlay
+                    const checkmark = document.createElement("div");
+                    checkmark.style.position = "absolute";
+                    checkmark.style.top = "0";
+                    checkmark.style.left = "0";
+                    checkmark.style.width = "100%";
+                    checkmark.style.height = "100%";
+                    checkmark.style.background = "rgba(52, 168, 224, 0.3)";
+                    checkmark.style.display = "flex";
+                    checkmark.style.alignItems = "center";
+                    checkmark.style.justifyContent = "center";
+                    checkmark.style.color = "white";
+                    checkmark.style.fontSize = "20px";
+                    checkmark.innerHTML = "✓";
+                    checkmark.style.opacity = "0";
+                    checkmark.style.transition = "opacity 0.2s ease";
+                    
+                    thumbnail.appendChild(img);
+                    thumbnail.appendChild(checkmark);
+                    
+                    // Click to select/deselect
+                    thumbnail.addEventListener("click", () => {
+                        if (this.selectedImageIndices.has(index)) {
+                            this.selectedImageIndices.delete(index);
+                        } else {
+                            this.selectedImageIndices.add(index);
+                        }
+                        
+                        this.updateImagePreview(files);
+                        this.updateThumbnailSelection();
+                        this.updateSendButtonText(files);
+                    });
+                    
+                    // Update preview on hover
+                    thumbnail.addEventListener("mouseenter", () => {
+                        this.currentImageIndex = index;
+                        this.updateImagePreview(files);
+                    });
+                    
+                    thumbnailsContainer.appendChild(thumbnail);
+                });
+                
+                this.updateThumbnailSelection();
+            }
+            
+            // Update send button count
+            const sendImageCount = document.getElementById("sendImageCount");
+            this.updateSendButtonText(files);
+            
+            // Setup navigation if multiple images
+            if (files.length > 1) {
+                document.getElementById("prevImageBtn").style.display = "block";
+                document.getElementById("nextImageBtn").style.display = "block";
+                
+                // Remove old listeners by cloning
+                const prevBtn = document.getElementById("prevImageBtn");
+                const nextBtn = document.getElementById("nextImageBtn");
+                const newPrevBtn = prevBtn.cloneNode(true);
+                const newNextBtn = nextBtn.cloneNode(true);
+                prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+                nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+                
+                // Add new listeners
+                newPrevBtn.addEventListener("click", () => {
+                    this.currentImageIndex = (this.currentImageIndex - 1 + files.length) % files.length;
+                    this.updateImagePreview(files);
+                });
+                newNextBtn.addEventListener("click", () => {
+                    this.currentImageIndex = (this.currentImageIndex + 1) % files.length;
+                    this.updateImagePreview(files);
+                });
+            }
+            
+            // Setup send button
+            const sendBtn = document.getElementById("sendImagesBtn");
+            if (sendBtn) {
+                // Remove old listeners by cloning
+                const newSendBtn = sendBtn.cloneNode(true);
+                sendBtn.parentNode.replaceChild(newSendBtn, sendBtn);
+                
+                // Add new listener
+                newSendBtn.addEventListener("click", () => {
+                    console.log(`[Chat] Send button clicked for ${this.selectedImageIndices.size} image(s)`);
+                    const selectedFiles = Array.from(this.selectedImageIndices).map(idx => files[idx]);
+                    this.processAndSendImages(selectedFiles);
+                });
+            }
+            
+            // Show modal
+            console.log(`[Chat] Showing preview modal`);
+            try {
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+                console.log(`[Chat] Preview modal shown`);
+            } catch (err) {
+                console.error(`[Chat] Error showing modal:`, err);
+            }
+        }
+        
+        /**
+         * Update thumbnail selection state visually
+         */
+        updateThumbnailSelection() {
+            const thumbnails = document.querySelectorAll("#imageThumbnails > div");
+            thumbnails.forEach((thumb) => {
+                const index = parseInt(thumb.dataset.imageIndex);
+                const checkmark = thumb.querySelector("div:last-child");
+                
+                if (this.selectedImageIndices.has(index)) {
+                    thumb.style.borderColor = "#34A8E0";
+                    thumb.style.opacity = "1";
+                    if (checkmark) checkmark.style.opacity = "1";
+                } else {
+                    thumb.style.borderColor = "transparent";
+                    thumb.style.opacity = "0.5";
+                    if (checkmark) checkmark.style.opacity = "0";
+                }
+            });
+        }
+        
+        /**
+         * Update send button text with count
+         */
+        updateSendButtonText(files) {
+            const sendImageCount = document.getElementById("sendImageCount");
+            if (sendImageCount) {
+                const count = this.selectedImageIndices.size;
+                if (count > 1) {
+                    sendImageCount.textContent = `(${count})`;
+                } else if (count === 1) {
+                    sendImageCount.textContent = "";
+                } else {
+                    sendImageCount.textContent = "(0)";
+                }
+            }
+        }
+
+        /**
+         * Update the preview image when navigating through multiple images
+         */
+        updateImagePreview(files) {
+            const previewImg = document.getElementById("previewModalImage");
+            const imageCounter = document.getElementById("imageCounter");
+            
+            if (previewImg) {
+                previewImg.src = this.pendingImageDataUrls[this.currentImageIndex];
+                console.log(`[Chat] Preview image updated to image ${this.currentImageIndex + 1}`);
+            }
+            
+            if (imageCounter) {
+                imageCounter.textContent = `${this.currentImageIndex + 1} / ${files.length}`;
+            }
+        }
+
+        /**
+         * Process and send all pending images
+         */
+        processAndSendImages(files) {
+            let imagesProcessed = 0;
+            
+            files.forEach((file, index) => {
+                this.compressImage(file, (compressedDataUrl) => {
+                    console.log(`[Chat] Compressed image ${index + 1}/${files.length}, adding to pending attachments...`);
+                    this.pendingAttachments = this.pendingAttachments || [];
+                    this.pendingAttachments.push({
+                        file: file,
+                        dataUrl: compressedDataUrl
+                    });
+                    
+                    imagesProcessed++;
+                    
+                    // When all images are processed, send the message
+                    if (imagesProcessed === files.length) {
+                        console.log(`[Chat] All ${files.length} images processed, creating message...`);
+                        this.createFileMessage();
+                        const modal = document.getElementById("imagePreviewModal");
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) bsModal.hide();
+                    }
+                });
+            });
+        }
+
+        /**
+         * Create a file message with single or multiple attachments
+         */
+        createFileMessage() {
             if (!this.currentChat) {
                 alert("Please select a chat first");
+                return;
+            }
+
+            // Use pending attachments if available
+            const attachments = (this.pendingAttachments || []).map((att) => ({
+                id: Date.now() + Math.random(),
+                name: att.file.name,
+                type: att.file.type,
+                size: att.file.size,
+                url: att.dataUrl,
+            }));
+
+            if (attachments.length === 0) {
+                console.warn(`[Chat] No attachments to send`);
                 return;
             }
 
@@ -494,14 +952,13 @@ if (typeof ChatSystem === "undefined") {
                 content: "",
                 timestamp: new Date().toISOString(),
                 type: "file",
-                attachments: [{
-                    id: Date.now(),
-                    name: file.name,
-                    type: file.type,
-                    size: file.size,
-                    url: dataUrl,
-                }, ],
+                attachments: attachments,
             };
+
+            console.log(`[Chat] Created file message with ${attachments.length} attachment(s):`, newMessage);
+            attachments.forEach((att, idx) => {
+                console.log(`[Chat] Attachment ${idx + 1}: ${att.name}, URL length: ${att.url.length}`);
+            });
 
             if (!this.messages[this.currentChat.id]) {
                 this.messages[this.currentChat.id] = [];
@@ -513,7 +970,11 @@ if (typeof ChatSystem === "undefined") {
                 JSON.stringify(this.messages[this.currentChat.id]),
             );
 
+            // Clear pending attachments
+            this.pendingAttachments = [];
+
             this.renderMessages();
+            this.renderChatList();
         }
 
         /**
@@ -762,17 +1223,29 @@ if (typeof ChatSystem === "undefined") {
         /**
          * Render messages
          */
-        renderMessages() {
-            const container = document.getElementById("chatMessagesContainer");
-            if (!container || !this.currentChat) return;
+         renderMessages() {
+             const container = document.getElementById("chatMessagesContainer");
+             if (!container || !this.currentChat) return;
 
-            const messages = this.messages[this.currentChat.id] || [];
+             const messages = this.messages[this.currentChat.id] || [];
+             console.log(`[Chat] renderMessages: ${messages.length} messages for chat ${this.currentChat.id}`);
+             messages.forEach((msg, idx) => {
+                 console.log(`  [${idx}] Type: ${msg.type}, Has attachments: ${!!msg.attachments}, Count: ${msg.attachments?.length || 0}`);
+                 if (msg.attachments) {
+                     msg.attachments.forEach((att, attIdx) => {
+                         console.log(`    [att ${attIdx}] Name: ${att.name}, Type: ${att.type}, URL length: ${att.url?.length || 0}`);
+                     });
+                 }
+             });
+             
+             // Store image URLs for later assignment
+             this.imageUrlMap = {};
 
-            if (messages.length === 0) {
-                container.innerHTML =
-                    '<div class="text-center text-muted py-5">No messages yet. Start the conversation.</div>';
-                return;
-            }
+             if (messages.length === 0) {
+                 container.innerHTML =
+                     '<div class="text-center text-muted py-5">No messages yet. Start the conversation.</div>';
+                 return;
+             }
 
             const messagesHtml = messages
                 .map((msg) => {
@@ -790,26 +1263,33 @@ if (typeof ChatSystem === "undefined") {
                         contentHtml = `<div class="message-text">${this.escapeHtml(msg.content)}</div>`;
                     } else if (msg.type === "file") {
                         contentHtml = msg.attachments
-                            .map((att) => {
+                            .map((att, idx) => {
                                 const isImage = att.type?.startsWith("image/");
                                 if (isImage) {
-                                    return `
-          <div class="message-file image-preview">
-            <img src="${att.url}" alt="${att.name}" class="preview-thumbnail" loading="lazy">
-            <small class="image-filename">${att.name}</small>
-          </div>
-        `;
+                                    // Ensure URL is properly formatted (should be data URL or blob URL)
+                                    const imageUrl = att.url || att.dataUrl || "";
+                                    console.log(`[Chat] Rendering image: ${att.name}, URL length: ${imageUrl.length}`);
+                                    if (!imageUrl) {
+                                        console.warn(`[Chat] No URL for image: ${att.name}`);
+                                        return `<div class="message-file image-preview"><div class="image-error">Image not available</div></div>`;
+                                    }
+                                    // Store URL in map, set via JS after rendering to avoid HTML parsing issues
+                                    const uniqueId = `img_${msg.id}_${idx}`;
+                                    this.imageUrlMap[uniqueId] = imageUrl;
+                                    return `<div class="message-file image-preview"><img id="${uniqueId}" alt="${att.name}" class="preview-thumbnail" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3C/svg%3E"></div>`;
                                 } else {
+                                   const escapedName = this.escapeHtml(att.name);
+                                   const escapedUrl = this.escapeHtml(att.url);
                                     return `
-          <div class="message-file">
-            <div class="d-flex align-items-center">
-              <i class="ri-file-line me-2"></i>
-              <a href="${att.url}" download="${att.name}" class="text-decoration-none flex-grow-1">
-                ${att.name} (${this.formatFileSize(att.size)})
-              </a>
-            </div>
-          </div>
-        `;
+                    <div class="message-file">
+                    <div class="d-flex align-items-center">
+                    <i class="ri-file-line me-2"></i>
+                    <a href="${escapedUrl}" download="${escapedName}" class="text-decoration-none flex-grow-1">
+                    ${escapedName} (${this.formatFileSize(att.size)})
+                    </a>
+                    </div>
+                    </div>
+                    `;
                                 }
                             })
                             .join("");
@@ -881,7 +1361,75 @@ if (typeof ChatSystem === "undefined") {
                 .join("");
 
             container.innerHTML = messagesHtml;
-            container.scrollTop = container.scrollHeight;
+
+            // Scroll to bottom to show new messages
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+
+            // Add click handlers for image previews and set actual image URLs
+            setTimeout(() => {
+                container.querySelectorAll(".preview-thumbnail").forEach((img) => {
+                    // Set the actual image URL from the map
+                    const imageId = img.id;
+                    if (this.imageUrlMap[imageId]) {
+                        img.src = this.imageUrlMap[imageId];
+                        console.log(`[Chat] Set image source for ${img.alt}, URL length: ${this.imageUrlMap[imageId].length}`);
+                    }
+                    
+                    img.style.cursor = "pointer";
+                    img.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        console.log(`[Chat] Image clicked: ${img.alt}`);
+                        this.openImageModal(img.src, img.alt);
+                    });
+                    // Log when image loads
+                    img.addEventListener('load', () => {
+                        console.log(`[Chat] Image loaded: ${img.alt}`);
+                    });
+                    img.addEventListener('error', () => {
+                        console.error(`[Chat] Image failed to load: ${img.alt}`);
+                    });
+                });
+            }, 100);
+        }
+
+        /**
+         * Open image in a modal viewer (WhatsApp style)
+         */
+        openImageModal(imageSrc, imageName) {
+            let modal = document.getElementById("imageViewerModal");
+            if (!modal) {
+                const modalHtml = `
+                    <div class="modal fade" id="imageViewerModal" tabindex="-1">
+                        <div class="modal-dialog modal-fullscreen">
+                            <div class="modal-content bg-dark border-0">
+                                <div class="modal-header border-0 bg-dark" style="padding: 12px 20px;">
+                                    <div class="d-flex align-items-center gap-3" style="flex: 1;">
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        <small class="text-light" id="imageViewerTime" style="opacity: 0.7;"></small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-light" title="Download" onclick="this.closest('.modal').querySelector('#imageViewerImg').download = true; this.closest('.modal').querySelector('#imageViewerImg').click();">
+                                        <i class="ri-download-2-line"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body d-flex align-items-center justify-content-center p-0" style="background: #000;">
+                                    <img id="imageViewerImg" src="" alt="" style="max-width: 100%; max-height: 100vh; object-fit: contain;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML("beforeend", modalHtml);
+                modal = document.getElementById("imageViewerModal");
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById("imageViewerTime").textContent = timeStr;
+            document.getElementById("imageViewerImg").src = imageSrc;
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
         }
 
         /**

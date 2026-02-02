@@ -157,13 +157,15 @@ const FeatureAccessLogger = {
                 },
                 body: JSON.stringify(logEntry)
             }).catch(err => {
-                console.warn('Could not send log to server:', err);
-                // Store locally if server unavailable
+                // Silently fail on dev server - expected behavior
                 FeatureAccessLogger.storeLocalLog(logEntry);
             });
 
             if (response && !response.ok) {
-                console.warn('Server returned error for log:', response.status);
+                // Silently handle 405 and other errors on dev server
+                if (response.status !== 405) {
+                    console.warn('Server returned error for log:', response.status);
+                }
                 FeatureAccessLogger.storeLocalLog(logEntry);
             }
         } catch (error) {

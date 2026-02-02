@@ -188,6 +188,12 @@
     line-height: 1.4;
 }
 
+/* Override max-width for image previews */
+.message-item .message-file.image-preview {
+    max-width: none !important;
+    width: auto;
+}
+
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -711,30 +717,70 @@
 
 /* Image Preview Thumbnails */
 .message-file.image-preview {
-    background: transparent;
-    padding: 0;
-    border: none;
-    margin-top: 6px;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    margin-top: 0;
+    display: block;
+    position: relative;
 }
 
 .preview-thumbnail {
-    max-width: 200px;
-    max-height: 200px;
-    border-radius: 8px;
+    display: block;
+    width: 100%;
+    height: auto;
+    min-width: 200px;
+    max-width: 300px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
+    object-fit: cover;
+    background: #f0f0f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    aspect-ratio: 1 / 1;
+}
+
+.preview-thumbnail:active {
+    transform: scale(0.98);
 }
 
 .preview-thumbnail:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* WhatsApp-style image container */
+.message-item .message-file.image-preview {
+    padding: 2px !important;
+    border-radius: 12px;
+    background: transparent;
+}
+
+/* Own messages - right-aligned */
+.message-group.text-end .message-file.image-preview .preview-thumbnail {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #DCF8C6 0%, #D5F4BE 100%);
+}
+
+/* Received messages - left-aligned */
+.message-group:not(.text-end) .message-file.image-preview .preview-thumbnail {
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
 }
 
 .image-filename {
-    display: block;
-    margin-top: 4px;
-    color: #666;
-    font-size: 0.8rem;
+    display: none;
+}
+
+.image-error {
+    display: inline-block;
+    padding: 20px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #999;
+    font-size: 0.9rem;
+    text-align: center;
 }
 
 /* Search Messages Button */
