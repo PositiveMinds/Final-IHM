@@ -96,11 +96,14 @@ Message Layout (Group Chat):
 - LocalStorage for chat persistence
 
 ## Future Enhancement Ideas
+## Implemented ✓
 - Message read receipts
 - Typing indicators
 - Message reactions/emoji support
 - Message search functionality
-- Voice message attachments
 - Image preview thumbnails
 - Message pinning
 - Message deletion/editing
+
+## Not Yet Implemented
+- Voice message attachments
