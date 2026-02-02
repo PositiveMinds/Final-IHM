@@ -38,9 +38,6 @@
     <!-- Material Design Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
 
-    <!-- Emoji Mart CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" rel="stylesheet">
-
     <!-- WhatsApp Style Chat CSS -->
     <style>
 .chat {
@@ -1771,7 +1768,8 @@ cursor: pointer;
                         <!-- Input Area -->
                         <div style="padding: 20px 24px; border-top: 1px solid #F0F0F0; background: #FFFFFF;">
                             <form id="form" style="display: flex; gap: 10px; align-items: center;">
-                                <button type="button" style="background: none; border: none; cursor: pointer; color: #999; padding: 0; display: flex; align-items: center; flex-shrink: 0;">
+                                <input type="file" id="messageFileInput" style="display: none;" accept=".pdf,.png,.jpeg,.jpg,.gif,.webp" />
+                                <button type="button" id="attachFileBtn" style="background: none; border: none; cursor: pointer; color: #999; padding: 0; display: flex; align-items: center; flex-shrink: 0;" title="Attach file">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
                                         <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
                                     </svg>
@@ -8213,6 +8211,43 @@ cursor: pointer;
                 return h + ':' + m;
             }
 
+            $("#attachFileBtn").click(function(e) {
+                e.preventDefault();
+                $("#messageFileInput").click();
+            });
+
+            $("#messageFileInput").change(function(e) {
+                var files = e.target.files;
+                if (files.length > 0) {
+                    var file = files[0];
+                    var fileName = file.name;
+                    var fileSize = file.size;
+                    
+                    // Add file info to message input
+                    var currentMsg = $("#val").val().trim();
+                    var fileInfo = "[Attachment: " + fileName + " (" + Math.round(fileSize / 1024) + " KB)]";
+                    
+                    if (currentMsg) {
+                        $("#val").val(currentMsg + "\n" + fileInfo);
+                    } else {
+                        $("#val").val(fileInfo);
+                    }
+                    
+                    // Read file and prepare for sending
+                    var reader = new FileReader();
+                    reader.onload = function(evt) {
+                        // Store file data for sending
+                        window.pendingFileAttachment = {
+                            name: fileName,
+                            type: file.type,
+                            size: fileSize,
+                            data: evt.target.result
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
             $("#form").submit(function(e) {
                 e.preventDefault();
                 $("#msend").click();
@@ -8383,9 +8418,6 @@ cursor: pointer;
         };
     </script>
 
-    <!-- Emoji Mart JS -->
-    <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
-
     <!-- Chat Button Handler -->
     <script>
         $(document).ready(function() {
@@ -8398,46 +8430,288 @@ cursor: pointer;
         });
     </script>
 
-    <!-- Emoji Mart Initialization -->
+    <!-- Simple Emoji Picker with Categories and Search -->
     <script>
-        // Initialize emoji picker when needed
+        // Simple emoji picker without external dependencies
         window.emojiPickerToggle = function() {
-            var emojiBtn = document.getElementById('emojiBtn');
             var emojiPicker = document.getElementById('emojiPicker');
             
             if (!emojiPicker) {
+                // Get recently selected emojis from localStorage
+                var recentEmojis = [];
+                try {
+                    var stored = localStorage.getItem('recentEmojis');
+                    if (stored) {
+                        recentEmojis = JSON.parse(stored);
+                    }
+                } catch(e) {
+                    console.log('localStorage not available');
+                }
+                
+                // Emojis organized by categories
+                var emojiCategories = {
+                    recent: {
+                        label: '⏰ Recent',
+                        emojis: recentEmojis.length > 0 ? recentEmojis : [{ emoji: '😊', keywords: ['recent'] }],
+                        isRecent: true
+                    },
+                    smileys: {
+                        label: '😀 Smileys',
+                        emojis: [
+                            { emoji: '😀', keywords: ['happy', 'smile', 'face'] },
+                            { emoji: '😁', keywords: ['happy', 'grin', 'face'] },
+                            { emoji: '😂', keywords: ['laugh', 'funny', 'face'] },
+                            { emoji: '😃', keywords: ['happy', 'smile', 'face'] },
+                            { emoji: '😄', keywords: ['happy', 'smile', 'face'] },
+                            { emoji: '😅', keywords: ['happy', 'sweat', 'face'] },
+                            { emoji: '😆', keywords: ['laugh', 'funny', 'face'] },
+                            { emoji: '😇', keywords: ['angel', 'face'] },
+                            { emoji: '😈', keywords: ['devil', 'evil', 'face'] },
+                            { emoji: '😉', keywords: ['wink', 'face'] },
+                            { emoji: '😊', keywords: ['happy', 'smile', 'face'] },
+                            { emoji: '😋', keywords: ['yummy', 'tongue', 'face'] },
+                            { emoji: '😌', keywords: ['relieved', 'face'] },
+                            { emoji: '😍', keywords: ['love', 'heart', 'face'] },
+                            { emoji: '😎', keywords: ['cool', 'face'] },
+                            { emoji: '😏', keywords: ['smirk', 'face'] }
+                        ]
+                    },
+                    sad: {
+                        label: '😢 Sad',
+                        emojis: [
+                            { emoji: '😐', keywords: ['neutral', 'face'] },
+                            { emoji: '😑', keywords: ['blank', 'face'] },
+                            { emoji: '😒', keywords: ['unamused', 'face'] },
+                            { emoji: '😓', keywords: ['sweat', 'face'] },
+                            { emoji: '😔', keywords: ['pensive', 'face'] },
+                            { emoji: '😕', keywords: ['confused', 'face'] },
+                            { emoji: '😖', keywords: ['distressed', 'face'] },
+                            { emoji: '😗', keywords: ['kiss', 'face'] },
+                            { emoji: '😘', keywords: ['kiss', 'heart', 'face'] },
+                            { emoji: '😙', keywords: ['kiss', 'face'] },
+                            { emoji: '😚', keywords: ['kiss', 'face'] },
+                            { emoji: '😛', keywords: ['tongue', 'face'] },
+                            { emoji: '😜', keywords: ['wink', 'tongue', 'face'] },
+                            { emoji: '😝', keywords: ['yummy', 'tongue', 'face'] },
+                            { emoji: '😞', keywords: ['sad', 'disappointed', 'face'] },
+                            { emoji: '😟', keywords: ['worried', 'face'] },
+                            { emoji: '😠', keywords: ['angry', 'face'] },
+                            { emoji: '😡', keywords: ['angry', 'rage', 'face'] },
+                            { emoji: '😢', keywords: ['sad', 'tear', 'face'] },
+                            { emoji: '😣', keywords: ['persevere', 'face'] },
+                            { emoji: '😤', keywords: ['frustrated', 'face'] },
+                            { emoji: '😥', keywords: ['sad', 'disappointed', 'face'] },
+                            { emoji: '😦', keywords: ['shocked', 'surprised', 'face'] },
+                            { emoji: '😧', keywords: ['anguished', 'face'] },
+                            { emoji: '😨', keywords: ['fear', 'scared', 'face'] },
+                            { emoji: '😩', keywords: ['sleepy', 'tired', 'face'] },
+                            { emoji: '😪', keywords: ['sleepy', 'tired', 'face'] },
+                            { emoji: '😫', keywords: ['tired', 'exhausted', 'face'] },
+                            { emoji: '😬', keywords: ['nervous', 'face'] },
+                            { emoji: '😭', keywords: ['sad', 'cry', 'face'] },
+                            { emoji: '😮', keywords: ['surprised', 'shocked', 'face'] },
+                            { emoji: '😯', keywords: ['hushed', 'surprised', 'face'] },
+                            { emoji: '😰', keywords: ['worried', 'scared', 'face'] },
+                            { emoji: '😱', keywords: ['fear', 'scared', 'face'] },
+                            { emoji: '😲', keywords: ['astonished', 'surprised', 'face'] },
+                            { emoji: '😳', keywords: ['flushed', 'embarrassed', 'face'] },
+                            { emoji: '😴', keywords: ['sleepy', 'sleep', 'face'] },
+                            { emoji: '😵', keywords: ['dizzy', 'face'] },
+                            { emoji: '😶', keywords: ['shy', 'face'] },
+                            { emoji: '😷', keywords: ['sick', 'mask', 'face'] }
+                        ]
+                    },
+                    hearts: {
+                        label: '❤️ Hearts',
+                        emojis: [
+                            { emoji: '❤️', keywords: ['love', 'heart', 'red'] },
+                            { emoji: '💕', keywords: ['love', 'heart'] },
+                            { emoji: '💖', keywords: ['love', 'heart'] },
+                            { emoji: '💗', keywords: ['love', 'heart'] },
+                            { emoji: '💙', keywords: ['love', 'heart', 'blue'] },
+                            { emoji: '💚', keywords: ['love', 'heart', 'green'] },
+                            { emoji: '💛', keywords: ['love', 'heart', 'yellow'] },
+                            { emoji: '💜', keywords: ['love', 'heart', 'purple'] }
+                        ]
+                    },
+                    hands: {
+                        label: '👋 Hands',
+                        emojis: [
+                            { emoji: '👋', keywords: ['wave', 'hand', 'hello'] },
+                            { emoji: '👌', keywords: ['ok', 'hand'] },
+                            { emoji: '👍', keywords: ['thumbs', 'up', 'hand'] },
+                            { emoji: '👎', keywords: ['thumbs', 'down', 'hand'] },
+                            { emoji: '👏', keywords: ['clap', 'applause', 'hand'] },
+                            { emoji: '👐', keywords: ['open', 'hands'] },
+                            { emoji: '💪', keywords: ['muscle', 'strong', 'power'] },
+                            { emoji: '🙏', keywords: ['pray', 'thanks', 'please'] }
+                        ]
+                    },
+                    celebration: {
+                        label: '🎉 Celebration',
+                        emojis: [
+                            { emoji: '👑', keywords: ['crown', 'king', 'queen'] },
+                            { emoji: '⭐', keywords: ['star', 'sparkle'] },
+                            { emoji: '✨', keywords: ['sparkle', 'star', 'shiny'] },
+                            { emoji: '🎉', keywords: ['party', 'celebration', 'confetti'] },
+                            { emoji: '🎊', keywords: ['party', 'celebration', 'confetti'] },
+                            { emoji: '🎈', keywords: ['balloon', 'party'] },
+                            { emoji: '🎁', keywords: ['gift', 'present', 'box'] }
+                        ]
+                    },
+                    symbols: {
+                        label: '⚡ Symbols',
+                        emojis: [
+                            { emoji: '🔥', keywords: ['fire', 'hot', 'flame'] },
+                            { emoji: '⚡', keywords: ['lightning', 'electric', 'bolt'] },
+                            { emoji: '💥', keywords: ['explosion', 'boom', 'burst'] },
+                            { emoji: '✅', keywords: ['check', 'checkmark', 'yes'] },
+                            { emoji: '❌', keywords: ['x', 'cross', 'no'] },
+                            { emoji: '⚠️', keywords: ['warning', 'alert', 'caution'] },
+                            { emoji: '🚀', keywords: ['rocket', 'space', 'launch'] },
+                            { emoji: '❓', keywords: ['question', 'help'] },
+                            { emoji: '❗', keywords: ['exclamation', 'important'] }
+                        ]
+                    }
+                };
+                
                 // Create emoji picker container
                 emojiPicker = document.createElement('div');
                 emojiPicker.id = 'emojiPicker';
-                emojiPicker.style.position = 'absolute';
-                emojiPicker.style.bottom = '60px';
-                emojiPicker.style.right = '10px';
-                emojiPicker.style.zIndex = '9999';
+                emojiPicker.style.cssText = 'position: fixed; bottom: 80px; right: 20px; z-index: 10000; background: white; border: 1px solid #E8E8E8; border-radius: 12px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 340px; max-height: 450px; overflow: hidden; display: flex; flex-direction: column;';
                 
-                var inputArea = document.getElementById('chatInputArea');
-                if (inputArea) {
-                    inputArea.parentNode.insertBefore(emojiPicker, inputArea);
+                // Create search input
+                var searchInput = document.createElement('input');
+                searchInput.id = 'emojiSearch';
+                searchInput.type = 'text';
+                searchInput.placeholder = 'Search emoji...';
+                searchInput.style.cssText = 'padding: 10px; border: 1px solid #E8E8E8; border-radius: 8px; margin-bottom: 10px; font-size: 14px; box-sizing: border-box; width: 100%;';
+                emojiPicker.appendChild(searchInput);
+                
+                // Create category tabs
+                var tabsContainer = document.createElement('div');
+                tabsContainer.id = 'emojiTabs';
+                tabsContainer.style.cssText = 'display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 6px; border-bottom: 1px solid #E8E8E8;';
+                emojiPicker.appendChild(tabsContainer);
+                
+                // Create emoji grid container
+                var emojiGrid = document.createElement('div');
+                emojiGrid.id = 'emojiGrid';
+                emojiGrid.style.cssText = 'display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; overflow-y: auto; flex: 1;';
+                emojiPicker.appendChild(emojiGrid);
+                
+                var allEmojis = [];
+                var currentCategory = 'recent';
+                
+                // Function to render emojis
+                function renderEmojis(emojisToRender) {
+                    emojiGrid.innerHTML = '';
+                    emojisToRender.forEach(function(item) {
+                        var btn = document.createElement('button');
+                        btn.textContent = item.emoji;
+                        btn.type = 'button';
+                        btn.style.cssText = 'background: none; border: 1px solid #E8E8E8; padding: 8px; cursor: pointer; font-size: 20px; border-radius: 6px; transition: all 0.2s;';
+                        btn.onmouseover = function() {
+                            this.style.background = '#F3F4F6';
+                            this.style.transform = 'scale(1.2)';
+                        };
+                        btn.onmouseout = function() {
+                            this.style.background = 'none';
+                            this.style.transform = 'scale(1)';
+                        };
+                        btn.onclick = function(e) {
+                            e.preventDefault();
+                            var input = document.getElementById('val');
+                            if (input) {
+                                input.value += item.emoji;
+                                input.focus();
+                            }
+                            
+                            // Save to recently selected
+                            try {
+                                var recent = [];
+                                try {
+                                    recent = JSON.parse(localStorage.getItem('recentEmojis') || '[]');
+                                } catch(err) {}
+                                
+                                // Remove if already exists, then add to beginning
+                                recent = recent.filter(e => e.emoji !== item.emoji);
+                                recent.unshift(item);
+                                
+                                // Keep only last 12 recently used
+                                recent = recent.slice(0, 12);
+                                localStorage.setItem('recentEmojis', JSON.stringify(recent));
+                            } catch(err) {
+                                console.log('Could not save recent emoji');
+                            }
+                            
+                            emojiPicker.style.display = 'none';
+                        };
+                        emojiGrid.appendChild(btn);
+                    });
                 }
                 
-                // Initialize Emoji Mart picker
-                new EmojiMart.Picker({
-                    onEmojiSelect: function(emoji) {
-                        var input = document.getElementById('val');
-                        if (input) {
-                            input.value += emoji.native;
-                            input.focus();
+                // Create category tabs
+                Object.keys(emojiCategories).forEach(function(categoryKey) {
+                    var tab = document.createElement('button');
+                    tab.type = 'button';
+                    tab.textContent = emojiCategories[categoryKey].label;
+                    tab.style.cssText = 'padding: 6px 12px; border: 1px solid #E8E8E8; border-radius: 6px; background: ' + (categoryKey === currentCategory ? '#734CF4' : '#F3F4F6') + '; color: ' + (categoryKey === currentCategory ? 'white' : '#1a1a1a') + '; cursor: pointer; font-size: 12px; white-space: nowrap; transition: all 0.2s;';
+                    tab.onclick = function(e) {
+                        e.preventDefault();
+                        currentCategory = categoryKey;
+                        var query = searchInput.value.toLowerCase().trim();
+                        
+                        // Update tab styling
+                        document.querySelectorAll('#emojiTabs button').forEach(function(btn) {
+                            btn.style.background = '#F3F4F6';
+                            btn.style.color = '#1a1a1a';
+                        });
+                        tab.style.background = '#734CF4';
+                        tab.style.color = 'white';
+                        
+                        // Filter and render
+                        if (query === '') {
+                            renderEmojis(emojiCategories[categoryKey].emojis);
+                        } else {
+                            var filtered = emojiCategories[categoryKey].emojis.filter(function(item) {
+                                return item.keywords.some(function(keyword) {
+                                    return keyword.includes(query);
+                                });
+                            });
+                            renderEmojis(filtered);
                         }
-                        // Toggle picker closed after selection
-                        if (emojiPicker) {
-                            emojiPicker.style.display = 'none';
-                        }
+                    };
+                    tabsContainer.appendChild(tab);
+                    
+                    // Collect all emojis
+                    allEmojis = allEmojis.concat(emojiCategories[categoryKey].emojis);
+                });
+                
+                // Search functionality
+                searchInput.oninput = function(e) {
+                    var query = e.target.value.toLowerCase().trim();
+                    if (query === '') {
+                        renderEmojis(emojiCategories[currentCategory].emojis);
+                    } else {
+                        var filtered = allEmojis.filter(function(item) {
+                            return item.keywords.some(function(keyword) {
+                                return keyword.includes(query);
+                            });
+                        });
+                        renderEmojis(filtered);
                     }
-                }).mount(emojiPicker);
+                };
+                
+                // Initial render
+                renderEmojis(emojiCategories[currentCategory].emojis);
+                document.body.appendChild(emojiPicker);
             }
             
             // Toggle visibility
             if (emojiPicker.style.display === 'none' || !emojiPicker.style.display) {
-                emojiPicker.style.display = 'block';
+                emojiPicker.style.display = 'flex';
+                document.getElementById('emojiSearch').focus();
             } else {
                 emojiPicker.style.display = 'none';
             }
