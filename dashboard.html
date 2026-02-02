@@ -7967,18 +7967,18 @@ cursor: pointer;
 
             // Contacts data matching ChatONN design
             var contacts = [
-                { id: 1, name: 'Kirti Yadov', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kirti', lastMessage: 'I really like your vibe but i still rock we can do this in...', time: '3:21 AM', status: 'online' },
-                { id: 2, name: 'Anish Melroy', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anish', lastMessage: 'Are you meeting today i can...', time: '5:44 PM', status: 'online' },
-                { id: 3, name: 'Akanksha Shrivs', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Akanksha', lastMessage: 'Perfect you for this more...', time: '6:00 PM', status: 'offline' },
-                { id: 4, name: 'Harshit Nagar', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Harshit', lastMessage: 'i had night party 30x conveniently', time: '1:18 PM', status: 'offline' },
-                { id: 5, name: 'Ashish Singh', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ashish', lastMessage: 'lets i meet you today. Call me...', time: '8:12 AM', status: 'offline' }
+                { id: 1, name: 'Kirti Yadov', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop', lastMessage: 'I really like your vibe but i still rock we can do this in...', time: '3:21 AM', status: 'online' },
+                { id: 2, name: 'Anish Melroy', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop', lastMessage: 'Are you meeting today i can...', time: '5:44 PM', status: 'online' },
+                { id: 3, name: 'Akanksha Shrivs', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop', lastMessage: 'Perfect you for this more...', time: '6:00 PM', status: 'offline' },
+                { id: 4, name: 'Harshit Nagar', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop', lastMessage: 'i had night party 30x conveniently', time: '1:18 PM', status: 'offline' },
+                { id: 5, name: 'Ashish Singh', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop', lastMessage: 'lets i meet you today. Call me...', time: '8:12 AM', status: 'offline' }
             ];
 
             var notifications = [
-                { name: '@john mentioned you in "trip to Goa"', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=john' },
-                { name: '@chiya.singh added you in "Group Study"', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chiya' },
-                { name: '@sudharith removed you from group "Makers"', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sudharith' },
-                { name: '@amit mentioned you in public chat', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=amit' }
+                { name: '@john mentioned you in "trip to Goa"', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
+                { name: '@chiya.singh added you in "Group Study"', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
+                { name: '@sudharith removed you from group "Makers"', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' },
+                { name: '@amit mentioned you in public chat', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop' }
             ];
 
             var suggestions = [
@@ -8000,7 +8000,7 @@ cursor: pointer;
                         '<div style="position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; background: ' + statusColor + '; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);"></div>' +
                         '</div>' +
                         '<div style="flex: 1; min-width: 0;">' +
-                        '<p style="margin: 0 0 6px 0; font-weight: 700; color: #1F2937; font-size: 14px; letter-spacing: -0.3px;">' + contact.name + '</p>' +
+                        '<p style="margin: 0 0 6px 0; font-weight: 700; color: #1F2937; font-size: 14px; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + contact.name + '</p>' +
                         '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">' +
                         '<span style="display: inline-block; width: 6px; height: 6px; background: ' + statusColor + '; border-radius: 50%;"></span>' +
                         '<span style="font-size: 12px; color: #6B7280; font-weight: 500;">' + statusText + '</span>' +
@@ -8186,7 +8186,7 @@ cursor: pointer;
                         const contactEmail = (item.getAttribute('data-email') || '').toLowerCase();
                         
                         if (contactName.includes(searchTerm) || contactEmail.includes(searchTerm)) {
-                            item.style.display = 'block';
+                            item.style.display = 'flex';
                         } else {
                             item.style.display = 'none';
                         }
