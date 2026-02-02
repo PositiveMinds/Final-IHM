@@ -41,6 +41,11 @@ body {
     color: #6c757d !important;
 }
 
+/* ===== PAGE WRAPPER ===== */
+.page-wrapper {
+    background: transparent !important;
+}
+
 /* ===== GRADIENT TEXT ===== */
 .gradient-text {
     background: linear-gradient(135deg, #EAB34B 0%, #15696B 100%);

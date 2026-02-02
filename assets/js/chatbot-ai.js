@@ -1267,3 +1267,4 @@ ${p.notes ? `<br/>Notes: ${p.notes}` : ""}
 
 // Initialize chatbot globally
 const healthFlowChatbot = new HealthFlowChatbot();
+window.healthFlowChatbot = healthFlowChatbot; // Expose to global scope

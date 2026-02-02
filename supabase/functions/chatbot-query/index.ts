@@ -466,47 +466,55 @@ async function getAppointmentsLastWeek(facilityId: string, query: string, params
 }
 
 async function getAppointmentsNextWeek(facilityId: string, query: string, params?: any) {
-  const today = new Date();
-  
-  // Calculate week boundaries (Monday to Sunday)
-  // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-  const dayOfWeek = today.getDay();
-  
-  // Calculate Monday of the next week
-  // If today is Monday (1), next Monday is 7 days away
-  // If today is Sunday (0), next Monday is 1 day away
-  const daysUntilNextMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
-  const nextMonday = new Date(today.getTime() + daysUntilNextMonday * 24 * 60 * 60 * 1000);
-  
-  // Sunday of next week is 6 days after Monday
-  const nextSunday = new Date(nextMonday.getTime() + 6 * 24 * 60 * 60 * 1000);
+   const today = new Date();
+   
+   // Reset time to midnight for accurate date comparison
+   today.setHours(0, 0, 0, 0);
+   
+   // Calculate week boundaries (Monday to Sunday)
+   // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+   const dayOfWeek = today.getDay();
+   
+   // Calculate Monday of the NEXT week
+   // We need to first get to the end of THIS week (Sunday), then add 1 day to get to next Monday
+   // Days until end of this week (Sunday): 
+   //   - If today is Sunday (0): 0 days (today is Sunday)
+   //   - If today is Monday (1): 6 days
+   //   - If today is Tuesday (2): 5 days
+   //   - etc.
+   const daysUntilSunday = dayOfWeek === 0 ? 0 : (7 - dayOfWeek);
+   const nextSunday = new Date(today.getTime() + daysUntilSunday * 24 * 60 * 60 * 1000);
+   const nextMonday = new Date(nextSunday.getTime() + 1 * 24 * 60 * 60 * 1000);
+   
+   // Next Sunday is the following Sunday (6 days after Monday)
+   const nextWeekSunday = new Date(nextMonday.getTime() + 6 * 24 * 60 * 60 * 1000);
 
-  const nextMondayStr = nextMonday.toISOString().split("T")[0];
-  const nextSundayStr = nextSunday.toISOString().split("T")[0];
+   const nextMondayStr = nextMonday.toISOString().split("T")[0];
+   const nextWeekSundayStr = nextWeekSunday.toISOString().split("T")[0];
 
-  const { data, error } = await supabase
-    .from("appointments")
-    .select("apid, pid, appointment_date, appointment_type, status")
-    .eq("fid", facilityId)
-    .gte("appointment_date", nextMondayStr)
-    .lte("appointment_date", nextSundayStr)
-    .order("appointment_date", { ascending: true });
+   const { data, error } = await supabase
+     .from("appointments")
+     .select("apid, pid, appointment_date, appointment_type, status")
+     .eq("fid", facilityId)
+     .gte("appointment_date", nextMondayStr)
+     .lte("appointment_date", nextWeekSundayStr)
+     .order("appointment_date", { ascending: true });
 
-  if (error || !data?.length) {
-    return { type: "text", message: "No appointments scheduled for next week." };
-  }
+   if (error || !data?.length) {
+     return { type: "text", message: "No appointments scheduled for next week." };
+   }
 
-  return {
-    type: "table",
-    columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
-    data: data.map((a: any) => ({
-      "Appointment ID": a.apid,
-      "Patient ID": a.pid,
-      Date: formatDate(a.appointment_date),
-      Type: a.appointment_type || "Follow-up",
-      Status: a.status || "Scheduled",
-    })),
-  };
+   return {
+     type: "table",
+     columns: ["Appointment ID", "Patient ID", "Date", "Type", "Status"],
+     data: data.map((a: any) => ({
+       "Appointment ID": a.apid,
+       "Patient ID": a.pid,
+       Date: formatDate(a.appointment_date),
+       Type: a.appointment_type || "Follow-up",
+       Status: a.status || "Scheduled",
+     })),
+   };
 }
 
 async function getAppointmentsThisMonth(facilityId: string, query: string, params?: any) {

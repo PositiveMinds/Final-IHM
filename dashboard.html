@@ -20,6 +20,8 @@
 	************* -->
     <link rel="stylesheet" href="assets/css/remixicon.css">
     <link rel="stylesheet" href="assets/css/main.min.css">
+    <link rel="stylesheet" href="chat-system-improved.css">
+    <link rel="stylesheet" href="assets/css/chatbot.css">
 
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -33,73 +35,358 @@
     <!-- Flatpickr JS -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-    <!-- Chatbot CSS -->
-    <link rel="stylesheet" href="assets/css/chatbot.css">
+    <!-- Material Design Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
 
-    <!-- Chat System CSS - Original + Improved -->
-    <link rel="stylesheet" href="chat-system.css">
-    <link rel="stylesheet" href="chat-system-improved.css">
+    <!-- WhatsApp Style Chat CSS -->
+    <style>
+.chat {
+  height: calc(100% - 69px);
+}
 
-    <!-- Demo Data Initialization - BEFORE chat-system.js -->
-    <script>
-        function initializeDemoData() {
-            // Use demo user for testing
-            const currentUser = {
-                id: 'user_001',
-                full_name: 'Dr. Sarah Johnson',
-                email: 'sarah.johnson@healthflow.com',
-                role: 'health_worker',
-                facility_id: 'facility_001'
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+.chat-container {
+  height: 100%;
+}
 
-            const allUsers = [
-                { id: 'user_001', full_name: 'Dr. Sarah Johnson', email: 'sarah.johnson@healthflow.com', role: 'health_worker', facility_id: 'facility_001' },
-                { id: 'user_002', full_name: 'James Mwale', email: 'james.mwale@healthflow.com', role: 'patient', facility_id: 'facility_001' },
-                { id: 'user_003', full_name: 'Dr. Emmanuel Kato', email: 'emmanuel.kato@healthflow.com', role: 'health_worker', facility_id: 'facility_001' },
-                { id: 'user_004', full_name: 'Grace Nakato', email: 'grace.nakato@healthflow.com', role: 'patient', facility_id: 'facility_001' },
-                { id: 'user_005', full_name: 'Dr. Robert Okot', email: 'robert.okot@healthflow.com', role: 'health_worker', facility_id: 'facility_001' }
-            ];
-            localStorage.setItem('allUsers', JSON.stringify(allUsers));
+.user-bar {
+  height: 55px;
+  background: #005e54;
+  color: #fff;
+  padding: 0 8px;
+  font-size: 24px;
+  position: relative;
+  z-index: 1;
+}
 
-            const demoChats = [
-                { id: 'chat_001', name: 'James Mwale', type: 'private', participants: ['user_001', 'user_002'], avatar: 'JM', lastMessage: 'Thanks for the appointment reminder', lastMessageTime: new Date(Date.now() - 3600000).toISOString() },
-                { id: 'chat_002', name: 'Medical Team', type: 'group', participants: ['user_001', 'user_003', 'user_005'], avatar: 'MT', lastMessage: 'Next team meeting is tomorrow at 2 PM', lastMessageTime: new Date(Date.now() - 7200000).toISOString() },
-                { id: 'chat_003', name: 'Grace Nakato', type: 'private', participants: ['user_001', 'user_004'], avatar: 'GN', lastMessage: 'Can I schedule an appointment for next week?', lastMessageTime: new Date(Date.now() - 86400000).toISOString() }
-            ];
-            localStorage.setItem('chats_user_001', JSON.stringify(demoChats));
+.user-bar:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 
-            const demoMessages = {
-                chat_001: [
-                    { id: 'msg_001', chatId: 'chat_001', senderId: 'user_002', senderName: 'James Mwale', type: 'text', content: 'Hi Dr. Sarah, I received the appointment reminder', timestamp: new Date(Date.now() - 7200000).toISOString(), attachments: [] },
-                    { id: 'msg_002', chatId: 'chat_001', senderId: 'user_001', senderName: 'Dr. Sarah Johnson', type: 'text', content: 'Great! Please confirm if you can make it tomorrow at 10 AM', timestamp: new Date(Date.now() - 3600000).toISOString(), attachments: [] }
-                ],
-                chat_002: [
-                    { id: 'msg_003', chatId: 'chat_002', senderId: 'user_003', senderName: 'Dr. Emmanuel Kato', type: 'text', content: 'Hi everyone, we have important updates to discuss', timestamp: new Date(Date.now() - 14400000).toISOString(), attachments: [] },
-                    { id: 'msg_004', chatId: 'chat_002', senderId: 'user_005', senderName: 'Dr. Robert Okot', type: 'text', content: 'I will be there', timestamp: new Date(Date.now() - 10800000).toISOString(), attachments: [] },
-                    { id: 'msg_005', chatId: 'chat_002', senderId: 'user_001', senderName: 'Dr. Sarah Johnson', type: 'text', content: 'Next team meeting is tomorrow at 2 PM', timestamp: new Date(Date.now() - 7200000).toISOString(), attachments: [] }
-                ],
-                chat_003: [
-                    { id: 'msg_006', chatId: 'chat_003', senderId: 'user_004', senderName: 'Grace Nakato', type: 'text', content: 'Can I schedule an appointment for next week?', timestamp: new Date(Date.now() - 86400000).toISOString(), attachments: [] }
-                ]
-            };
+.user-bar div {
+  float: left;
+  transform: translateY(-50%);
+  position: relative;
+  top: 50%;
+}
 
-            Object.keys(demoMessages).forEach(chatId => {
-                localStorage.setItem(`messages_${chatId}`, JSON.stringify(demoMessages[chatId]));
-            });
+.user-bar .actions {
+  float: right;
+  margin: 0 0 0 20px;
+}
 
-            console.log('Demo data initialized successfully');
-        }
-        
-        // Initialize immediately
-        initializeDemoData();
-    </script>
+.user-bar .actions.more {
+  margin: 0 12px 0 32px;
+}
 
-    <!-- Chat System JS -->
-    <script src="chat-system.js" defer></script>
-    <!-- Chat System Enhancements -->
-    <script src="chat-system-enhancements.js" defer></script>
+.user-bar .actions.attachment {
+  margin: 0 0 0 30px;
+}
+
+.user-bar .actions.attachment i {
+  display: block;
+  transform: rotate(-45deg);
+}
+
+.user-bar .avatar {
+  margin: 0 0 0 5px;
+  width: 36px;
+  height: 36px;
+}
+
+.user-bar .avatar img {
+  border-radius: 50%;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: block;width: 100%;
+}
+
+.user-bar .name {
+  font-size: 17px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px;
+  margin: 0 0 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  width: auto;
+}
+
+.user-bar .status {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  width:auto;
+}
+
+.conversation {
+  height: calc(100% - 12px);
+  position: relative;
+  background: #efe7dd url("https://cloud.githubusercontent.com/assets/398893/15136779/4e765036-1639-11e6-9201-67e728e86f39.jpg") repeat;
+  z-index: 0;
+}
+
+.conversation ::-webkit-scrollbar {
+  transition: all .5s;
+  width: 5px;
+  height: 1px;
+  z-index: 10;
+}
+
+.conversation ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.conversation ::-webkit-scrollbar-thumb {
+  background: #b3ada7;
+}
+
+.conversation .conversation-container {
+  height: calc(100% - 68px);
+  box-shadow: inset 0 10px 10px -10px #000000;
+  overflow-x: hidden;
+  padding: 0 16px;
+  margin-bottom: 5px;
+}
+
+.conversation .conversation-container:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.message {
+  color: #000;
+clear: both;
+  line-height: 18px;
+  font-size: 15px;
+  padding: 8px;
+  position: relative;
+  margin: 8px 0;
+  max-width: 80%;
+  word-wrap: break-word;
+
+}
+
+.message:after {
+  position: absolute;
+  content: "";
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.metadata {
+  display: inline-block;
+  float: right;
+  padding: 0 0 0 7px;
+  position: relative;
+  bottom: -4px;
+}
+.metadata .time {
+  color: rgba(0, 0, 0, .45);
+  font-size: 11px;
+  display: inline-block;
+}
+
+.metadata .tick {
+  display: inline-block;
+  margin-left: 2px;
+  position: relative;
+  top: 4px;
+  height: 16px;
+  width: 16px;
+}
+
+.metadata .tick svg {
+  position: absolute;
+  transition: .5s ease-in-out;
+}
+
+.metadata .tick svg:first-child {
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+  -webkit-transform: perspective(800px) rotateY(180deg);
+          transform: perspective(800px) rotateY(180deg);
+}
+
+.metadata .tick svg:last-child {
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+  -webkit-transform: perspective(800px) rotateY(0deg);
+          transform: perspective(800px) rotateY(0deg);
+}
+
+.metadata .tick-animation svg:first-child {
+  -webkit-transform: perspective(800px) rotateY(0);
+          transform: perspective(800px) rotateY(0);
+}
+
+.metadata .tick-animation svg:last-child {
+  -webkit-transform: perspective(800px) rotateY(-179.9deg);
+transform: perspective(800px) rotateY(-179.9deg);
+}
+
+.message:first-child {
+  margin: 16px 0 8px;
+}
+
+.message.received {
+  background: #fff;
+  border-radius: 0px 5px 5px 5px;
+  float: left;
+}
+
+.message.received .metadata {
+  padding: 0 0 0 16px;
+}
+
+.message.received:after {
+  border-width: 0px 10px 10px 0;
+  border-color: transparent #fff transparent transparent;
+  top: 0;left: -10px;
+}
+
+.message.sent {
+  background: #e1ffc7;
+  border-radius: 5px 0px 5px 5px;
+  float: right;
+}
+
+.message.sent:after {
+  border-width: 0px 0 10px 10px;
+  border-color: transparent transparent transparent #e1ffc7;
+  top: 0;
+  right: -10px;
+}
+
+
+.conversation-compose {
+  display: flex;
+  flex-direction: row;
+align-items: flex-end;
+  overflow: hidden;
+  height: 50px;
+  width: 100%;
+  z-index: 2;
+}
+
+.conversation-compose div,
+.conversation-compose input {
+  background: #fff;
+  height: 100%;
+}
+
+.conversation-compose .emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 5px 0 0 5px;
+  flex: 0 0 auto;
+  margin-left: 8px;
+  width: 48px;
+}
+
+.conversation-compose .input-msg {
+  border: 0;
+  flex: 1 1 auto;
+  font-size: 16px;
+  margin: 0;
+  outline: none;
+  min-width: 50px;
+}
+
+.conversation-compose .photo {
+  flex: 0 0 auto;
+  border-radius: 0 0 5px 0;
+  text-align: center;
+  position: relative;
+  width: 48px;
+}
+
+.conversation-compose .photo:after {
+  border-width: 0px 0 10px 10px;
+  border-color: transparent transparent transparent #fff;
+border-style: solid;
+  position: absolute;
+  width: 0;
+  height: 0;
+  content: "";
+  top: 0;
+  right: -10px;
+}
+
+.conversation-compose .photo i {
+  display: block;
+  color: #7d8488;
+  font-size: 24px;
+  transform: translate(-50%, -50%);
+  position: relative;
+  top: 50%;
+  left: 50%;
+}
+
+.conversation-compose .send {
+  background: transparent;
+  border: 0;
+cursor: pointer;
+  flex: 0 0 auto;
+  margin-left: 8px;
+  margin-right: 8px;
+  padding: 0;
+  position: relative;
+  outline: none;
+}
+
+.conversation-compose .send .circle {
+  background: #008a7c;
+  border-radius: 50%;
+  color: #fff;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.conversation-compose .send .circle i {
+  font-size: 24px;
+  margin-left: 5px;
+}
+
+
+
+  .marvel-device .status-bar {
+    display: none;
+  }
+
+  .screen-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .conversation {
+    height: calc(100vh - 55px);
+  }
+  .conversation .conversation-container {
+    height: calc(100vh - 120px);
+  }
+.back{
+    font-size:30px;
+    float:left;
+}
+.forword{
+    font-size:30px;
+    float:right;
+}
+    </style>
+
 
     <!-- Appointment Notifications -->
     <script src="appointment-notifications.js" defer></script>
@@ -1349,6 +1636,148 @@
             </nav>
             <!-- Sidebar wrapper ends -->
 
+            <style>
+                @media (max-width: 1024px) {
+                    #leftChatSidebar {
+                        position: fixed;
+                        left: 0;
+                        top: 0;
+                        width: 280px;
+                        height: 100vh;
+                        z-index: 10001;
+                        transform: translateX(-100%);
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    #leftChatSidebar.open {
+                        transform: translateX(0);
+                    }
+                    
+                    #rightChatSidebar {
+                        position: fixed;
+                        right: 0;
+                        top: 0;
+                        width: 280px;
+                        height: 100vh;
+                        z-index: 10001;
+                        transform: translateX(100%);
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    #rightChatSidebar.open {
+                        transform: translateX(0);
+                    }
+                    
+                    #chatInterface::before {
+                        content: '';
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.5);
+                        z-index: 10000;
+                        opacity: 0;
+                        pointer-events: none;
+                        transition: opacity 0.3s ease;
+                    }
+                    
+                    #chatInterface.show-sidebar::before {
+                        opacity: 1;
+                        pointer-events: auto;
+                    }
+                }
+            </style>
+
+            <!-- Chat Interface - ChatONN Design -->
+            <div id="chatInterface" style="display: none; position: fixed; right: 0; top: 0; width: 100%; height: 100vh; z-index: 9000; background: linear-gradient(135deg, #734CF4 0%, #9966FF 100%); padding: 0; overflow: hidden;">
+                <div style="width: 100%; height: 100%; display: flex; background: #FFFFFF; border-radius: 0; overflow: hidden; box-shadow: none;">
+                    
+                    <!-- Left Sidebar - Chat List -->
+                    <div id="leftChatSidebar" style="width: 280px; background: #FFFFFF; border-right: 1px solid #F0F0F0; display: flex; flex-direction: column; min-height: 100vh;">
+                        <div style="padding: 24px 20px; border-bottom: 1px solid #F0F0F0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                                <h3 style="margin: 0; font-size: 24px; font-weight: 700; color: #1a1a1a;">Chats</h3>
+                                <button onclick="closeChatInterface()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #999;">×</button>
+                            </div>
+                            <input type="text" id="contactSearchInput" placeholder="Search..." style="width: 100%; padding: 10px 14px; border: 1px solid #E8E8E8; border-radius: 0; font-size: 13px; box-sizing: border-box; background: #F8F8F8; outline: none;">
+                        </div>
+                        <div id="contactsList" style="flex: 1; overflow-y: auto; padding: 8px 0;">
+                            <!-- Contacts will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Center - Messages Area -->
+                    <div style="flex: 1; display: flex; flex-direction: column; background: #FFFFFF; width: 100%; height: 100vh;">
+                        <!-- Header with Contact Info -->
+                        <div style="padding: 20px 24px; border-bottom: 1px solid #F0F0F0; background: #FFFFFF;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <button onclick="toggleLeftSidebar()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #999; display: none;" id="toggleLeftBtn">☰</button>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div style="position: relative;">
+                                        <img id="selectedAvatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Default" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                                        <div style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #2DDC9A; border: 2px solid white; border-radius: 50%;"></div>
+                                    </div>
+                                    <div>
+                                        <h4 id="selectedName" style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Kirti Yadav</h4>
+                                        <p id="selectedStatus" style="margin: 0; font-size: 11px; color: #999;">Last seen 3 hours ago</p>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 12px;">
+                                    <button style="background: none; border: none; font-size: 18px; cursor: pointer; color: #999;">☎️</button>
+                                    <button style="background: none; border: none; font-size: 18px; cursor: pointer; color: #999;">📹</button>
+                                    <button style="background: none; border: none; font-size: 18px; cursor: pointer; color: #999;">⋮</button>
+                                    <button onclick="toggleRightSidebar()" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #999; display: none;" id="toggleRightBtn">ℹ️</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Messages Container -->
+                        <div id="ap" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; background: #FFFFFF;">
+                            <div style="text-align: center; color: #999; font-size: 13px; margin: 20px 0;">Today 12:31 AM</div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div style="padding: 20px 24px; border-top: 1px solid #F0F0F0; background: #FFFFFF;">
+                            <form id="form" style="display: flex; gap: 10px; align-items: center;">
+                                <button type="button" style="background: none; border: none; cursor: pointer; color: #999; padding: 0; display: flex; align-items: center; flex-shrink: 0;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                                        <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+                                    </svg>
+                                </button>
+                                <div style="flex: 1; position: relative; display: flex; align-items: center;">
+                                    <input type="text" id="val" placeholder="Type a message here..." style="flex: 1; padding: 12px 50px 12px 16px; border: 1px solid #E8E8E8; border-radius: 0; font-size: 14px; outline: none; background: #F8F8F8; width: 100%; box-sizing: border-box;">
+                                    <div style="position: absolute; right: 12px; display: flex; gap: 8px; pointer-events: all;">
+                                        <button type="button" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #999; padding: 0; display: flex; align-items: center;">😊</button>
+                                        <button type="button" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #999; padding: 0; display: flex; align-items: center;">🗑️</button>
+                                    </div>
+                                </div>
+                                <button type="button" id="msend" style="background: #734CF4; color: white; border: none; padding: 10px 24px; border-radius: 0; font-weight: 600; cursor: pointer; font-size: 14px; flex-shrink: 0;">➤</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Sidebar - Notifications & Suggestions -->
+                    <div id="rightChatSidebar" style="width: 280px; background: #FFFFFF; border-left: 1px solid #F0F0F0; display: flex; flex-direction: column; overflow: hidden; min-height: 100vh;">
+                        <!-- Notifications Section -->
+                        <div style="flex: 1; border-bottom: 1px solid #F0F0F0; overflow-y: auto; padding: 20px 16px;">
+                            <h5 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700; color: #1a1a1a;">Notifications</h5>
+                            <div id="notificationsList" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Notifications will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Suggestions Section -->
+                        <div style="flex: 1; overflow-y: auto; padding: 20px 16px;">
+                            <h5 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700; color: #1a1a1a;">Suggestions</h5>
+                            <div id="suggestionsList" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Suggestions will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- App container starts -->
             <div class="app-container">
 
@@ -2360,8 +2789,12 @@
                      fabButton.classList.remove('active');
 
                      // Open chatbot
-                     if (typeof chatbotUI !== 'undefined' && chatbotUI.open) {
+                     if (typeof window.chatbotUI !== 'undefined' && window.chatbotUI && window.chatbotUI.open) {
+                         window.chatbotUI.open();
+                     } else if (typeof chatbotUI !== 'undefined' && chatbotUI && chatbotUI.open) {
                          chatbotUI.open();
+                     } else {
+                         console.warn('Chatbot UI not available yet');
                      }
                  });
              }
@@ -3240,12 +3673,18 @@
                 // Fetch next week appointments from appointments table
                 // Next week = Monday through Sunday
                 const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 const dayOfWeek = today.getDay();
 
                 // Calculate next Monday (0 = Sunday, 1 = Monday)
-                const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
-                const nextMonday = new Date(today);
-                nextMonday.setDate(nextMonday.getDate() + daysUntilMonday);
+                // First calculate days until end of this week (Sunday)
+                const daysUntilSunday = dayOfWeek === 0 ? 0 : (7 - dayOfWeek);
+                const endOfThisWeek = new Date(today);
+                endOfThisWeek.setDate(endOfThisWeek.getDate() + daysUntilSunday);
+                
+                // Next Monday is the day after Sunday
+                const nextMonday = new Date(endOfThisWeek);
+                nextMonday.setDate(nextMonday.getDate() + 1);
 
                 // Calculate Sunday of next week
                 const nextSunday = new Date(nextMonday);
@@ -7362,22 +7801,28 @@
         <ul class="fab-menu">
             <li class="fab-menu-item">
                 <button type="button" class="import-btn" id="fabImportBtn" title="Import Patient Data"
-                    style="font-size: 20px; font-weight: bold;">
+                    style="font-size: 20px; font-weight: bold; display: flex; align-items: center; justify-content: center;">
                     <span class="fab-tooltip">Import Data</span>
-                    📤
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" style="width: 20px; height: 20px; fill: currentColor;">
+                        <path d="M176 544C96.5 544 32 479.5 32 400C32 336.6 73 282.8 129.9 263.5C128.6 255.8 128 248 128 240C128 160.5 192.5 96 272 96C327.4 96 375.5 127.3 399.6 173.1C413.8 164.8 430.4 160 448 160C501 160 544 203 544 256C544 271.7 540.2 286.6 533.5 299.7C577.5 320 608 364.4 608 416C608 486.7 550.7 544 480 544L176 544zM337 255C327.6 245.6 312.4 245.6 303.1 255L231.1 327C221.7 336.4 221.7 351.6 231.1 360.9C240.5 370.2 255.7 370.3 265 360.9L296 329.9L296 432C296 445.3 306.7 456 320 456C333.3 456 344 445.3 344 432L344 329.9L375 360.9C384.4 370.3 399.6 370.3 408.9 360.9C418.2 351.5 418.3 336.3 408.9 327L336.9 255z"/>
+                    </svg>
                 </button>
             </li>
             <li class="fab-menu-item">
-                <button type="button" class="chat-btn" id="fabChatBtn" title="Open Chat" style="font-size: 20px;">
+                <button type="button" class="chat-btn" id="fabChatBtn" title="Open Chat" style="font-size: 20px; display: flex; align-items: center; justify-content: center;">
                     <span class="fab-tooltip">Chat Messages</span>
-                    💬
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" style="width: 20px; height: 20px; fill: currentColor;">
+                        <path d="M108.2 322.7C114.3 307.5 112.2 290.1 102.6 276.8C88.1 256.7 80 233.1 80 208C80 141.2 140.5 80 224 80C307.5 80 368 141.2 368 208C368 274.8 307.5 336 224 336C208.1 336 192.9 333.7 178.7 329.5C168.4 326.4 157.3 327 147.3 331L96.9 351.2L108.3 322.7zM32 208C32 243.8 43.6 277.1 63.7 304.8L33.9 379.2C32.6 382.4 32 385.8 32 389.2C32 404 44 416 58.8 416C62.2 416 65.6 415.3 68.8 414.1L165.1 375.6C183.7 381.1 203.5 384 224 384C330 384 416 305.2 416 208C416 110.8 330 32 224 32C118 32 32 110.8 32 208zM416 576C436.6 576 456.3 573 474.9 567.6L571.2 606.1C574.4 607.4 577.8 608 581.2 608C596 608 608 596 608 581.2C608 577.8 607.3 574.4 606.1 571.2L576.4 496.8C596.4 469 608.1 435.7 608.1 400C608.1 317.6 546.4 248.5 463.1 229.3C461.5 245.6 458 261.2 453 276.2C516.9 291 560.2 343.5 560.2 400.1C560.2 425.2 552.1 448.8 537.6 468.9C528 482.2 525.9 499.5 532 514.8L543.4 543.3L493 523.1C483 519.1 471.9 518.6 461.6 521.6C447.4 525.8 432.2 528.1 416.3 528.1C344.1 528.1 289.2 482.4 275.6 426.9C260 430.1 243.9 431.9 227.5 432.1C243.9 514 322.2 576.1 416.3 576.1z"/>
+                    </svg>
                 </button>
             </li>
             <li class="fab-menu-item">
                 <button type="button" class="chat-btn" id="fabChatbotBtn" title="Open AI Chatbot"
-                    style="font-size: 20px;">
+                    style="font-size: 20px; display: flex; align-items: center; justify-content: center;">
                     <span class="fab-tooltip">AI Assistant</span>
-                    🤖
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" style="width: 20px; height: 20px; fill: currentColor;">
+                        <path d="M352 64C352 46.3 337.7 32 320 32C302.3 32 288 46.3 288 64L288 128L192 128C139 128 96 171 96 224L96 448C96 501 139 544 192 544L448 544C501 544 544 501 544 448L544 224C544 171 501 128 448 128L352 128L352 64zM160 432C160 418.7 170.7 408 184 408L216 408C229.3 408 240 418.7 240 432C240 445.3 229.3 456 216 456L184 456C170.7 456 160 445.3 160 432zM280 432C280 418.7 290.7 408 304 408L336 408C349.3 408 360 418.7 360 432C360 445.3 349.3 456 336 456L304 456C290.7 456 280 445.3 280 432zM400 432C400 418.7 410.7 408 424 408L456 408C469.3 408 480 418.7 480 432C480 445.3 469.3 456 456 456L424 456C410.7 456 400 445.3 400 432zM224 240C250.5 240 272 261.5 272 288C272 314.5 250.5 336 224 336C197.5 336 176 314.5 176 288C176 261.5 197.5 240 224 240zM368 288C368 261.5 389.5 240 416 240C442.5 240 464 261.5 464 288C464 314.5 442.5 336 416 336C389.5 336 368 314.5 368 288zM64 288C64 270.3 49.7 256 32 256C14.3 256 0 270.3 0 288L0 384C0 401.7 14.3 416 32 416C49.7 416 64 401.7 64 384L64 288zM608 256C590.3 256 576 270.3 576 288L576 384C576 401.7 590.3 416 608 416C625.7 416 640 401.7 640 384L640 288C640 270.3 625.7 256 608 256z"/>
+                    </svg>
                 </button>
             </li>
             <li class="fab-menu-item">
@@ -7512,6 +7957,311 @@
             const modal = bootstrap.Modal.getInstance(document.getElementById('appointmentNotificationModal'));
             if (modal) modal.hide();
         }
+    </script>
+
+    <!-- ChatONN Chat Application JavaScript -->
+    <script>
+        $(function() {
+            var lastmsg = "";
+            var currentContact = null;
+
+            // Contacts data matching ChatONN design
+            var contacts = [
+                { id: 1, name: 'Kirti Yadov', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kirti', lastMessage: 'I really like your vibe but i still rock we can do this in...', time: '3:21 AM', status: 'online' },
+                { id: 2, name: 'Anish Melroy', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anish', lastMessage: 'Are you meeting today i can...', time: '5:44 PM', status: 'online' },
+                { id: 3, name: 'Akanksha Shrivs', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Akanksha', lastMessage: 'Perfect you for this more...', time: '6:00 PM', status: 'offline' },
+                { id: 4, name: 'Harshit Nagar', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Harshit', lastMessage: 'i had night party 30x conveniently', time: '1:18 PM', status: 'offline' },
+                { id: 5, name: 'Ashish Singh', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ashish', lastMessage: 'lets i meet you today. Call me...', time: '8:12 AM', status: 'offline' }
+            ];
+
+            var notifications = [
+                { name: '@john mentioned you in "trip to Goa"', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=john' },
+                { name: '@chiya.singh added you in "Group Study"', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chiya' },
+                { name: '@sudharith removed you from group "Makers"', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sudharith' },
+                { name: '@amit mentioned you in public chat', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=amit' }
+            ];
+
+            var suggestions = [
+                { name: 'Abhishman Singh', role: '35 Mutual Friends' },
+                { name: 'Vad Prakash', role: '21 Mutual Friends' },
+                { name: 'Amit Trivedi', role: '18 Mutual Friends' },
+                { name: 'Vikash Raj', role: '12 Mutual Friends' }
+            ];
+
+            // Load contacts list
+            function loadContacts() {
+                var html = '';
+                contacts.forEach(function(contact) {
+                    var statusColor = contact.status === 'online' ? '#10B981' : '#D1D5DB';
+                    var statusText = contact.status === 'online' ? 'Online' : 'Offline';
+                    html += '<div class="contact-item" data-id="' + contact.id + '" data-contact="' + contact.name + '" data-email="' + (contact.email || '') + '" style="padding: 14px 16px; margin: 6px 10px; cursor: pointer; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; gap: 14px; align-items: center; border: 1px solid transparent; background: #FAFAFA;">' +
+                        '<div style="position: relative; flex-shrink: 0;">' +
+                        '<img src="' + contact.avatar + '" alt="' + contact.name + '" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">' +
+                        '<div style="position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; background: ' + statusColor + '; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);"></div>' +
+                        '</div>' +
+                        '<div style="flex: 1; min-width: 0;">' +
+                        '<p style="margin: 0 0 6px 0; font-weight: 700; color: #1F2937; font-size: 14px; letter-spacing: -0.3px;">' + contact.name + '</p>' +
+                        '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">' +
+                        '<span style="display: inline-block; width: 6px; height: 6px; background: ' + statusColor + '; border-radius: 50%;"></span>' +
+                        '<span style="font-size: 12px; color: #6B7280; font-weight: 500;">' + statusText + '</span>' +
+                        '</div>' +
+                        '<p style="margin: 0; color: #9CA3AF; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + contact.lastMessage + '</p>' +
+                        '</div>' +
+                        '<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">' +
+                        '<span style="font-size: 12px; color: #9CA3AF; font-weight: 500;">' + contact.time + '</span>' +
+                        '</div>' +
+                        '</div>';
+                });
+                $('#contactsList').html(html);
+
+                $('.contact-item').hover(
+                    function() {
+                        $(this).css({
+                            'background': '#F3F4F6',
+                            'border-color': '#E5E7EB',
+                            'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.08)',
+                            'transform': 'translateX(4px)'
+                        });
+                    },
+                    function() {
+                        $(this).css({
+                            'background': '#FAFAFA',
+                            'border-color': 'transparent',
+                            'box-shadow': 'none',
+                            'transform': 'translateX(0)'
+                        });
+                    }
+                );
+
+                $('.contact-item').click(function() {
+                    var contactId = $(this).data('id');
+                    $(this).css('background', '#EFF6FF').css('border-color', '#BFDBFE');
+                    selectContact(contactId);
+                });
+            }
+
+            // Load notifications
+            function loadNotifications() {
+                var html = '';
+                notifications.forEach(function(notif) {
+                    html += '<div style="display: flex; gap: 10px; padding: 10px; border-radius: 8px; background: #F8F8F8; cursor: pointer;">' +
+                        '<img src="' + notif.avatar + '" alt="' + notif.name + '" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;">' +
+                        '<p style="margin: 0; font-size: 12px; color: #1a1a1a; line-height: 1.3;">' + notif.name + '</p>' +
+                        '</div>';
+                });
+                $('#notificationsList').html(html);
+            }
+
+            // Load suggestions
+            function loadSuggestions() {
+                var html = '';
+                suggestions.forEach(function(sug) {
+                    html += '<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">' +
+                        '<div>' +
+                        '<p style="margin: 0 0 2px 0; font-size: 13px; font-weight: 600; color: #1a1a1a;">' + sug.name + '</p>' +
+                        '<p style="margin: 0; font-size: 11px; color: #999;">' + sug.role + '</p>' +
+                        '</div>' +
+                        '<button style="background: #734CF4; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Add</button>' +
+                        '</div>';
+                });
+                $('#suggestionsList').html(html);
+            }
+
+            // Select a contact
+            function selectContact(contactId) {
+                var contact = contacts.find(c => c.id === contactId);
+                if (contact) {
+                    currentContact = contact;
+                    $('#selectedName').text(contact.name);
+                    $('#selectedStatus').text('Last seen ' + contact.time);
+                    $('#selectedAvatar').attr('src', contact.avatar);
+                    
+                    $('#ap').html('<div style="text-align: center; color: #999; font-size: 13px; margin: 20px 0;">Today 12:31 AM</div>');
+                    
+                    $('.contact-item').css({'background': 'transparent', 'color': '#1a1a1a'});
+                    $('.contact-item[data-id="' + contactId + '"]').css({'background': '#F0E8FF'});
+                }
+            }
+
+            loadContacts();
+            loadNotifications();
+            loadSuggestions();
+            selectContact(1);
+
+            function getCurrentTime() {
+                var d = new Date();
+                var h = d.getHours();
+                var m = d.getMinutes();
+                h = h < 10 ? '0' + h : h;
+                m = m < 10 ? '0' + m : m;
+                return h + ':' + m;
+            }
+
+            $("#form").submit(function(e) {
+                e.preventDefault();
+                $("#msend").click();
+            });
+
+            $("#msend").click(function() {
+                var msg = $("#val").val().trim();
+                if (msg === "") return;
+
+                var time = getCurrentTime();
+                var msgHtml = '<div style="display: flex; justify-content: flex-end;">' +
+                    '<div style="background: #734CF4; color: white; padding: 12px 16px; border-radius: 18px 18px 4px 18px; max-width: 70%; word-wrap: break-word; font-size: 14px;">' +
+                    msg +
+                    '</div>' +
+                    '</div>';
+
+                $('#ap').append(msgHtml);
+                $("#val").val("");
+                $('#ap').scrollTop($('#ap')[0].scrollHeight);
+
+                lastmsg = msg.toUpperCase();
+
+                setTimeout(function() {
+                    sendResponse();
+                }, 1200);
+            });
+
+            function sendResponse() {
+                var time = getCurrentTime();
+                var responses = [
+                    "I really like your vibe but i still rock we can do this in...",
+                    "Sounds perfect",
+                    "Let's discuss something",
+                    "I totally agree with you",
+                    "Bonjour! 😊"
+                ];
+                var randomResponse = responses[Math.floor(Math.random() * responses.length)];
+
+                var msgHtml = '<div style="display: flex; justify-content: flex-start;">' +
+                    '<div style="background: #F0F0F0; color: #1a1a1a; padding: 12px 16px; border-radius: 18px 18px 18px 4px; max-width: 70%; word-wrap: break-word; font-size: 14px;">' +
+                    randomResponse +
+                    '</div>' +
+                    '</div>';
+
+                $('#ap').append(msgHtml);
+                $('#ap').scrollTop($('#ap')[0].scrollHeight);
+            }
+
+            window.openChatInterface = function() {
+                $("#chatInterface").fadeIn(300);
+            }
+
+            window.closeChatInterface = function() {
+                $("#chatInterface").fadeOut(300);
+            }
+        });
+    </script>
+
+    <!-- Sidebar Toggle Functions -->
+    <script>
+        function toggleLeftSidebar() {
+            const sidebar = document.getElementById('leftChatSidebar');
+            const chatInterface = document.getElementById('chatInterface');
+            sidebar.classList.toggle('open');
+            chatInterface.classList.toggle('show-sidebar');
+        }
+
+        function toggleRightSidebar() {
+            const sidebar = document.getElementById('rightChatSidebar');
+            const chatInterface = document.getElementById('chatInterface');
+            sidebar.classList.toggle('open');
+            chatInterface.classList.toggle('show-sidebar');
+        }
+
+        // Contact list search functionality
+        function setupContactSearch() {
+            const searchInput = document.getElementById('contactSearchInput');
+            const contactsList = document.getElementById('contactsList');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    const contactItems = contactsList.querySelectorAll('[data-contact]');
+                    
+                    contactItems.forEach(item => {
+                        const contactName = item.getAttribute('data-contact').toLowerCase();
+                        const contactEmail = (item.getAttribute('data-email') || '').toLowerCase();
+                        
+                        if (contactName.includes(searchTerm) || contactEmail.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show no results message if all items are hidden
+                    const visibleItems = Array.from(contactItems).filter(item => item.style.display !== 'none');
+                    if (visibleItems.length === 0 && searchTerm.length > 0) {
+                        if (!contactsList.querySelector('.no-results')) {
+                            const noResults = document.createElement('div');
+                            noResults.className = 'no-results';
+                            noResults.style.cssText = 'text-align: center; padding: 20px; color: #999; font-size: 13px;';
+                            noResults.textContent = 'No contacts found';
+                            contactsList.appendChild(noResults);
+                        }
+                    } else {
+                        const noResults = contactsList.querySelector('.no-results');
+                        if (noResults) noResults.remove();
+                    }
+                });
+            }
+        }
+
+        // Show/hide toggle buttons based on screen size
+        function updateSidebarButtons() {
+            const toggleLeftBtn = document.getElementById('toggleLeftBtn');
+            const toggleRightBtn = document.getElementById('toggleRightBtn');
+            const isMobile = window.innerWidth <= 1024;
+            
+            if (toggleLeftBtn) toggleLeftBtn.style.display = isMobile ? 'block' : 'none';
+            if (toggleRightBtn) toggleRightBtn.style.display = isMobile ? 'block' : 'none';
+            
+            // Hide sidebars on mobile
+            const leftSidebar = document.getElementById('leftChatSidebar');
+            const rightSidebar = document.getElementById('rightChatSidebar');
+            
+            if (isMobile) {
+                if (leftSidebar) leftSidebar.style.position = 'fixed';
+                if (rightSidebar) rightSidebar.style.position = 'fixed';
+            } else {
+                if (leftSidebar) leftSidebar.style.position = 'relative';
+                if (rightSidebar) rightSidebar.style.position = 'relative';
+            }
+        }
+
+        // Close sidebars when clicking overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInterface = document.getElementById('chatInterface');
+            if (chatInterface) {
+                chatInterface.addEventListener('click', function(e) {
+                    if (e.target === chatInterface && window.innerWidth <= 1024) {
+                        document.getElementById('leftChatSidebar').classList.remove('open');
+                        document.getElementById('rightChatSidebar').classList.remove('open');
+                        chatInterface.classList.remove('show-sidebar');
+                    }
+                });
+            }
+            updateSidebarButtons();
+            setupContactSearch();
+        });
+
+        // Update on window resize
+        window.addEventListener('resize', updateSidebarButtons);
+    </script>
+
+    <!-- Chat Button Handler -->
+    <script>
+        $(document).ready(function() {
+            var chatBtn = $(".chat-btn");
+            if (chatBtn.length > 0) {
+                chatBtn.click(function() {
+                    openChatInterface();
+                });
+            }
+        });
     </script>
 </body>
 

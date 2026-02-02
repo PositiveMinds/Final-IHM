@@ -3230,12 +3230,18 @@
                 // Fetch next week appointments from appointments table
                 // Next week = Monday through Sunday
                 const today = new Date();
+                today.setHours(0, 0, 0, 0);
                 const dayOfWeek = today.getDay();
 
                 // Calculate next Monday (0 = Sunday, 1 = Monday)
-                const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
-                const nextMonday = new Date(today);
-                nextMonday.setDate(nextMonday.getDate() + daysUntilMonday);
+                // First calculate days until end of this week (Sunday)
+                const daysUntilSunday = dayOfWeek === 0 ? 0 : (7 - dayOfWeek);
+                const endOfThisWeek = new Date(today);
+                endOfThisWeek.setDate(endOfThisWeek.getDate() + daysUntilSunday);
+                
+                // Next Monday is the day after Sunday
+                const nextMonday = new Date(endOfThisWeek);
+                nextMonday.setDate(nextMonday.getDate() + 1);
 
                 // Calculate Sunday of next week
                 const nextSunday = new Date(nextMonday);

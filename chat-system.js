@@ -5,37 +5,42 @@
  */
 
 // Only define if not already defined
-if (typeof ChatSystem === 'undefined') {
+if (typeof ChatSystem === "undefined") {
   class ChatSystem {
-  constructor() {
-    this.currentUser = null;
-    this.currentChat = null;
-    this.chats = [];
-    this.messages = {};
-    this.contacts = [];
-    this.allowedFileTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-    this.fileExtensions = ['.pdf', '.png', '.jpeg', '.jpg'];
-    this.init();
-  }
-
-  init() {
-    this.loadCurrentUser();
-    this.createChatPanel();  // Create DOM elements FIRST
-    this.setupEventListeners();
-    this.loadChats();
-    this.loadContacts();
-  }
-
-  /**
-   * Create chat panel DOM elements
-   */
-  createChatPanel() {
-    // Check if panel already exists
-    if (document.getElementById('chatPanelOverlay')) {
-      return;
+    constructor() {
+      this.currentUser = null;
+      this.currentChat = null;
+      this.chats = [];
+      this.messages = {};
+      this.contacts = [];
+      this.allowedFileTypes = [
+        "application/pdf",
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+      ];
+      this.fileExtensions = [".pdf", ".png", ".jpeg", ".jpg"];
+      this.init();
     }
 
-    const panelHTML = `
+    init() {
+      this.loadCurrentUser();
+      this.createChatPanel(); // Create DOM elements FIRST
+      this.setupEventListeners();
+      this.loadChats();
+      this.loadContacts();
+    }
+
+    /**
+     * Create chat panel DOM elements
+     */
+    createChatPanel() {
+      // Check if panel already exists
+      if (document.getElementById("chatPanelOverlay")) {
+        return;
+      }
+
+      const panelHTML = `
       <div id="chatPanelOverlay" class="chat-panel-overlay"></div>
       <div id="chatContainer" class="chat-container">
         <button class="chat-panel-close" onclick="chatSystem.closeChat()" title="Close chat">
@@ -169,452 +174,479 @@ if (typeof ChatSystem === 'undefined') {
       </div>
     `;
 
-    // Insert panel into body
-    document.body.insertAdjacentHTML('beforeend', panelHTML);
+      // Insert panel into body
+      document.body.insertAdjacentHTML("beforeend", panelHTML);
 
-    // Re-setup event listeners now that panel is in DOM
-    this.setupEventListeners();
-  }
-
-  /**
-   * Open chat panel
-   */
-  openChat() {
-    const overlay = document.getElementById('chatPanelOverlay');
-    const container = document.getElementById('chatContainer');
-    if (overlay && container) {
-      overlay.classList.add('active');
-      container.classList.add('open');
-    }
-  }
-
-  /**
-   * Close chat panel
-   */
-  closeChat() {
-    const overlay = document.getElementById('chatPanelOverlay');
-    const container = document.getElementById('chatContainer');
-    if (overlay && container) {
-      overlay.classList.remove('active');
-      container.classList.remove('open');
-    }
-  }
-
-  /**
-   * Load current logged-in user
-   */
-  loadCurrentUser() {
-    const userStr = localStorage.getItem('currentUser');
-    if (userStr) {
-      this.currentUser = JSON.parse(userStr);
-    }
-  }
-
-  /**
-   * Setup all event listeners for chat system
-   */
-  setupEventListeners() {
-    // Send message
-    const sendBtn = document.getElementById('chatSendBtn');
-    const msgInput = document.getElementById('chatMessageInput');
-    if (sendBtn) {
-      sendBtn.addEventListener('click', () => this.sendMessage());
-    }
-    if (msgInput) {
-      msgInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          this.sendMessage();
-        }
-      });
+      // Re-setup event listeners now that panel is in DOM
+      this.setupEventListeners();
     }
 
-    // New chat button
-    const newChatBtn = document.getElementById('newChatBtn');
-    if (newChatBtn) {
-      newChatBtn.addEventListener('click', () => this.showNewChatModal());
+    /**
+     * Open chat panel
+     */
+    openChat() {
+      const overlay = document.getElementById("chatPanelOverlay");
+      const container = document.getElementById("chatContainer");
+      if (overlay && container) {
+        overlay.classList.add("active");
+        container.classList.add("open");
+      }
     }
 
-    // New group button
-    const newGroupBtn = document.getElementById('newGroupBtn');
-    if (newGroupBtn) {
-      newGroupBtn.addEventListener('click', () => this.showNewGroupModal());
+    /**
+     * Close chat panel
+     */
+    closeChat() {
+      const overlay = document.getElementById("chatPanelOverlay");
+      const container = document.getElementById("chatContainer");
+      if (overlay && container) {
+        overlay.classList.remove("active");
+        container.classList.remove("open");
+      }
     }
 
-    // File upload
-    const fileInput = document.getElementById('chatFileInput');
-    if (fileInput) {
-      fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+    /**
+     * Load current logged-in user
+     */
+    loadCurrentUser() {
+      const userStr = localStorage.getItem("currentUser");
+      if (userStr) {
+        this.currentUser = JSON.parse(userStr);
+      }
     }
 
-    // File upload button
-    const fileUploadBtn = document.getElementById('chatFileUploadBtn');
-    if (fileUploadBtn) {
-      fileUploadBtn.addEventListener('click', () => {
-        document.getElementById('chatFileInput').click();
-      });
-    }
-
-    // Search contacts
-    const searchInput = document.getElementById('chatSearchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => this.filterContacts(e.target.value));
-    }
-
-    // Overlay close
-    this.setupOverlayClose();
-  }
-
-  /**
-   * Load chats from localStorage or database
-   */
-  loadChats() {
-    if (!this.currentUser) {
-      console.log('No current user in loadChats');
-      return;
-    }
-
-    console.log('Loading chats for user:', this.currentUser.id);
-    const chatsStr = localStorage.getItem(`chats_${this.currentUser.id}`);
-    console.log('Chats string from localStorage:', chatsStr);
-    this.chats = chatsStr ? JSON.parse(chatsStr) : [];
-    console.log('Parsed chats:', this.chats);
-
-    // Load messages for each chat
-    this.chats.forEach(chat => {
-      const messagesStr = localStorage.getItem(`messages_${chat.id}`);
-      this.messages[chat.id] = messagesStr ? JSON.parse(messagesStr) : [];
-    });
-
-    console.log('Final chats and messages:', this.chats, this.messages);
-    this.renderChatList();
-  }
-
-  /**
-   * Load contacts based on user role and facility
-   */
-  loadContacts() {
-    if (!this.currentUser) return;
-
-    const allUsersStr = localStorage.getItem('allUsers');
-    if (!allUsersStr) return;
-
-    const allUsers = JSON.parse(allUsersStr);
-    
-    if (this.currentUser.role === 'patient') {
-      // Patients can only see health workers from their facility
-      this.contacts = allUsers.filter(user => 
-        user.facility_id === this.currentUser.facility_id && 
-        user.role !== 'patient' &&
-        user.id !== this.currentUser.id
-      );
-    } else if (this.currentUser.role === 'health_worker') {
-      // Health workers can see their patients and other health workers from same facility
-      this.contacts = allUsers.filter(user => 
-        user.facility_id === this.currentUser.facility_id && 
-        user.id !== this.currentUser.id &&
-        (user.role === 'patient' || user.role === 'health_worker')
-      );
-    }
-  }
-
-  /**
-   * Send a message
-   */
-  sendMessage() {
-    if (!this.currentChat) {
-      alert('Please select a chat first');
-      return;
-    }
-
-    const msgInput = document.getElementById('chatMessageInput');
-    const message = msgInput.value.trim();
-
-    if (!message) return;
-
-    const newMessage = {
-      id: Date.now(),
-      chatId: this.currentChat.id,
-      senderId: this.currentUser.id,
-      senderName: this.currentUser.full_name,
-      content: message,
-      timestamp: new Date().toISOString(),
-      type: 'text',
-      attachments: []
-    };
-
-    // Add to messages
-    if (!this.messages[this.currentChat.id]) {
-      this.messages[this.currentChat.id] = [];
-    }
-    this.messages[this.currentChat.id].push(newMessage);
-
-    // Save to localStorage
-    localStorage.setItem(
-      `messages_${this.currentChat.id}`,
-      JSON.stringify(this.messages[this.currentChat.id])
-    );
-
-    // Update chat's last message
-    const chat = this.chats.find(c => c.id === this.currentChat.id);
-    if (chat) {
-      chat.lastMessage = message;
-      chat.lastMessageTime = new Date().toISOString();
-      chat.lastMessageSender = this.currentUser.id;
-      this.saveChats();
-    }
-
-    msgInput.value = '';
-    this.renderMessages();
-    this.renderChatList();
-  }
-
-  /**
-   * Handle file upload for chat
-   */
-  handleFileUpload(event) {
-    const files = event.target.files;
-    
-    for (let file of files) {
-      // Validate file type
-      const isValidType = this.allowedFileTypes.includes(file.type) ||
-                         this.fileExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-
-      if (!isValidType) {
-        alert(`File type not allowed. Only PDF, PNG, JPEG, and JPG files are supported.`);
-        continue;
+    /**
+     * Setup all event listeners for chat system
+     */
+    setupEventListeners() {
+      // Send message
+      const sendBtn = document.getElementById("chatSendBtn");
+      const msgInput = document.getElementById("chatMessageInput");
+      if (sendBtn) {
+        sendBtn.addEventListener("click", () => this.sendMessage());
+      }
+      if (msgInput) {
+        msgInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            this.sendMessage();
+          }
+        });
       }
 
-      // Validate file size (limit to 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`File "${file.name}" is too large. Maximum size is 10MB.`);
-        continue;
+      // New chat button
+      const newChatBtn = document.getElementById("newChatBtn");
+      if (newChatBtn) {
+        newChatBtn.addEventListener("click", () => this.showNewChatModal());
       }
 
-      // Read file and create message
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.createFileMessage(file, e.target.result);
-      };
-      reader.readAsDataURL(file);
+      // New group button
+      const newGroupBtn = document.getElementById("newGroupBtn");
+      if (newGroupBtn) {
+        newGroupBtn.addEventListener("click", () => this.showNewGroupModal());
+      }
+
+      // File upload
+      const fileInput = document.getElementById("chatFileInput");
+      if (fileInput) {
+        fileInput.addEventListener("change", (e) => this.handleFileUpload(e));
+      }
+
+      // File upload button
+      const fileUploadBtn = document.getElementById("chatFileUploadBtn");
+      if (fileUploadBtn) {
+        fileUploadBtn.addEventListener("click", () => {
+          document.getElementById("chatFileInput").click();
+        });
+      }
+
+      // Search contacts
+      const searchInput = document.getElementById("chatSearchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) =>
+          this.filterContacts(e.target.value),
+        );
+      }
+
+      // Overlay close
+      this.setupOverlayClose();
     }
 
-    // Clear input
-    event.target.value = '';
-  }
+    /**
+     * Load chats from localStorage or database
+     */
+    loadChats() {
+      if (!this.currentUser) {
+        console.log("No current user in loadChats");
+        return;
+      }
 
-  /**
-   * Create a file message
-   */
-  createFileMessage(file, dataUrl) {
-    if (!this.currentChat) {
-      alert('Please select a chat first');
-      return;
+      console.log("Loading chats for user:", this.currentUser.id);
+      const chatsStr = localStorage.getItem(`chats_${this.currentUser.id}`);
+      console.log("Chats string from localStorage:", chatsStr);
+      this.chats = chatsStr ? JSON.parse(chatsStr) : [];
+      console.log("Parsed chats:", this.chats);
+
+      // Load messages for each chat
+      this.chats.forEach((chat) => {
+        const messagesStr = localStorage.getItem(`messages_${chat.id}`);
+        this.messages[chat.id] = messagesStr ? JSON.parse(messagesStr) : [];
+      });
+
+      console.log("Final chats and messages:", this.chats, this.messages);
+      this.renderChatList();
     }
 
-    const newMessage = {
-      id: Date.now(),
-      chatId: this.currentChat.id,
-      senderId: this.currentUser.id,
-      senderName: this.currentUser.full_name,
-      content: '',
-      timestamp: new Date().toISOString(),
-      type: 'file',
-      attachments: [{
+    /**
+     * Load contacts based on user role and facility
+     */
+    loadContacts() {
+      if (!this.currentUser) return;
+
+      const allUsersStr = localStorage.getItem("allUsers");
+      if (!allUsersStr) return;
+
+      const allUsers = JSON.parse(allUsersStr);
+
+      if (this.currentUser.role === "patient") {
+        // Patients can only see health workers from their facility
+        this.contacts = allUsers.filter(
+          (user) =>
+            user.facility_id === this.currentUser.facility_id &&
+            user.role !== "patient" &&
+            user.id !== this.currentUser.id,
+        );
+      } else if (this.currentUser.role === "health_worker") {
+        // Health workers can see their patients and other health workers from same facility
+        this.contacts = allUsers.filter(
+          (user) =>
+            user.facility_id === this.currentUser.facility_id &&
+            user.id !== this.currentUser.id &&
+            (user.role === "patient" || user.role === "health_worker"),
+        );
+      }
+    }
+
+    /**
+     * Send a message
+     */
+    sendMessage() {
+      if (!this.currentChat) {
+        alert("Please select a chat first");
+        return;
+      }
+
+      const msgInput = document.getElementById("chatMessageInput");
+      const message = msgInput.value.trim();
+
+      if (!message) return;
+
+      const newMessage = {
         id: Date.now(),
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        url: dataUrl
-      }]
-    };
+        chatId: this.currentChat.id,
+        senderId: this.currentUser.id,
+        senderName: this.currentUser.full_name,
+        content: message,
+        timestamp: new Date().toISOString(),
+        type: "text",
+        attachments: [],
+      };
 
-    if (!this.messages[this.currentChat.id]) {
-      this.messages[this.currentChat.id] = [];
-    }
-    this.messages[this.currentChat.id].push(newMessage);
+      // Add to messages
+      if (!this.messages[this.currentChat.id]) {
+        this.messages[this.currentChat.id] = [];
+      }
+      this.messages[this.currentChat.id].push(newMessage);
 
-    localStorage.setItem(
-      `messages_${this.currentChat.id}`,
-      JSON.stringify(this.messages[this.currentChat.id])
-    );
+      // Save to localStorage
+      localStorage.setItem(
+        `messages_${this.currentChat.id}`,
+        JSON.stringify(this.messages[this.currentChat.id]),
+      );
 
-    this.renderMessages();
-  }
+      // Update chat's last message
+      const chat = this.chats.find((c) => c.id === this.currentChat.id);
+      if (chat) {
+        chat.lastMessage = message;
+        chat.lastMessageTime = new Date().toISOString();
+        chat.lastMessageSender = this.currentUser.id;
+        this.saveChats();
+      }
 
-  /**
-   * Show new chat modal
-   */
-  showNewChatModal() {
-    const modal = new bootstrap.Modal(document.getElementById('newChatModal'));
-    this.renderContactsList('chatContactsList');
-    modal.show();
-  }
-
-  /**
-   * Show new group modal
-   */
-  showNewGroupModal() {
-    const modal = new bootstrap.Modal(document.getElementById('newGroupModal'));
-    this.renderContactsList('groupMembersList');
-    modal.show();
-  }
-
-  /**
-   * Render contacts list for selection
-   */
-  renderContactsList(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (this.contacts.length === 0) {
-      container.innerHTML = '<p class="text-muted text-center py-4">No contacts available</p>';
-      return;
+      msgInput.value = "";
+      this.renderMessages();
+      this.renderChatList();
     }
 
-    const contactsHtml = this.contacts.map(contact => `
+    /**
+     * Handle file upload for chat
+     */
+    handleFileUpload(event) {
+      const files = event.target.files;
+
+      for (let file of files) {
+        // Validate file type
+        const isValidType =
+          this.allowedFileTypes.includes(file.type) ||
+          this.fileExtensions.some((ext) =>
+            file.name.toLowerCase().endsWith(ext),
+          );
+
+        if (!isValidType) {
+          alert(
+            `File type not allowed. Only PDF, PNG, JPEG, and JPG files are supported.`,
+          );
+          continue;
+        }
+
+        // Validate file size (limit to 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`File "${file.name}" is too large. Maximum size is 10MB.`);
+          continue;
+        }
+
+        // Read file and create message
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.createFileMessage(file, e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Clear input
+      event.target.value = "";
+    }
+
+    /**
+     * Create a file message
+     */
+    createFileMessage(file, dataUrl) {
+      if (!this.currentChat) {
+        alert("Please select a chat first");
+        return;
+      }
+
+      const newMessage = {
+        id: Date.now(),
+        chatId: this.currentChat.id,
+        senderId: this.currentUser.id,
+        senderName: this.currentUser.full_name,
+        content: "",
+        timestamp: new Date().toISOString(),
+        type: "file",
+        attachments: [
+          {
+            id: Date.now(),
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            url: dataUrl,
+          },
+        ],
+      };
+
+      if (!this.messages[this.currentChat.id]) {
+        this.messages[this.currentChat.id] = [];
+      }
+      this.messages[this.currentChat.id].push(newMessage);
+
+      localStorage.setItem(
+        `messages_${this.currentChat.id}`,
+        JSON.stringify(this.messages[this.currentChat.id]),
+      );
+
+      this.renderMessages();
+    }
+
+    /**
+     * Show new chat modal
+     */
+    showNewChatModal() {
+      const modal = new bootstrap.Modal(
+        document.getElementById("newChatModal"),
+      );
+      this.renderContactsList("chatContactsList");
+      modal.show();
+    }
+
+    /**
+     * Show new group modal
+     */
+    showNewGroupModal() {
+      const modal = new bootstrap.Modal(
+        document.getElementById("newGroupModal"),
+      );
+      this.renderContactsList("groupMembersList");
+      modal.show();
+    }
+
+    /**
+     * Render contacts list for selection
+     */
+    renderContactsList(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      if (this.contacts.length === 0) {
+        container.innerHTML =
+          '<p class="text-muted text-center py-4">No contacts available</p>';
+        return;
+      }
+
+      const contactsHtml = this.contacts
+        .map(
+          (contact) => `
       <div class="contact-item p-3 border-bottom d-flex align-items-center">
         <input type="checkbox" class="form-check-input me-3" value="${contact.id}" data-contact-id="${contact.id}">
         <div class="flex-grow-1">
           <div class="fw-500">${contact.full_name}</div>
-          <small class="text-muted">${contact.role === 'patient' ? 'Patient' : 'Health Worker'}</small>
+          <small class="text-muted">${contact.role === "patient" ? "Patient" : "Health Worker"}</small>
         </div>
       </div>
-    `).join('');
+    `,
+        )
+        .join("");
 
-    container.innerHTML = contactsHtml;
-  }
-
-  /**
-   * Create a new private chat
-   */
-  createPrivateChat(contactId) {
-    const contact = this.contacts.find(c => c.id === contactId);
-    if (!contact) return;
-
-    // Check if chat already exists
-    const existingChat = this.chats.find(chat => 
-      chat.type === 'private' &&
-      chat.participants.includes(contactId)
-    );
-
-    if (existingChat) {
-      this.selectChat(existingChat.id);
-      return;
+      container.innerHTML = contactsHtml;
     }
 
-    const newChat = {
-      id: Date.now().toString(),
-      type: 'private',
-      name: contact.full_name,
-      participants: [this.currentUser.id, contactId],
-      createdAt: new Date().toISOString(),
-      createdBy: this.currentUser.id,
-      lastMessage: '',
-      lastMessageTime: null,
-      lastMessageSender: null,
-      avatar: contact.avatar || this.getInitials(contact.full_name)
-    };
+    /**
+     * Create a new private chat
+     */
+    createPrivateChat(contactId) {
+      const contact = this.contacts.find((c) => c.id === contactId);
+      if (!contact) return;
 
-    this.chats.push(newChat);
-    this.messages[newChat.id] = [];
-    this.saveChats();
-    this.selectChat(newChat.id);
-  }
+      // Check if chat already exists
+      const existingChat = this.chats.find(
+        (chat) =>
+          chat.type === "private" && chat.participants.includes(contactId),
+      );
 
-  /**
-   * Create a new group chat
-   */
-  createGroupChat(groupName, memberIds) {
-    if (!groupName.trim()) {
-      alert('Please enter a group name');
-      return;
+      if (existingChat) {
+        this.selectChat(existingChat.id);
+        return;
+      }
+
+      const newChat = {
+        id: Date.now().toString(),
+        type: "private",
+        name: contact.full_name,
+        participants: [this.currentUser.id, contactId],
+        createdAt: new Date().toISOString(),
+        createdBy: this.currentUser.id,
+        lastMessage: "",
+        lastMessageTime: null,
+        lastMessageSender: null,
+        avatar: contact.avatar || this.getInitials(contact.full_name),
+      };
+
+      this.chats.push(newChat);
+      this.messages[newChat.id] = [];
+      this.saveChats();
+      this.selectChat(newChat.id);
     }
 
-    if (memberIds.length === 0) {
-      alert('Please select at least one member');
-      return;
+    /**
+     * Create a new group chat
+     */
+    createGroupChat(groupName, memberIds) {
+      if (!groupName.trim()) {
+        alert("Please enter a group name");
+        return;
+      }
+
+      if (memberIds.length === 0) {
+        alert("Please select at least one member");
+        return;
+      }
+
+      // Ensure current user is included
+      if (!memberIds.includes(this.currentUser.id)) {
+        memberIds.push(this.currentUser.id);
+      }
+
+      const newChat = {
+        id: Date.now().toString(),
+        type: "group",
+        name: groupName,
+        participants: memberIds,
+        createdAt: new Date().toISOString(),
+        createdBy: this.currentUser.id,
+        lastMessage: "",
+        lastMessageTime: null,
+        lastMessageSender: null,
+        avatar: this.getInitials(groupName),
+      };
+
+      this.chats.push(newChat);
+      this.messages[newChat.id] = [];
+      this.saveChats();
+      this.selectChat(newChat.id);
     }
 
-    // Ensure current user is included
-    if (!memberIds.includes(this.currentUser.id)) {
-      memberIds.push(this.currentUser.id);
+    /**
+     * Select a chat to view
+     */
+    selectChat(chatId) {
+      const chat = this.chats.find((c) => c.id === chatId);
+      if (!chat) return;
+
+      this.currentChat = chat;
+      this.renderChatView();
+      this.renderMessages();
+
+      // Show input area
+      const inputArea = document.getElementById("chatInputArea");
+      if (inputArea) {
+        inputArea.style.display = "block";
+      }
+
+      // Update active state in chat list
+      document.querySelectorAll(".chat-item").forEach((item) => {
+        item.classList.remove("active");
+      });
+      const activeItem = document.querySelector(
+        `[onclick*="selectChat('${chatId}')"]`,
+      );
+      if (activeItem) {
+        activeItem.classList.add("active");
+      }
     }
 
-    const newChat = {
-      id: Date.now().toString(),
-      type: 'group',
-      name: groupName,
-      participants: memberIds,
-      createdAt: new Date().toISOString(),
-      createdBy: this.currentUser.id,
-      lastMessage: '',
-      lastMessageTime: null,
-      lastMessageSender: null,
-      avatar: this.getInitials(groupName)
-    };
+    /**
+     * Render chat list
+     */
+    renderChatList() {
+      const container = document.getElementById("chatList");
+      console.log("renderChatList - container found:", !!container);
+      if (!container) {
+        console.log("No chatList container found in DOM");
+        return;
+      }
 
-    this.chats.push(newChat);
-    this.messages[newChat.id] = [];
-    this.saveChats();
-    this.selectChat(newChat.id);
-  }
+      if (this.chats.length === 0) {
+        container.innerHTML =
+          '<p class="text-muted text-center py-4">No chats yet. Start a conversation.</p>';
+        return;
+      }
 
-  /**
-   * Select a chat to view
-   */
-  selectChat(chatId) {
-    const chat = this.chats.find(c => c.id === chatId);
-    if (!chat) return;
+      // Sort by last message time
+      const sortedChats = [...this.chats].sort((a, b) => {
+        const timeA = new Date(a.lastMessageTime || a.createdAt);
+        const timeB = new Date(b.lastMessageTime || b.createdAt);
+        return timeB - timeA;
+      });
 
-    this.currentChat = chat;
-    this.renderChatView();
-    this.renderMessages();
-    
-    // Show input area
-    const inputArea = document.getElementById('chatInputArea');
-    if (inputArea) {
-      inputArea.style.display = 'block';
-    }
-    
-    // Update active state in chat list
-    document.querySelectorAll('.chat-item').forEach(item => {
-      item.classList.remove('active');
-    });
-    const activeItem = document.querySelector(`[onclick*="selectChat('${chatId}')"]`);
-    if (activeItem) {
-      activeItem.classList.add('active');
-    }
-  }
+      const chatsHtml = sortedChats
+        .map((chat) => {
+          const isSelected =
+            this.currentChat && this.currentChat.id === chat.id ? "active" : "";
+          const timeStr = this.formatTime(
+            chat.lastMessageTime || chat.createdAt,
+          );
 
-  /**
-   * Render chat list
-   */
-  renderChatList() {
-    const container = document.getElementById('chatList');
-    console.log('renderChatList - container found:', !!container);
-    if (!container) {
-      console.log('No chatList container found in DOM');
-      return;
-    }
-
-    if (this.chats.length === 0) {
-      container.innerHTML = '<p class="text-muted text-center py-4">No chats yet. Start a conversation.</p>';
-      return;
-    }
-
-    // Sort by last message time
-    const sortedChats = [...this.chats].sort((a, b) => {
-      const timeA = new Date(a.lastMessageTime || a.createdAt);
-      const timeB = new Date(b.lastMessageTime || b.createdAt);
-      return timeB - timeA;
-    });
-
-    const chatsHtml = sortedChats.map(chat => {
-      const isSelected = this.currentChat && this.currentChat.id === chat.id ? 'active' : '';
-      const timeStr = this.formatTime(chat.lastMessageTime || chat.createdAt);
-      
-      return `
+          return `
         <div class="chat-item ${isSelected} p-3 border-bottom cursor-pointer" onclick="chatSystem.selectChat('${chat.id}')">
           <div class="d-flex align-items-center">
             <div class="chat-avatar me-3" style="width: 45px; height: 45px; border-radius: 50%; background: #15696B; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
@@ -622,29 +654,31 @@ if (typeof ChatSystem === 'undefined') {
             </div>
             <div class="flex-grow-1">
               <div class="fw-500 text-truncate">${chat.name}</div>
-              <small class="text-muted text-truncate">${chat.lastMessage || 'No messages yet'}</small>
+              <small class="text-muted text-truncate">${chat.lastMessage || "No messages yet"}</small>
             </div>
             <small class="text-muted ms-2">${timeStr}</small>
           </div>
         </div>
       `;
-    }).join('');
+        })
+        .join("");
 
-    container.innerHTML = chatsHtml;
-  }
+      container.innerHTML = chatsHtml;
+    }
 
-  /**
-   * Render chat view header
-   */
-  renderChatView() {
-    const header = document.getElementById('chatViewHeader');
-    if (!header || !this.currentChat) return;
+    /**
+     * Render chat view header
+     */
+    renderChatView() {
+      const header = document.getElementById("chatViewHeader");
+      if (!header || !this.currentChat) return;
 
-    const participantCount = this.currentChat.type === 'group' 
-      ? `${this.currentChat.participants.length} members` 
-      : '1 contact';
+      const participantCount =
+        this.currentChat.type === "group"
+          ? `${this.currentChat.participants.length} members`
+          : "1 contact";
 
-    header.innerHTML = `
+      header.innerHTML = `
       <div class="d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
           <div class="chat-avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; background: #15696B; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
@@ -662,32 +696,37 @@ if (typeof ChatSystem === 'undefined') {
         </div>
       </div>
     `;
-  }
-
-  /**
-   * Render messages
-   */
-  renderMessages() {
-    const container = document.getElementById('chatMessagesContainer');
-    if (!container || !this.currentChat) return;
-
-    const messages = this.messages[this.currentChat.id] || [];
-
-    if (messages.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted py-5">No messages yet. Start the conversation.</div>';
-      return;
     }
 
-    const messagesHtml = messages.map(msg => {
-      const isOwn = msg.senderId === this.currentUser.id;
-      const timeStr = this.formatTime(msg.timestamp);
+    /**
+     * Render messages
+     */
+    renderMessages() {
+      const container = document.getElementById("chatMessagesContainer");
+      if (!container || !this.currentChat) return;
 
-      let contentHtml = '';
-      if (msg.type === 'text') {
-        contentHtml = `<div class="message-text">${this.escapeHtml(msg.content)}</div>`;
-      } else if (msg.type === 'file') {
-        contentHtml = msg.attachments.map(att => `
-          <div class="message-file p-2 border rounded" style="background: #f8f9fa;">
+      const messages = this.messages[this.currentChat.id] || [];
+
+      if (messages.length === 0) {
+        container.innerHTML =
+          '<div class="text-center text-muted py-5">No messages yet. Start the conversation.</div>';
+        return;
+      }
+
+      const messagesHtml = messages
+        .map((msg) => {
+          const isOwn = msg.senderId === this.currentUser.id;
+          const timeStr = this.formatTime(msg.timestamp);
+          const senderInitials = this.getInitials(msg.senderName);
+
+          let contentHtml = "";
+          if (msg.type === "text") {
+            contentHtml = `<div class="message-text">${this.escapeHtml(msg.content)}</div>`;
+          } else if (msg.type === "file") {
+            contentHtml = msg.attachments
+              .map(
+                (att) => `
+          <div class="message-file">
             <div class="d-flex align-items-center">
               <i class="ri-file-line me-2"></i>
               <a href="${att.url}" download="${att.name}" class="text-decoration-none flex-grow-1">
@@ -695,172 +734,204 @@ if (typeof ChatSystem === 'undefined') {
               </a>
             </div>
           </div>
-        `).join('');
-      }
+        `,
+              )
+              .join("");
+          }
 
-      return `
-        <div class="message-group ${isOwn ? 'text-end' : ''}">
-          <div class="message-item ${isOwn ? 'own' : 'other'}" style="
-            background: ${isOwn ? '#e7f3ff' : '#e4e6eb'};
-            color: #000;
-            padding: 8px 12px;
-            border-radius: 18px;
-            margin-left: ${isOwn ? 'auto' : '0'};
-            word-wrap: break-word;
-            display: inline-block;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            ${isOwn ? 'margin-right: 0;' : 'margin-left: 0;'}
-          ">
-            ${!isOwn && this.currentChat.type === 'group' ? `<small class="d-block fw-500 mb-1" style="color: #0084ff; font-size: 0.8rem;">${msg.senderName}</small>` : ''}
-            ${contentHtml}
-            <small class="d-block mt-1" style="opacity: 0.6; font-size: 0.75rem;">${timeStr}</small>
+          const senderNameHtml =
+            !isOwn && this.currentChat.type === "group"
+              ? `<span class="message-sender-name">${msg.senderName}</span>`
+              : "";
+
+          return `
+        <div class="message-group ${isOwn ? "text-end" : ""}">
+          ${!isOwn ? `<div class="message-avatar">${senderInitials}</div>` : ""}
+          <div class="message-wrapper">
+            ${senderNameHtml}
+            <div class="message-item">
+              ${contentHtml}
+              <small class="message-time">${timeStr}</small>
+            </div>
           </div>
         </div>
       `;
-    }).join('');
+        })
+        .join("");
 
-    container.innerHTML = messagesHtml;
-    container.scrollTop = container.scrollHeight;
-  }
-
-  /**
-   * Show chat info
-   */
-  showChatInfo() {
-    if (!this.currentChat) return;
-
-    const participantsHtml = this.currentChat.participants.map(pid => {
-      const allUsersStr = localStorage.getItem('allUsers');
-      const allUsers = allUsersStr ? JSON.parse(allUsersStr) : [];
-      const user = allUsers.find(u => u.id === pid);
-      return user ? `<li>${user.full_name} (${user.role === 'patient' ? 'Patient' : 'Health Worker'})</li>` : '';
-    }).join('');
-
-    alert(`Chat: ${this.currentChat.name}\nType: ${this.currentChat.type === 'group' ? 'Group' : 'Private'}\nMembers:\n${participantsHtml}`);
-  }
-
-  /**
-   * Filter contacts by search
-   */
-  filterContacts(query) {
-    const filtered = this.contacts.filter(contact =>
-      contact.full_name.toLowerCase().includes(query.toLowerCase())
-    );
-
-    const container = document.getElementById('chatSearchResults');
-    if (!container) return;
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<p class="text-muted text-center py-4">No contacts found</p>';
-      return;
+      container.innerHTML = messagesHtml;
+      container.scrollTop = container.scrollHeight;
     }
 
-    container.innerHTML = filtered.map(contact => `
+    /**
+     * Show chat info
+     */
+    showChatInfo() {
+      if (!this.currentChat) return;
+
+      const participantsHtml = this.currentChat.participants
+        .map((pid) => {
+          const allUsersStr = localStorage.getItem("allUsers");
+          const allUsers = allUsersStr ? JSON.parse(allUsersStr) : [];
+          const user = allUsers.find((u) => u.id === pid);
+          return user
+            ? `<li>${user.full_name} (${user.role === "patient" ? "Patient" : "Health Worker"})</li>`
+            : "";
+        })
+        .join("");
+
+      alert(
+        `Chat: ${this.currentChat.name}\nType: ${this.currentChat.type === "group" ? "Group" : "Private"}\nMembers:\n${participantsHtml}`,
+      );
+    }
+
+    /**
+     * Filter contacts by search
+     */
+    filterContacts(query) {
+      const filtered = this.contacts.filter((contact) =>
+        contact.full_name.toLowerCase().includes(query.toLowerCase()),
+      );
+
+      const container = document.getElementById("chatSearchResults");
+      if (!container) return;
+
+      if (filtered.length === 0) {
+        container.innerHTML =
+          '<p class="text-muted text-center py-4">No contacts found</p>';
+        return;
+      }
+
+      container.innerHTML = filtered
+        .map(
+          (contact) => `
       <div class="contact-item p-3 border-bottom d-flex align-items-center">
         <div class="flex-grow-1">
           <div class="fw-500">${contact.full_name}</div>
-          <small class="text-muted">${contact.role === 'patient' ? 'Patient' : 'Health Worker'}</small>
+          <small class="text-muted">${contact.role === "patient" ? "Patient" : "Health Worker"}</small>
         </div>
         <button class="btn btn-sm btn-primary" onclick="chatSystem.createPrivateChat('${contact.id}')">
           Chat
         </button>
       </div>
-    `).join('');
-  }
-
-  /**
-   * Save chats to localStorage
-   */
-  saveChats() {
-    if (!this.currentUser) return;
-    localStorage.setItem(`chats_${this.currentUser.id}`, JSON.stringify(this.chats));
-  }
-
-  /**
-   * Utility: Format time
-   */
-  formatTime(dateString) {
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-  }
-
-  /**
-   * Utility: Format file size
-   */
-  formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-  }
-
-  /**
-   * Utility: Get initials
-   */
-  getInitials(name) {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-  }
-
-  /**
-   * Utility: Escape HTML
-   */
-  escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  /**
-   * Handle create group
-   */
-  handleCreateGroup() {
-    const groupName = document.getElementById('groupNameInput').value;
-    const checkboxes = document.querySelectorAll('#groupMembersList input[type="checkbox"]:checked');
-    const memberIds = Array.from(checkboxes).map(cb => cb.getAttribute('data-contact-id'));
-
-    this.createGroupChat(groupName, memberIds);
-
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('newGroupModal'));
-    if (modal) {
-      modal.hide();
+    `,
+        )
+        .join("");
     }
 
-    // Reset form
-    document.getElementById('groupNameInput').value = '';
-    checkboxes.forEach(cb => cb.checked = false);
+    /**
+     * Save chats to localStorage
+     */
+    saveChats() {
+      if (!this.currentUser) return;
+      localStorage.setItem(
+        `chats_${this.currentUser.id}`,
+        JSON.stringify(this.chats),
+      );
+    }
 
-    // Show input area
-    document.getElementById('chatInputArea').style.display = 'block';
-  }
+    /**
+     * Utility: Format time
+     */
+    formatTime(dateString) {
+      const date = new Date(dateString);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
 
-  /**
-   * Handle overlay click to close
-   */
-  setupOverlayClose() {
-    const overlay = document.getElementById('chatPanelOverlay');
-    if (overlay) {
-      overlay.addEventListener('click', () => this.closeChat());
+      if (date.toDateString() === today.toDateString()) {
+        return date.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return "Yesterday";
+      } else {
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        });
+      }
+    }
+
+    /**
+     * Utility: Format file size
+     */
+    formatFileSize(bytes) {
+      if (bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+    }
+
+    /**
+     * Utility: Get initials
+     */
+    getInitials(name) {
+      return name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2);
+    }
+
+    /**
+     * Utility: Escape HTML
+     */
+    escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    /**
+     * Handle create group
+     */
+    handleCreateGroup() {
+      const groupName = document.getElementById("groupNameInput").value;
+      const checkboxes = document.querySelectorAll(
+        '#groupMembersList input[type="checkbox"]:checked',
+      );
+      const memberIds = Array.from(checkboxes).map((cb) =>
+        cb.getAttribute("data-contact-id"),
+      );
+
+      this.createGroupChat(groupName, memberIds);
+
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(
+        document.getElementById("newGroupModal"),
+      );
+      if (modal) {
+        modal.hide();
+      }
+
+      // Reset form
+      document.getElementById("groupNameInput").value = "";
+      checkboxes.forEach((cb) => (cb.checked = false));
+
+      // Show input area
+      document.getElementById("chatInputArea").style.display = "block";
+    }
+
+    /**
+     * Handle overlay click to close
+     */
+    setupOverlayClose() {
+      const overlay = document.getElementById("chatPanelOverlay");
+      if (overlay) {
+        overlay.addEventListener("click", () => this.closeChat());
+      }
     }
   }
-}
 
   // Initialize chat system when DOM is ready
-  if (typeof chatSystem === 'undefined' || !chatSystem) {
+  if (typeof chatSystem === "undefined" || !chatSystem) {
     let chatSystem;
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
         if (!window.chatSystem) {
           window.chatSystem = new ChatSystem();
         }
@@ -873,9 +944,12 @@ if (typeof ChatSystem === 'undefined') {
   }
 }
 // Make chatSystem available globally if it was created
-if (typeof window.chatSystem === 'undefined' && typeof ChatSystem !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+if (
+  typeof window.chatSystem === "undefined" &&
+  typeof ChatSystem !== "undefined"
+) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
       window.chatSystem = new ChatSystem();
     });
   } else {
