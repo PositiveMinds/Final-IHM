@@ -57,9 +57,21 @@ class PWAInstallationManager {
     // Retry if not found
     if (this.buttonSearchAttempts < this.maxButtonSearchAttempts) {
       this.buttonSearchAttempts++;
-      setTimeout(() => this.findInstallButton(), 500);
+      console.log('[PWA Install] Button not found, retry attempt', this.buttonSearchAttempts);
+      setTimeout(() => this.findInstallButton(), 300);
     } else {
-      console.warn('[PWA Install] Install button not found after multiple attempts');
+      console.warn('[PWA Install] Install button not found after', this.maxButtonSearchAttempts, 'attempts');
+      console.log('[PWA Install] DOM is ready:', document.readyState);
+      console.log('[PWA Install] Total elements in DOM:', document.querySelectorAll('*').length);
+      // Try one more time with longer delay
+      setTimeout(() => {
+        const lastAttempt = document.getElementById('pwa-install-button');
+        if (lastAttempt) {
+          this.installButton = lastAttempt;
+          console.log('[PWA Install] Button found on final attempt');
+          this.setupInstallButton();
+        }
+      }, 1000);
     }
     return false;
   }
@@ -442,13 +454,26 @@ class PWAInstallationManager {
 // Initialize on DOM ready
 let pwaInstallManager = null;
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    pwaInstallManager = new PWAInstallationManager();
-  });
-} else {
+function initializePWA() {
+  if (pwaInstallManager) return; // Avoid duplicate initialization
   pwaInstallManager = new PWAInstallationManager();
 }
+
+// Multiple initialization strategies to ensure it runs
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializePWA);
+} else {
+  // DOM already loaded
+  initializePWA();
+}
+
+// Also try on window load for safety
+window.addEventListener('load', () => {
+  if (!pwaInstallManager) {
+    console.log('[PWA Install] Initializing on window.load event');
+    initializePWA();
+  }
+});
 
 // Export for global access
 window.PWAInstallManager = PWAInstallationManager;

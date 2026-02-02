@@ -258,6 +258,10 @@ if (typeof ChatSystem === "undefined") {
                         this.sendMessage();
                     }
                 });
+                // Typing indicator
+                msgInput.addEventListener("input", () =>
+                    this.broadcastTypingIndicator(),
+                );
             }
 
             // New chat button
@@ -295,13 +299,6 @@ if (typeof ChatSystem === "undefined") {
             if (messageSearchCloseBtn) {
                 messageSearchCloseBtn.addEventListener("click", () =>
                     this.toggleMessageSearch(),
-                );
-            }
-
-            // Typing indicator
-            if (msgInput) {
-                msgInput.addEventListener("input", () =>
-                    this.broadcastTypingIndicator(),
                 );
             }
 
