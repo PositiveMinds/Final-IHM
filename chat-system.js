@@ -20,6 +20,12 @@ if (typeof ChatSystem === "undefined") {
         "image/jpg",
       ];
       this.fileExtensions = [".pdf", ".png", ".jpeg", ".jpg"];
+      this.typingUsers = new Set();
+      this.typingTimeout = null;
+      this.searchQuery = "";
+      this.pinnedMessages = {};
+      this.messageReactions = {};
+      this.readReceipts = {};
       this.init();
     }
 
@@ -84,33 +90,53 @@ if (typeof ChatSystem === "undefined") {
             </div>
           </div>
 
-          <div id="chatMessagesContainer" class="chat-messages">
-            <div class="empty-chat-state">
-              <i class="ri-chat-smile-line"></i>
-              <p>No messages yet. Start the conversation!</p>
-            </div>
+          <div class="chat-message-search" id="chatMessageSearch" style="display: none;">
+            <input 
+              type="text" 
+              id="messageSearchInput" 
+              placeholder="Search messages..." 
+              class="form-control form-control-sm"
+            >
+            <button class="btn btn-sm btn-outline-secondary" id="messageSearchCloseBtn" title="Close search">
+              <i class="ri-close-line"></i>
+            </button>
           </div>
 
-          <div class="chat-input-area" id="chatInputArea" style="display: none;">
-            <div class="chat-input-wrapper">
-              <input 
-                type="text" 
-                id="chatMessageInput" 
-                placeholder="Type a message..." 
-                class="form-control"
-              >
-              <button type="button" class="btn btn-outline-secondary file-upload-btn" id="chatFileUploadBtn" title="Attach file">
-                <i class="ri-attachment-2"></i>
-              </button>
-              <button type="button" class="btn btn-primary" id="chatSendBtn" title="Send message">
-                <i class="ri-send-plane-line"></i>
-              </button>
-            </div>
-            <input type="file" id="chatFileInput" accept=".pdf,.png,.jpeg,.jpg" multiple>
-            <small class="text-muted d-block mt-2">
-              <i class="ri-information-line"></i> Supported: PDF, PNG, JPEG, JPG (max 10MB)
-            </small>
-          </div>
+          <div id="chatMessagesContainer" class="chat-messages">
+             <div class="empty-chat-state">
+               <i class="ri-chat-smile-line"></i>
+               <p>No messages yet. Start the conversation!</p>
+             </div>
+           </div>
+
+           <div id="typingIndicator" class="typing-indicator" style="display: none;">
+             <span></span><span></span><span></span>
+             <small id="typingText" class="typing-text"></small>
+           </div>
+
+           <div class="chat-input-area" id="chatInputArea" style="display: none;">
+             <div class="chat-input-wrapper">
+               <input 
+                 type="text" 
+                 id="chatMessageInput" 
+                 placeholder="Type a message..." 
+                 class="form-control"
+               >
+               <button type="button" class="btn btn-outline-secondary file-upload-btn" id="chatFileUploadBtn" title="Attach file">
+                 <i class="ri-attachment-2"></i>
+               </button>
+               <button type="button" class="btn btn-outline-secondary search-messages-btn" id="searchMessagesBtn" title="Search messages">
+                 <i class="ri-search-line"></i>
+               </button>
+               <button type="button" class="btn btn-primary" id="chatSendBtn" title="Send message">
+                 <i class="ri-send-plane-line"></i>
+               </button>
+             </div>
+             <input type="file" id="chatFileInput" accept=".pdf,.png,.jpeg,.jpg" multiple>
+             <small class="text-muted d-block mt-2">
+               <i class="ri-information-line"></i> Supported: PDF, PNG, JPEG, JPG (max 10MB)
+             </small>
+           </div>
         </div>
       </div>
 
@@ -244,6 +270,40 @@ if (typeof ChatSystem === "undefined") {
       const newGroupBtn = document.getElementById("newGroupBtn");
       if (newGroupBtn) {
         newGroupBtn.addEventListener("click", () => this.showNewGroupModal());
+      }
+
+      // Search messages button
+      const searchMessagesBtn = document.getElementById("searchMessagesBtn");
+      if (searchMessagesBtn) {
+        searchMessagesBtn.addEventListener("click", () =>
+          this.toggleMessageSearch(),
+        );
+      }
+
+      // Message search
+      const messageSearchInput = document.getElementById("messageSearchInput");
+      if (messageSearchInput) {
+        messageSearchInput.addEventListener("keyup", (e) =>
+          this.searchMessages(e.target.value),
+        );
+      }
+
+      // Close message search
+      const messageSearchCloseBtn = document.getElementById(
+        "messageSearchCloseBtn",
+      );
+      if (messageSearchCloseBtn) {
+        messageSearchCloseBtn.addEventListener("click", () =>
+          this.toggleMessageSearch(),
+        );
+      }
+
+      // Typing indicator
+      const msgInput = document.getElementById("chatMessageInput");
+      if (msgInput) {
+        msgInput.addEventListener("input", () =>
+          this.broadcastTypingIndicator(),
+        );
       }
 
       // File upload
@@ -612,6 +672,9 @@ if (typeof ChatSystem === "undefined") {
       if (activeItem) {
         activeItem.classList.add("active");
       }
+
+      // Mark messages as read
+      this.markMessagesAsRead();
     }
 
     /**
@@ -718,14 +781,28 @@ if (typeof ChatSystem === "undefined") {
           const isOwn = msg.senderId === this.currentUser.id;
           const timeStr = this.formatTime(msg.timestamp);
           const senderInitials = this.getInitials(msg.senderName);
+          const isPinned = this.pinnedMessages[this.currentChat.id]?.includes(
+            msg.id,
+          );
+          const reactions = this.messageReactions[msg.id] || {};
+          const readStatus = this.readReceipts[msg.id] || [];
 
           let contentHtml = "";
           if (msg.type === "text") {
             contentHtml = `<div class="message-text">${this.escapeHtml(msg.content)}</div>`;
           } else if (msg.type === "file") {
             contentHtml = msg.attachments
-              .map(
-                (att) => `
+              .map((att) => {
+                const isImage = att.type?.startsWith("image/");
+                if (isImage) {
+                  return `
+          <div class="message-file image-preview">
+            <img src="${att.url}" alt="${att.name}" class="preview-thumbnail" loading="lazy">
+            <small class="image-filename">${att.name}</small>
+          </div>
+        `;
+                } else {
+                  return `
           <div class="message-file">
             <div class="d-flex align-items-center">
               <i class="ri-file-line me-2"></i>
@@ -734,8 +811,9 @@ if (typeof ChatSystem === "undefined") {
               </a>
             </div>
           </div>
-        `,
-              )
+        `;
+                }
+              })
               .join("");
           }
 
@@ -744,15 +822,61 @@ if (typeof ChatSystem === "undefined") {
               ? `<span class="message-sender-name">${msg.senderName}</span>`
               : "";
 
+          const reactionsHtml =
+            Object.keys(reactions).length > 0
+              ? `<div class="message-reactions">${Object.keys(reactions)
+                  .map(
+                    (emoji) =>
+                      `<span class="reaction-emoji" title="${reactions[emoji].join(", ")}">${emoji} ${reactions[emoji].length > 1 ? reactions[emoji].length : ""}</span>`,
+                  )
+                  .join("")}</div>`
+              : "";
+
+          const pinnedIndicator = isPinned
+            ? '<div class="message-pinned-indicator"><i class="ri-pushpin-fill"></i> Pinned</div>'
+            : "";
+
+          const readReceiptsHtml =
+            isOwn && readStatus.length > 0
+              ? `<small class="message-read-receipt" title="Read by: ${readStatus.join(", ")}"><i class="ri-check-double-line"></i></small>`
+              : "";
+
+          const messageActions = `
+            <div class="message-actions">
+              <button class="msg-action-btn" onclick="chatSystem.toggleReactionPicker(event, '${msg.id}')" title="React">
+                <i class="ri-emotion-smile-line"></i>
+              </button>
+              <button class="msg-action-btn" onclick="chatSystem.pinMessage('${msg.id}')" title="${isPinned ? "Unpin" : "Pin"}">
+                <i class="ri-pushpin-line"></i>
+              </button>
+              ${
+                isOwn
+                  ? `
+              <button class="msg-action-btn" onclick="chatSystem.editMessage('${msg.id}')" title="Edit">
+                <i class="ri-edit-line"></i>
+              </button>
+              <button class="msg-action-btn" onclick="chatSystem.deleteMessage('${msg.id}')" title="Delete">
+                <i class="ri-delete-bin-line"></i>
+              </button>
+              `
+                  : ""
+              }
+            </div>
+          `;
+
           return `
-        <div class="message-group ${isOwn ? "text-end" : ""}">
+        <div class="message-group ${isOwn ? "text-end" : ""}" data-message-id="${msg.id}">
           ${!isOwn ? `<div class="message-avatar">${senderInitials}</div>` : ""}
           <div class="message-wrapper">
             ${senderNameHtml}
+            ${pinnedIndicator}
             <div class="message-item">
               ${contentHtml}
               <small class="message-time">${timeStr}</small>
+              ${readReceiptsHtml}
             </div>
+            ${reactionsHtml}
+            ${messageActions}
           </div>
         </div>
       `;
@@ -924,6 +1048,255 @@ if (typeof ChatSystem === "undefined") {
       if (overlay) {
         overlay.addEventListener("click", () => this.closeChat());
       }
+    }
+
+    /**
+     * Toggle message search UI
+     */
+    toggleMessageSearch() {
+      const searchUI = document.getElementById("chatMessageSearch");
+      if (searchUI) {
+        searchUI.style.display =
+          searchUI.style.display === "none" ? "flex" : "none";
+        if (searchUI.style.display !== "none") {
+          document.getElementById("messageSearchInput").focus();
+        }
+      }
+    }
+
+    /**
+     * Search messages
+     */
+    searchMessages(query) {
+      this.searchQuery = query.toLowerCase();
+      if (!this.currentChat || !this.messages[this.currentChat.id]) return;
+
+      const messages = this.messages[this.currentChat.id];
+      const container = document.getElementById("chatMessagesContainer");
+
+      if (!query) {
+        this.renderMessages();
+        return;
+      }
+
+      const filtered = messages.filter(
+        (msg) =>
+          msg.content.toLowerCase().includes(query) ||
+          msg.senderName.toLowerCase().includes(query),
+      );
+
+      const html =
+        filtered.length > 0
+          ? filtered
+              .map((msg) => {
+                const isOwn = msg.senderId === this.currentUser.id;
+                const timeStr = this.formatTime(msg.timestamp);
+                const senderInitials = this.getInitials(msg.senderName);
+                let contentHtml = `<div class="message-text" style="background: #ffffcc;">${this.escapeHtml(msg.content)}</div>`;
+                const senderNameHtml =
+                  !isOwn && this.currentChat.type === "group"
+                    ? `<span class="message-sender-name">${msg.senderName}</span>`
+                    : "";
+                return `
+        <div class="message-group ${isOwn ? "text-end" : ""}" data-message-id="${msg.id}">
+          ${!isOwn ? `<div class="message-avatar">${senderInitials}</div>` : ""}
+          <div class="message-wrapper">
+            ${senderNameHtml}
+            <div class="message-item">
+              ${contentHtml}
+              <small class="message-time">${timeStr}</small>
+            </div>
+          </div>
+        </div>`;
+              })
+              .join("")
+          : `<div class="text-center text-muted py-5">No messages match "${query}"</div>`;
+
+      container.innerHTML = html;
+    }
+
+    /**
+     * Broadcast typing indicator
+     */
+    broadcastTypingIndicator() {
+      if (this.typingTimeout) clearTimeout(this.typingTimeout);
+
+      this.typingUsers.add(this.currentUser.id);
+      this.showTypingIndicator();
+
+      this.typingTimeout = setTimeout(() => {
+        this.typingUsers.delete(this.currentUser.id);
+        this.hideTypingIndicator();
+      }, 3000);
+    }
+
+    /**
+     * Show typing indicator
+     */
+    showTypingIndicator() {
+      const indicator = document.getElementById("typingIndicator");
+      const typingText = document.getElementById("typingText");
+      if (indicator && this.typingUsers.size > 0) {
+        const typingUsers = Array.from(this.typingUsers)
+          .map((id) => {
+            const user = JSON.parse(
+              localStorage.getItem("allUsers") || "[]",
+            ).find((u) => u.id === id);
+            return user?.full_name.split(" ")[0] || "Someone";
+          })
+          .join(", ");
+        typingText.textContent = `${typingUsers} ${this.typingUsers.size > 1 ? "are" : "is"} typing...`;
+        indicator.style.display = "flex";
+      }
+    }
+
+    /**
+     * Hide typing indicator
+     */
+    hideTypingIndicator() {
+      const indicator = document.getElementById("typingIndicator");
+      if (indicator && this.typingUsers.size === 0) {
+        indicator.style.display = "none";
+      }
+    }
+
+    /**
+     * Toggle reaction picker
+     */
+    toggleReactionPicker(event, messageId) {
+      event.stopPropagation();
+      const emojis = ["👍", "❤️", "😂", "😮", "😢", "🔥", "✨", "👏"];
+      const picker = document.createElement("div");
+      picker.className = "emoji-picker";
+      picker.style.position = "absolute";
+      picker.style.background = "white";
+      picker.style.border = "1px solid #ddd";
+      picker.style.borderRadius = "8px";
+      picker.style.padding = "8px";
+      picker.style.display = "grid";
+      picker.style.gridTemplateColumns = "repeat(4, 1fr)";
+      picker.style.gap = "4px";
+      picker.style.zIndex = "1050";
+
+      emojis.forEach((emoji) => {
+        const btn = document.createElement("button");
+        btn.textContent = emoji;
+        btn.style.border = "none";
+        btn.style.background = "#f0f0f0";
+        btn.style.padding = "6px";
+        btn.style.cursor = "pointer";
+        btn.style.fontSize = "1.2rem";
+        btn.style.borderRadius = "4px";
+        btn.onclick = () => this.addReaction(messageId, emoji);
+        picker.appendChild(btn);
+      });
+
+      document.body.appendChild(picker);
+      const rect = event.target.getBoundingClientRect();
+      picker.style.top = rect.bottom + "px";
+      picker.style.left = rect.left + "px";
+
+      setTimeout(() => {
+        document.addEventListener("click", function closeEmojiPicker() {
+          picker.remove();
+          document.removeEventListener("click", closeEmojiPicker);
+        });
+      }, 0);
+    }
+
+    /**
+     * Add reaction to message
+     */
+    addReaction(messageId, emoji) {
+      if (!this.messageReactions[messageId]) {
+        this.messageReactions[messageId] = {};
+      }
+      if (!this.messageReactions[messageId][emoji]) {
+        this.messageReactions[messageId][emoji] = [];
+      }
+      if (
+        !this.messageReactions[messageId][emoji].includes(
+          this.currentUser.full_name,
+        )
+      ) {
+        this.messageReactions[messageId][emoji].push(
+          this.currentUser.full_name,
+        );
+      }
+      this.renderMessages();
+    }
+
+    /**
+     * Pin message
+     */
+    pinMessage(messageId) {
+      if (!this.currentChat) return;
+      const chatId = this.currentChat.id;
+      if (!this.pinnedMessages[chatId]) {
+        this.pinnedMessages[chatId] = [];
+      }
+      const index = this.pinnedMessages[chatId].indexOf(messageId);
+      if (index > -1) {
+        this.pinnedMessages[chatId].splice(index, 1);
+      } else {
+        this.pinnedMessages[chatId].push(messageId);
+      }
+      this.renderMessages();
+    }
+
+    /**
+     * Edit message
+     */
+    editMessage(messageId) {
+      if (!this.currentChat || !this.messages[this.currentChat.id]) return;
+      const msg = this.messages[this.currentChat.id].find(
+        (m) => m.id === messageId,
+      );
+      if (msg && msg.type === "text") {
+        const newContent = prompt("Edit message:", msg.content);
+        if (newContent && newContent.trim()) {
+          msg.content = newContent.trim();
+          msg.edited = true;
+          msg.editedAt = new Date().toISOString();
+          this.renderMessages();
+          this.saveMessages();
+        }
+      }
+    }
+
+    /**
+     * Delete message
+     */
+    deleteMessage(messageId) {
+      if (!confirm("Delete this message?")) return;
+      if (!this.currentChat || !this.messages[this.currentChat.id]) return;
+      const index = this.messages[this.currentChat.id].findIndex(
+        (m) => m.id === messageId,
+      );
+      if (index > -1) {
+        this.messages[this.currentChat.id].splice(index, 1);
+        this.renderMessages();
+        this.saveMessages();
+      }
+    }
+
+    /**
+     * Mark messages as read
+     */
+    markMessagesAsRead() {
+      if (!this.currentChat || !this.messages[this.currentChat.id]) return;
+      const messages = this.messages[this.currentChat.id];
+      messages.forEach((msg) => {
+        if (msg.senderId !== this.currentUser.id) {
+          if (!this.readReceipts[msg.id]) {
+            this.readReceipts[msg.id] = [];
+          }
+          if (!this.readReceipts[msg.id].includes(this.currentUser.full_name)) {
+            this.readReceipts[msg.id].push(this.currentUser.full_name);
+          }
+        }
+      });
+      this.renderMessages();
     }
   }
 
