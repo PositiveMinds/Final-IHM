@@ -1702,8 +1702,28 @@ cursor: pointer;
                             </div>
                             <input type="text" id="contactSearchInput" placeholder="Search..." style="width: 100%; padding: 10px 14px; border: 1px solid #E8E8E8; border-radius: 0; font-size: 13px; box-sizing: border-box; background: #F8F8F8; outline: none;">
                         </div>
-                        <div id="contactsList" style="flex: 1; overflow-y: auto; padding: 8px 0;">
-                            <!-- Contacts will be populated here -->
+
+                        <!-- Tab Navigation -->
+                        <div style="display: flex; border-bottom: 1px solid #E8E8E8; background: #FAFAFA;">
+                            <button id="privateTab" class="chat-tab active" onclick="switchChatTab('private')" style="flex: 1; padding: 14px 12px; border: none; background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #1a1a1a; border-bottom: 3px solid #734CF4; transition: all 0.3s ease;">
+                                <i class="ri-chat-private-line" style="margin-right: 6px;"></i>Private
+                            </button>
+                            <button id="groupTab" class="chat-tab" onclick="switchChatTab('group')" style="flex: 1; padding: 14px 12px; border: none; background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #9CA3AF; border-bottom: 3px solid transparent; transition: all 0.3s ease;">
+                                <i class="ri-team-line" style="margin-right: 6px;"></i>Groups
+                            </button>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div id="privateChatsPanel" style="flex: 1; overflow-y: auto; padding: 8px 0;">
+                            <div id="contactsList" style="">
+                                <!-- Private contacts will be populated here -->
+                            </div>
+                        </div>
+
+                        <div id="groupChatsPanel" style="flex: 1; overflow-y: auto; padding: 8px 0; display: none;">
+                            <div id="groupsList" style="">
+                                <!-- Groups will be populated here -->
+                            </div>
                         </div>
                     </div>
 
@@ -7992,6 +8012,15 @@ cursor: pointer;
                 { id: 15, name: 'Mr. Robert Mukasa', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop', lastMessage: 'WhatsApp integration working perfectly', time: '11:00 AM', status: 'offline' }
             ];
 
+            var groups = [
+                { id: 1, name: 'Healthcare Team', avatar: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop', lastMessage: 'Project deadline moved to next week', time: '2:30 PM', members: 12, status: 'active' },
+                { id: 2, name: 'Patient Support', avatar: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop', lastMessage: 'Weekly check-in meeting scheduled', time: '1:15 PM', members: 8, status: 'active' },
+                { id: 3, name: 'Medical Updates', avatar: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop', lastMessage: 'New training materials available', time: '11:45 AM', members: 24, status: 'active' },
+                { id: 4, name: 'Clinical Research', avatar: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop', lastMessage: 'Data analysis in progress', time: '10:20 AM', members: 15, status: 'active' },
+                { id: 5, name: 'Facility Admins', avatar: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop', lastMessage: 'Monthly review completed', time: 'Yesterday', members: 6, status: 'active' },
+                { id: 6, name: 'Emergency Response', avatar: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=400&fit=crop', lastMessage: 'Alert protocols updated', time: 'Yesterday', members: 18, status: 'active' }
+            ];
+
             var notifications = [
                 { name: '@john mentioned you in "trip to Goa"', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
                 { name: '@chiya.singh added you in "Group Study"', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop' },
@@ -8085,6 +8114,70 @@ cursor: pointer;
                 $('#suggestionsList').html(html);
             }
 
+            // Load groups list
+            function loadGroups() {
+                var html = '';
+                groups.forEach(function(group) {
+                    html += '<div class="group-item" data-id="' + group.id + '" data-group="' + group.name + '" style="padding: 14px 16px; margin: 6px 10px; cursor: pointer; border-radius: 14px; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; gap: 14px; align-items: center; border: 1px solid transparent; background: #FAFAFA;">' +
+                        '<div style="position: relative; flex-shrink: 0;">' +
+                        '<img src="' + group.avatar + '" alt="' + group.name + '" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">' +
+                        '<div style="position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; background: #10B981; border: 1px solid white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);"></div>' +
+                        '</div>' +
+                        '<div style="flex: 1; min-width: 0;">' +
+                        '<p style="margin: 0 0 6px 0; font-weight: 700; color: #1F2937; font-size: 14px; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + group.name + '</p>' +
+                        '<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">' +
+                        '<span style="font-size: 12px; color: #6B7280; font-weight: 500;">👥 ' + group.members + ' members</span>' +
+                        '</div>' +
+                        '<p style="margin: 0; color: #9CA3AF; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + group.lastMessage + '</p>' +
+                        '</div>' +
+                        '<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">' +
+                        '<span style="font-size: 12px; color: #9CA3AF; font-weight: 500;">' + group.time + '</span>' +
+                        '</div>' +
+                        '</div>';
+                });
+                $('#groupsList').html(html);
+
+                $('.group-item').hover(
+                    function() {
+                        $(this).css({
+                            'background': '#F3F4F6',
+                            'border-color': '#E5E7EB',
+                            'box-shadow': '0 4px 12px rgba(0, 0, 0, 0.08)',
+                            'transform': 'translateX(4px)'
+                        });
+                    },
+                    function() {
+                        $(this).css({
+                            'background': '#FAFAFA',
+                            'border-color': 'transparent',
+                            'box-shadow': 'none',
+                            'transform': 'translateX(0)'
+                        });
+                    }
+                );
+
+                $('.group-item').click(function() {
+                    var groupId = $(this).data('id');
+                    $(this).css('background', '#F0E8FF').css('border-color', '#BFDBFE');
+                    selectGroup(groupId);
+                });
+            }
+
+            // Switch between Private and Group tabs
+            function switchChatTab(tabName) {
+                if (tabName === 'private') {
+                    $('#privateChatsPanel').show();
+                    $('#groupChatsPanel').hide();
+                    $('#privateTab').css({'color': '#1a1a1a', 'border-bottom-color': '#734CF4'});
+                    $('#groupTab').css({'color': '#9CA3AF', 'border-bottom-color': 'transparent'});
+                } else if (tabName === 'group') {
+                    $('#privateChatsPanel').hide();
+                    $('#groupChatsPanel').show();
+                    $('#groupTab').css({'color': '#1a1a1a', 'border-bottom-color': '#734CF4'});
+                    $('#privateTab').css({'color': '#9CA3AF', 'border-bottom-color': 'transparent'});
+                }
+            }
+
             // Select a contact
             function selectContact(contactId) {
                 var contact = contacts.find(c => c.id === contactId);
@@ -8101,7 +8194,24 @@ cursor: pointer;
                 }
             }
 
+            // Select a group
+            function selectGroup(groupId) {
+                var group = groups.find(g => g.id === groupId);
+                if (group) {
+                    currentContact = group;
+                    $('#selectedName').text(group.name);
+                    $('#selectedStatus').text(group.members + ' members in group');
+                    $('#selectedAvatar').attr('src', group.avatar);
+                    
+                    $('#ap').html('<div style="text-align: center; color: #999; font-size: 13px; margin: 20px 0;">Today 12:31 AM</div>');
+                    
+                    $('.group-item').css({'background': 'transparent', 'color': '#1a1a1a'});
+                    $('.group-item[data-id="' + groupId + '"]').css({'background': '#F0E8FF'});
+                }
+            }
+
             loadContacts();
+            loadGroups();
             loadNotifications();
             loadSuggestions();
             selectContact(1);
