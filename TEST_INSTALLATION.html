@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Installation Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .test-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .test-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .test-result {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            padding: 8px 0;
+        }
+        
+        .status-icon {
+            font-size: 18px;
+            min-width: 20px;
+        }
+        
+        .status-icon.success { color: #10b981; }
+        .status-icon.error { color: #ef4444; }
+        .status-icon.warning { color: #f59e0b; }
+        .status-icon.loading { 
+            color: #667eea; 
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .test-details {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        .summary {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .summary.show {
+            display: block;
+        }
+        
+        .summary h3 {
+            color: #10b981;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .summary p {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .error-summary {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        
+        .error-summary h3 {
+            color: #ef4444;
+        }
+        
+        .console-output {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .console-output.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 PWA Installation Tester</h1>
+        <p class="subtitle">Diagnose why your PWA isn't installing</p>
+        
+        <!-- Service Worker Test -->
+        <div class="test-group">
+            <div class="test-name">1. Service Worker Registration</div>
+            <div class="test-result">
+                <span class="status-icon loading">⏳</span>
+                <span id="sw-status">Checking...</span>
+            </div>
+            <div class="test-details" id="sw-details"></div>
+        </div>
+        
+        <!-- Manifest Test -->
+        <div class="test-group">
+            <div class="test-name">2. Manifest File</div>
+            <div class="test-result">
+                <span class="status-icon loading">⏳</span>
+                <span id="manifest-status">Checking...</span>
+            </div>
+            <div class="test-details" id="manifest-details"></div>
+        </div>
+        
+        <!-- Icons Test -->
+        <div class="test-group">
+            <div class="test-name">3. App Icons</div>
+            <div class="test-result">
+                <span class="status-icon loading">⏳</span>
+                <span id="icons-status">Checking...</span>
+            </div>
+            <div class="test-details" id="icons-details"></div>
+        </div>
+        
+        <!-- HTTPS Test -->
+        <div class="test-group">
+            <div class="test-name">4. HTTPS (Required)</div>
+            <div class="test-result">
+                <span class="status-icon loading">⏳</span>
+                <span id="https-status">Checking...</span>
+            </div>
+            <div class="test-details" id="https-details"></div>
+        </div>
+        
+        <!-- Install Prompt Test -->
+        <div class="test-group">
+            <div class="test-name">5. Install Prompt Event</div>
+            <div class="test-result">
+                <span class="status-icon loading">⏳</span>
+                <span id="prompt-status">Waiting for event...</span>
+            </div>
+            <div class="test-details" id="prompt-details"></div>
+        </div>
+        
+        <!-- Browser Support -->
+        <div class="test-group">
+            <div class="test-name">6. Browser Support</div>
+            <div class="test-result">
+                <span class="status-icon loading">⏳</span>
+                <span id="browser-status">Checking...</span>
+            </div>
+            <div class="test-details" id="browser-details"></div>
+        </div>
+        
+        <!-- Summary -->
+        <div class="summary" id="summary"></div>
+        
+        <!-- Console Output -->
+        <div class="console-output" id="console">
+            <div>Console Output:</div>
+            <div id="console-lines"></div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="button-group">
+            <button class="btn-primary" onclick="runAllTests()">Run All Tests</button>
+            <button class="btn-secondary" onclick="toggleConsole()">Show Console</button>
+        </div>
+    </div>
+
+    <script>
+        let allTestsPassed = true;
+        const consoleLogs = [];
+        
+        // Override console.log to capture output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleLogs.push(args.join(' '));
+            const consoleLines = document.getElementById('console-lines');
+            if (consoleLines) {
+                const line = document.createElement('div');
+                line.textContent = args.join(' ');
+                consoleLines.appendChild(line);
+                consoleLines.parentElement.scrollTop = consoleLines.parentElement.scrollHeight;
+            }
+        };
+        
+        function updateTest(testId, status, icon, details) {
+            const statusEl = document.getElementById(`${testId}-status`);
+            const detailsEl = document.getElementById(`${testId}-details`);
+            const iconEl = statusEl.parentElement.querySelector('.status-icon');
+            
+            statusEl.textContent = status;
+            if (detailsEl && details) {
+                detailsEl.textContent = details;
+            }
+            
+            // Update icon
+            iconEl.classList.remove('loading');
+            if (icon === 'success') {
+                iconEl.classList.add('success');
+                iconEl.textContent = '✅';
+            } else if (icon === 'error') {
+                iconEl.classList.add('error');
+                iconEl.textContent = '❌';
+                allTestsPassed = false;
+            } else if (icon === 'warning') {
+                iconEl.classList.add('warning');
+                iconEl.textContent = '⚠️';
+            }
+        }
+        
+        async function testServiceWorker() {
+            console.log('Testing Service Worker...');
+            try {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                if (regs.length === 0) {
+                    updateTest('sw', 'Not Registered', 'error', 'No service workers found. This is required.');
+                } else {
+                    const reg = regs[0];
+                    const details = `Scope: ${reg.scope}\nActive: ${reg.active ? 'Yes' : 'No'}\nController: ${navigator.serviceWorker.controller ? 'Yes' : 'No'}`;
+                    updateTest('sw', 'Registered', 'success', details);
+                }
+            } catch (err) {
+                updateTest('sw', 'Error', 'error', err.message);
+            }
+        }
+        
+        async function testManifest() {
+            console.log('Testing Manifest...');
+            try {
+                const basePath = window.APP_BASE_PATH || '/Final-IHM/';
+                const response = await fetch(basePath + 'manifest.json');
+                
+                if (!response.ok) {
+                    updateTest('manifest', `Failed (${response.status})`, 'error', `Could not load manifest: HTTP ${response.status}`);
+                    return;
+                }
+                
+                const manifest = await response.json();
+                const required = ['name', 'short_name', 'start_url', 'scope', 'display', 'icons'];
+                const missing = required.filter(f => !manifest[f]);
+                
+                if (missing.length > 0) {
+                    updateTest('manifest', `Invalid (Missing: ${missing.join(', ')})`, 'error', JSON.stringify(missing));
+                } else {
+                    const details = `Name: ${manifest.name}\nShort: ${manifest.short_name}\nIcons: ${manifest.icons.length}\nDisplay: ${manifest.display}`;
+                    updateTest('manifest', 'Valid', 'success', details);
+                }
+            } catch (err) {
+                updateTest('manifest', 'Error', 'error', err.message);
+            }
+        }
+        
+        async function testIcons() {
+            console.log('Testing Icons...');
+            const basePath = window.APP_BASE_PATH || '/Final-IHM/';
+            const icons = ['192x192.png', '512x512.png'];
+            let loadedCount = 0;
+            
+            const results = [];
+            
+            for (const icon of icons) {
+                const img = new Image();
+                const url = basePath + 'assets/images/healthflow-icon-' + icon;
+                
+                await new Promise((resolve) => {
+                    img.onload = () => {
+                        results.push(`✅ ${icon}`);
+                        loadedCount++;
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        results.push(`❌ ${icon}`);
+                        resolve();
+                    };
+                    img.src = url;
+                });
+            }
+            
+            if (loadedCount === icons.length) {
+                updateTest('icons', 'All Load', 'success', results.join('\n'));
+            } else {
+                updateTest('icons', `Partial (${loadedCount}/${icons.length})`, 'warning', results.join('\n'));
+            }
+        }
+        
+        function testHTTPS() {
+            console.log('Testing HTTPS...');
+            const protocol = window.location.protocol;
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            
+            if (protocol === 'https:') {
+                updateTest('https', 'Secure HTTPS', 'success', `Protocol: ${protocol}`);
+            } else if (isLocal) {
+                updateTest('https', 'Localhost (OK)', 'success', `Protocol: ${protocol}\nHost: ${window.location.hostname}`);
+            } else {
+                updateTest('https', 'Not HTTPS', 'error', `Protocol: ${protocol}\nRequired: HTTPS`);
+            }
+        }
+        
+        function testBrowser() {
+            console.log('Testing Browser...');
+            const ua = navigator.userAgent;
+            const isChrome = /Chrome/.test(ua) && /Google Inc/.test(navigator.vendor);
+            const isEdge = /Edg/.test(ua);
+            const isFirefox = /Firefox/.test(ua);
+            const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
+            
+            let browserName = 'Unknown';
+            let supported = false;
+            
+            if (isChrome) {
+                browserName = 'Chrome';
+                supported = true;
+            } else if (isEdge) {
+                browserName = 'Edge';
+                supported = true;
+            } else if (isFirefox) {
+                browserName = 'Firefox';
+                supported = true;
+            } else if (isSafari) {
+                browserName = 'Safari';
+                supported = false; // Limited support
+            }
+            
+            const icon = supported ? 'success' : 'warning';
+            const details = `Browser: ${browserName}\nSupported: ${supported ? 'Yes' : 'Limited'}\nUserAgent: ${ua.substring(0, 50)}...`;
+            
+            updateTest('browser', browserName, icon, details);
+        }
+        
+        function testInstallPrompt() {
+            console.log('Waiting for beforeinstallprompt event...');
+            updateTest('prompt', 'Listening (wait 3 sec)...', 'loading', 'Waiting for beforeinstallprompt event');
+            
+            let promptFired = false;
+            
+            const handler = (e) => {
+                promptFired = true;
+                updateTest('prompt', 'Event Fired!', 'success', 'beforeinstallprompt event received\nInstallation is available!');
+                window.removeEventListener('beforeinstallprompt', handler);
+            };
+            
+            window.addEventListener('beforeinstallprompt', handler);
+            
+            setTimeout(() => {
+                if (!promptFired) {
+                    updateTest('prompt', 'No Event', 'warning', 'beforeinstallprompt did not fire\nCheck Service Worker and Manifest');
+                    window.removeEventListener('beforeinstallprompt', handler);
+                }
+            }, 3000);
+        }
+        
+        async function runAllTests() {
+            console.clear();
+            consoleLogs.length = 0;
+            allTestsPassed = true;
+            
+            console.log('=== PWA INSTALLATION DIAGNOSTIC ===\n');
+            
+            testHTTPS();
+            testBrowser();
+            await testServiceWorker();
+            await testManifest();
+            await testIcons();
+            testInstallPrompt();
+            
+            setTimeout(() => {
+                showSummary();
+            }, 3500);
+        }
+        
+        function showSummary() {
+            const summary = document.getElementById('summary');
+            const swStatus = document.getElementById('sw-status').textContent;
+            const manifestStatus = document.getElementById('manifest-status').textContent;
+            const httpsStatus = document.getElementById('https-status').textContent;
+            
+            const swOK = swStatus.includes('Registered');
+            const manifestOK = manifestStatus.includes('Valid');
+            const httpsOK = httpsStatus.includes('Secure') || httpsStatus.includes('Localhost');
+            
+            let html = '';
+            
+            if (swOK && manifestOK && httpsOK) {
+                html = `
+                    <h3>✅ PWA Setup is Correct!</h3>
+                    <p>All requirements are met. Your PWA should install correctly.</p>
+                    <p><strong>Next steps:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Open site on Android Chrome</li>
+                        <li>Wait 2-3 seconds for modal to appear</li>
+                        <li>Click "Install Now"</li>
+                        <li>App should install</li>
+                    </ul>
+                `;
+            } else {
+                html = `
+                    <h3>❌ PWA Setup Issues Found</h3>
+                    <p><strong>Problems:</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        ${!swOK ? '<li>Service Worker not registered</li>' : ''}
+                        ${!manifestOK ? '<li>Manifest invalid or not found</li>' : ''}
+                        ${!httpsOK ? '<li>HTTPS not enabled (required)</li>' : ''}
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Fix these issues before testing installation.</strong></p>
+                `;
+                summary.classList.add('error-summary');
+            }
+            
+            summary.innerHTML = html;
+            summary.classList.add('show');
+        }
+        
+        function toggleConsole() {
+            document.getElementById('console').classList.toggle('show');
+        }
+        
+        // Run tests on load
+        window.addEventListener('load', () => {
+            console.log('Page loaded. Click "Run All Tests" to diagnose.');
+        });
+    </script>
+</body>
+</html>
