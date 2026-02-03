@@ -4,7 +4,8 @@ const IMAGE_CACHE = 'healthflow-images-v1';
 const API_CACHE = 'healthflow-api-v1';
 
 // Detect base path (GitHub Pages vs local)
-const BASE_PATH = self.registration.scope.includes('Final-IHM') ? '/Final-IHM/' : '/';
+// Use relative scope from manifest
+const BASE_PATH = './';
 
 // Core files to cache on install
 const STATIC_ASSETS = [

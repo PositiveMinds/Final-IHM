@@ -46,7 +46,7 @@ async function isAppInstalled() {
  * Create floating button HTML
  */
 function createFloatingButton() {
-  const basePath = window.APP_BASE_PATH || '/Final-IHM/';
+  const basePath = window.APP_BASE_PATH || './';
   const button = document.createElement('div');
   button.className = 'custom-install-button';
   button.id = 'custom-install-button';
@@ -278,7 +278,7 @@ async function handleInstallClick() {
       
       showNotification('HealthFlow Installed!', {
         body: 'You can now use HealthFlow offline.',
-        icon: (window.APP_BASE_PATH || '/Final-IHM/') + 'assets/images/healthflow-icon-192x192.png'
+        icon: (window.APP_BASE_PATH || './') + 'assets/images/healthflow-icon-192x192.png'
       });
       
       console.log('[Custom Install] ✅ HealthFlow installed successfully');
@@ -302,8 +302,8 @@ async function handleInstallClick() {
 function showNotification(title, options = {}) {
   if ('Notification' in window && Notification.permission === 'granted') {
     const defaultOptions = {
-      icon: (window.APP_BASE_PATH || '/Final-IHM/') + 'assets/images/favicon.png',
-      badge: (window.APP_BASE_PATH || '/Final-IHM/') + 'assets/images/favicon.png',
+      icon: (window.APP_BASE_PATH || './') + 'assets/images/favicon.png',
+      badge: (window.APP_BASE_PATH || './') + 'assets/images/favicon.png',
       ...options
     };
     
